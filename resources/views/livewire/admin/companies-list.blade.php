@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 new class extends Component {
     use WithPagination;
 
+    public string $filter = 'verified';
     public $editingCompanyId = null;
     public $maxTeamCount = 2;
 
@@ -37,10 +38,16 @@ new class extends Component {
 
     public function with(): array
     {
+        $query = Company::withCount(['users', 'teams']);
+
+        if ($this->filter === 'verified') {
+            $query->whereHas('users', function ($q) {
+                $q->whereNotNull('email_verified_at');
+            });
+        }
+
         return [
-            'companies' => Company::withCount(['users', 'teams'])
-                ->latest()
-                ->paginate(10),
+            'companies' => $query->latest()->paginate(10),
         ];
     }
 }; ?>
@@ -48,6 +55,12 @@ new class extends Component {
 <div>
     <div class="card bg-base-100 shadow-sm border-base-300 border-1">
         <div class="card-body">
+            <!-- Filter tabs -->
+            <div class="tabs tabs-boxed mb-4">
+                <a wire:click="$set('filter', 'all')" class="tab {{ $filter === 'all' ? 'tab-active' : '' }}">All Companies</a>
+                <a wire:click="$set('filter', 'verified')" class="tab {{ $filter === 'verified' ? 'tab-active' : '' }}">Verified</a>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="table table-zebra">
                     <thead>

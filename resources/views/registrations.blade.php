@@ -21,7 +21,8 @@
                                 <div>
                                     <p class="font-semibold text-lg">Team Composition</p>
                                     <p class="text-base-content/80">Every team must consist of <span class="font-bold text-primary">12 players</span>, made up of <span class="font-bold">9 male</span> players and <span class="font-bold">3 female</span> players.</p>
-                                    <p class="text-sm text-base-content/70 mt-1">On Field: 8 players | Reserve: 4 players</p>
+                                    <p class="text-sm text-base-content/70 mt-1">On Field: 6 male, 2 female players</p>
+                                    <p class="text-sm text-base-content/70">Reserve: 3 male, 1 female players</p>
                                 </div>
                             </div>
 

@@ -111,6 +111,11 @@ new class extends Component {
         // Get user
         $user = User::find($this->userId);
 
+        // Mark email as verified if not already verified
+        if (is_null($user->email_verified_at)) {
+            $user->update(['email_verified_at' => now()]);
+        }
+
         // Generate JWT token
         $jwtService = new JWTService();
         $token = $jwtService->generateToken($user);

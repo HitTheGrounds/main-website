@@ -7,7 +7,7 @@ use Livewire\WithPagination;
 new class extends Component {
     use WithPagination;
 
-    public string $filter = 'all';
+    public string $filter = 'verified';
 
     public function promoteToAdmin(int $userId): void
     {
@@ -40,8 +40,8 @@ new class extends Component {
             $query->where('is_admin', true);
         } elseif ($this->filter === 'company') {
             $query->whereNotNull('company_id');
-        } elseif ($this->filter === 'no_company') {
-            $query->whereNull('company_id');
+        } elseif ($this->filter === 'verified') {
+            $query->whereNotNull('email_verified_at');
         }
 
         return [
@@ -56,9 +56,9 @@ new class extends Component {
             <!-- Filter tabs -->
             <div class="tabs tabs-boxed mb-4">
                 <a wire:click="$set('filter', 'all')" class="tab {{ $filter === 'all' ? 'tab-active' : '' }}">All Users</a>
+                <a wire:click="$set('filter', 'verified')" class="tab {{ $filter === 'verified' ? 'tab-active' : '' }}">Verified</a>
                 <a wire:click="$set('filter', 'admins')" class="tab {{ $filter === 'admins' ? 'tab-active' : '' }}">Admins</a>
                 <a wire:click="$set('filter', 'company')" class="tab {{ $filter === 'company' ? 'tab-active' : '' }}">With Company</a>
-                <a wire:click="$set('filter', 'no_company')" class="tab {{ $filter === 'no_company' ? 'tab-active' : '' }}">No Company</a>
             </div>
 
             <div class="overflow-x-auto">

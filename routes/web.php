@@ -69,6 +69,9 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
         return view('admin.teams.index');
     })->name('admin.teams');
 
+    Route::get('/admin/teams/export', [App\Http\Controllers\Admin\TeamExportController::class, 'export'])
+        ->name('admin.teams.export');
+
     Route::get('/admin/teams/{team}', function (App\Models\Team $team) {
         return view('admin.teams.show', ['team' => $team]);
     })->name('admin.teams.show');

@@ -17,6 +17,14 @@ new class extends Component {
         $this->dispatch('team-approved');
     }
 
+    public function toggleLock(int $teamId): void
+    {
+        $team = Team::findOrFail($teamId);
+        $team->update(['locked' => !$team->locked]);
+
+        $this->dispatch('team-lock-toggled');
+    }
+
     public function with(): array
     {
         $query = Team::with(['company', 'user', 'members']);
@@ -81,15 +89,24 @@ new class extends Component {
                                     </div>
                                 </td>
                                 <td>
-                                    @if(!$team->approved)
+                                    <div class="flex gap-2">
+                                        @if(!$team->approved)
+                                            <button
+                                                wire:click="approveTeam({{ $team->id }})"
+                                                wire:confirm="Are you sure you want to approve this team?"
+                                                class="btn btn-success btn-xs"
+                                            >
+                                                Approve
+                                            </button>
+                                        @endif
                                         <button
-                                            wire:click="approveTeam({{ $team->id }})"
-                                            wire:confirm="Are you sure you want to approve this team?"
-                                            class="btn btn-success btn-xs"
+                                            wire:click="toggleLock({{ $team->id }})"
+                                            wire:confirm="Are you sure you want to {{ $team->locked ? 'unlock' : 'lock' }} this team?"
+                                            class="btn {{ $team->locked ? 'btn-warning' : 'btn-error' }} btn-xs"
                                         >
-                                            Approve
+                                            {{ $team->locked ? 'Unlock' : 'Lock' }}
                                         </button>
-                                    @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty

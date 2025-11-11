@@ -32,6 +32,10 @@ Route::get('/registrations', function () {
     return view('registrations');
 })->name('registrations');
 
+Route::get('/rules', function () {
+    return view('rules');
+})->name('rules');
+
 Route::get('/teams/university', function () {
     return view('teams-university');
 })->name('teams.university');

@@ -20,9 +20,23 @@ new class extends Component {
 
     public bool $showVerification = false;
     public ?int $userId = null;
+    public bool $showClosedModal = false;
+
+    public function mount(): void
+    {
+        if (!config('registration.enabled')) {
+            $this->showClosedModal = true;
+        }
+    }
 
     public function register(): void
     {
+        if (!config('registration.enabled')) {
+            throw ValidationException::withMessages([
+                'contact_email' => 'Registrations are currently closed.',
+            ]);
+        }
+
         $validated = $this->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person_name' => ['required', 'string', 'max:255'],
@@ -155,6 +169,22 @@ new class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
+    {{-- Registration Closed Modal --}}
+    <x-mary-modal wire:model="showClosedModal" title="Registrations Closed" class="backdrop-blur">
+        <div class="flex flex-col items-center gap-4 py-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-center text-base-content">
+                Company registrations are currently closed. Please check back later.
+            </p>
+        </div>
+
+        <x-slot:actions>
+            <x-mary-button label="Go to Login" link="{{ route('login') }}" class="btn-primary" />
+        </x-slot:actions>
+    </x-mary-modal>
+
     @if (!$showVerification)
         <form wire:submit="register" class="flex flex-col gap-6" id="company-registration-form">
             <x-mary-input

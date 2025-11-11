@@ -161,16 +161,16 @@
                                     <p class="font-semibold text-lg mb-3">No-Ball Rules</p>
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div class="flex items-start gap-2">
-                                            <div class="w-12 h-12 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                                <img src="/images/rulebook_illustrations/no_ball_height.avif" alt="Height No-Ball" class="w-10 h-10">
+                                            <div class="w-16 h-16 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                <img src="/images/rulebook_illustrations/no_ball_height.avif" alt="Height No-Ball" class="w-16 h-16">
                                             </div>
                                             <div class="text-sm text-base-content/80">
                                                 <span class="font-semibold">Over-height no-balls</span> judged at chest height. Bouncers are no-balls.
                                             </div>
                                         </div>
                                         <div class="flex items-start gap-2">
-                                            <div class="w-12 h-12 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                                <img src="/images/rulebook_illustrations/no_ball_foot.avif" alt="Foot No-Ball" class="w-10 h-10">
+                                            <div class="w-16 h-16 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                                <img src="/images/rulebook_illustrations/no_ball_foot.avif" alt="Foot No-Ball" class="w-16 h-16">
                                             </div>
                                             <div class="text-sm text-base-content/80">
                                                 <span class="font-semibold">Front-foot no-ball</span> called if foot lands beyond popping crease.

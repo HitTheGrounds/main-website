@@ -221,7 +221,7 @@
                 </svg>
                 <h3 class="font-bold text-2xl">Registrations Closed</h3>
                 <p class="text-center text-base-content/80">
-                    Company registrations are currently closed. Please check back later for future registration opportunities.
+                    Company registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route("committee") }}">Contact Us</a>.
                 </p>
             </div>
             <div class="modal-action">

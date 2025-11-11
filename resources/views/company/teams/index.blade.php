@@ -11,12 +11,21 @@
                 <p class="mt-2 text-base-content/70">Manage your tournament teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</p>
             </div>
             @if($user->teams->count() < $maxTeamCount)
-                <a href="{{ route('company.teams.create') }}" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    Add New Team
-                </a>
+                @if(config('registration.team_enabled'))
+                    <a href="{{ route('company.teams.create') }}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Add New Team
+                    </a>
+                @else
+                    <button onclick="team_creation_closed_modal.showModal()" class="btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Team Registration Closed
+                    </button>
+                @endif
             @endif
         </div>
 
@@ -65,15 +74,47 @@
                     <p class="text-base-content/70 mt-2">Create your first team to participate in the tournament</p>
                     <p class="text-sm text-base-content/50 mt-1">You can register up to {{ $maxTeamCount }} teams</p>
                     <div class="mt-6">
-                        <a href="{{ route('company.teams.create') }}" class="btn btn-primary">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                            Create First Team
-                        </a>
+                        @if(config('registration.team_enabled'))
+                            <a href="{{ route('company.teams.create') }}" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Create First Team
+                            </a>
+                        @else
+                            <button onclick="team_creation_closed_modal.showModal()" class="btn btn-disabled">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                Team Registration Closed
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
         @endif
     </div>
+
+    <!-- Team Creation Closed Modal -->
+    <dialog id="team_creation_closed_modal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <div class="flex flex-col items-center gap-4 py-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3 class="font-bold text-2xl">Team Registration Closed</h3>
+                <p class="text-center text-base-content/80">
+                    New team registrations are currently closed. You can still manage your existing teams, but cannot create new ones at this time.
+                </p>
+            </div>
+            <div class="modal-action">
+                <form method="dialog" class="w-full">
+                    <button class="btn btn-primary w-full">Close</button>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 </x-layouts.company>

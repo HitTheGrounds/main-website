@@ -18,6 +18,12 @@ new class extends Component {
             return;
         }
 
+        // Check if team registrations are enabled
+        if (!config('registration.team_enabled')) {
+            $this->addError('team_name', 'Team registrations are currently closed.');
+            return;
+        }
+
         // Check team limit based on company's max_team_count
         $company = $user->company;
         $currentTeamCount = $user->teams()->count();

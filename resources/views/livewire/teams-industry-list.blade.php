@@ -2,11 +2,8 @@
 
 use App\Models\Team;
 use Livewire\Volt\Component;
-use Livewire\WithPagination;
 
 new class extends Component {
-    use WithPagination;
-
     public string $search = '';
 
     public function with(): array
@@ -16,7 +13,7 @@ new class extends Component {
             ->whereHas('company');
 
         return [
-            'teams' => $query->latest()->paginate(12),
+            'teams' => $query->latest()->get(),
         ];
     }
 }; ?>
@@ -44,14 +41,15 @@ new class extends Component {
                         <div class="flex justify-center mb-4">
                             @if($team->company->logo)
                                 <div class="avatar">
-                                    <div class="w-32 h-32 rounded-lg transition-all p-4 group-hover:p-3">
+                                    <div class="w-32 h-32 rounded-lg transition-all">
                                         <img src="{{ Storage::url($team->company->logo) }}"
-                                             alt="{{ $team->company->name }}" />
+                                             alt="{{ $team->company->name }}"
+                                             class="w-full h-full object-contain" />
                                     </div>
                                 </div>
                             @else
                                 <div class="avatar placeholder">
-                                    <div class="w-32 h-32 rounded-lg transition-all p-4 group-hover:p-3">
+                                    <div class="w-32 h-32 rounded-lg transition-all">
                                     <x-mary-icon name="o-building-office-2" class="w-full h-full text-primary/50" />
                                     </div>
                                 </div>
@@ -86,11 +84,5 @@ new class extends Component {
             @endforelse
         </div>
 
-        <!-- Pagination -->
-        @if($teams->hasPages())
-            <div class="mt-8 flex justify-center">
-                {{ $teams->links() }}
-            </div>
-        @endif
     </div>
 </div>

@@ -31,7 +31,7 @@ new class extends Component {
                     <div class="avatar">
                         <div class="w-24 h-24 rounded-lg">
                             @if($company->logo)
-                                <img src="{{ Storage::url($company->logo) }}" alt="{{ $company->name }}" class="object-cover" />
+                                <img src="{{ Storage::url($company->logo) }}" alt="{{ $company->name }}" class="w-full h-full object-contain" />
                             @else
                                 <div class="w-full h-full bg-base-300 flex items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-base-content/30">
@@ -47,11 +47,11 @@ new class extends Component {
                     </div>
                 </div>
 
-                <!-- Divider -->
-                <div class="divider"></div>
-
                 <!-- Description -->
                 @if($company->description)
+                    <!-- Divider -->
+                    <div class="divider"></div>
+
                     <div class="prose max-w-none mb-6">
                         <div id="mainarticle" class="markdown-content text-base-content/70">
                             {!! \Illuminate\Support\Str::markdown($company->description, ['html_input' => 'strip', 'allow_unsafe_links' => false]) !!}

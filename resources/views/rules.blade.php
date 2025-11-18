@@ -39,7 +39,7 @@
                                 <div>
                                     <p class="font-semibold text-lg">Team Size</p>
                                     <p class="text-base-content/80">Every team must have a squad of <span class="font-bold text-primary">12 players</span> (9 male, 3 female). The playing team will consist of <span class="font-bold text-primary">8 players</span>.</p>
-                                    <p class="text-sm text-base-content/70 mt-1">11 players can be chosen for one match, where any 8 can be active on the field at a time. Out of the 8 active players in any innings, at least 2 must be women.</p>
+                                    <p class="text-sm text-base-content/70 mt-1">11 players can be chosen for one match, where any 8 can be active on the field at a time. Out of the 8 active players in any innings, at least 2 must be female.</p>
                                 </div>
                             </div>
 
@@ -306,15 +306,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <div>
-                                    <p class="font-semibold text-lg">Bowling Allowance</p>
-                                    <p class="text-base-content/80">In the finals, <span class="font-bold text-primary">one bowler will be allowed to bowl two overs</span> per innings.</p>
-                                </div>
-                            </div>
+                            
 
                             <div class="flex items-start gap-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary flex-shrink-0 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -413,7 +405,7 @@
                 <div class="card bg-base-200 shadow-sm">
                     <div class="card-body">
                         <h2 class="card-title text-2xl mb-4 font-title">Questions?</h2>
-                        <p class="text-base-content/80">If you have any questions about the rules and regulations, please contact the organizing committee.</p>
+                        <p class="text-base-content/80">If you have any questions about the rules and regulations, please contact the <a href="{{ route('committee') }}" class="text-primary hover:underline font-semibold">organizing committee</a>.</p>
                         <p class="text-sm text-base-content/60 mt-2">Organized by the Department of Computer Science & Engineering, University of Moratuwa</p>
                     </div>
                 </div>

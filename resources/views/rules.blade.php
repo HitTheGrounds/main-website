@@ -413,7 +413,7 @@
                 <div class="card bg-base-200 shadow-sm">
                     <div class="card-body">
                         <h2 class="card-title text-2xl mb-4 font-title">Questions?</h2>
-                        <p class="text-base-content/80">If you have any questions about the rules and regulations, please contact the organizing committee.</p>
+                        <p class="text-base-content/80">If you have any questions about the rules and regulations, please contact the <a href="{{ route('committee') }}" class="text-primary hover:underline font-semibold">organizing committee</a>.</p>
                         <p class="text-sm text-base-content/60 mt-2">Organized by the Department of Computer Science & Engineering, University of Moratuwa</p>
                     </div>
                 </div>

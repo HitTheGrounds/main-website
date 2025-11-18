@@ -39,7 +39,7 @@
                                 <div>
                                     <p class="font-semibold text-lg">Team Size</p>
                                     <p class="text-base-content/80">Every team must have a squad of <span class="font-bold text-primary">12 players</span> (9 male, 3 female). The playing team will consist of <span class="font-bold text-primary">8 players</span>.</p>
-                                    <p class="text-sm text-base-content/70 mt-1">11 players can be chosen for one match, where any 8 can be active on the field at a time. Out of the 8 active players in any innings, at least 2 must be women.</p>
+                                    <p class="text-sm text-base-content/70 mt-1">11 players can be chosen for one match, where any 8 can be active on the field at a time. Out of the 8 active players in any innings, at least 2 must be female.</p>
                                 </div>
                             </div>
 

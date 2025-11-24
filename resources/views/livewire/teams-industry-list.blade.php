@@ -9,7 +9,7 @@ new class extends Component {
     public function with(): array
     {
         $query = Team::with(['company', 'members'])
-            //->where('approved', true)
+            ->where('approved', true)
             ->whereHas('company');
 
         return [
@@ -33,9 +33,9 @@ new class extends Component {
         <!-- Teams Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" data-aos="fade-up" data-aos-delay="200">
             @forelse($teams as $team)
-                <a href="{{ route('company.public-profile', $team->company) }}"
+                <a href="{{-- route('company.public-profile', $team->company) --}}"
                    wire:navigate
-                   class="card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer group">
+                   class="card bg-base-200 shadow-sm hover:shadow-md transition-shadow duration-300 cursor-default group">
                     <div class="card-body p-6">
                         <!-- Company Logo -->
                         <div class="flex justify-center mb-4">

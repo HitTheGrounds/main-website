@@ -20,11 +20,11 @@
           tabindex="0"
           class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow border border-base-300">
           <li><a href="/" class="{{ request()->routeIs('home') ? 'active text-primary' : 'text-base-content' }}">Home</a></li>
-          <li><a href="{{ route('registrations') }}" class="{{ request()->routeIs('registrations') ? 'active text-primary' : 'text-base-content' }}">Registrations</a></li>
+          {{-- <li><a href="{{ route('registrations') }}" class="{{ request()->routeIs('registrations') ? 'active text-primary' : 'text-base-content' }}">Registrations</a></li> --}}
           <li><a href="{{ route('rules') }}" class="{{ request()->routeIs('rules') ? 'active text-primary' : 'text-base-content' }}">Rules</a></li>
           <li><a href="{{ route('timeline') }}" class="{{ request()->routeIs('timeline') ? 'active text-primary' : 'text-base-content' }}">Timeline</a></li>
           <li><a href="{{ route('awards') }}" class="{{ request()->routeIs('awards') ? 'active text-primary' : 'text-base-content' }}">Awards</a></li>
-          {{-- <li><a href="{{ route('partners') }}" class="{{ request()->routeIs('partners') ? 'active text-primary' : 'text-base-content' }}">Partners</a></li> --}}
+          <li><a href="{{ route('partners') }}" class="{{ request()->routeIs('partners') ? 'active text-primary' : 'text-base-content' }}">Partners</a></li>
           <li><a href="{{ route('gallery') }}" class="{{ request()->routeIs('gallery') ? 'active text-primary' : 'text-base-content' }}">Gallery</a></li>
           <li><a href="{{ route('committee') }}" class="{{ request()->routeIs('committee') ? 'active text-primary' : 'text-base-content' }}">Committee</a></li>
         </ul>
@@ -42,11 +42,11 @@
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1 gap-2 xl:gap-4">
         <li><a href="/" class="{{ request()->routeIs('home') ? 'active text-primary' : 'text-base-content' }}">Home</a></li>
-          <li><a href="{{ route("registrations") }}" class="{{ request()->routeIs('registrations') ? 'active text-primary' : 'text-base-content' }}">Registrations</a></li>
+          {{-- <li><a href="{{ route("registrations") }}" class="{{ request()->routeIs('registrations') ? 'active text-primary' : 'text-base-content' }}">Registrations</a></li> --}}
           <li><a href="{{ route("rules") }}" class="{{ request()->routeIs('rules') ? 'active text-primary' : 'text-base-content' }}">Rules</a></li>
           <li><a href="{{ route("timeline") }}" class="{{ request()->routeIs('timeline') ? 'active text-primary' : 'text-base-content' }}">Timeline</a></li>
           <li><a href="{{ route("awards") }}" class="{{ request()->routeIs('awards') ? 'active text-primary' : 'text-base-content' }}">Awards</a></li>
-          {{-- <li><a href="{{ route("partners") }}" class="{{ request()->routeIs('partners') ? 'active text-primary' : 'text-base-content' }}">Partners</a></li> --}}
+          <li><a href="{{ route("partners") }}" class="{{ request()->routeIs('partners') ? 'active text-primary' : 'text-base-content' }}">Partners</a></li>
           <li><a href="{{ route("gallery") }}" class="{{ request()->routeIs('gallery') ? 'active text-primary' : 'text-base-content' }}">Gallery</a></li>
           <li><a href="{{ route("committee") }}" class="{{ request()->routeIs('committee') ? 'active text-primary' : 'text-base-content' }}">Committee</a></li>
       </ul>

@@ -36,6 +36,10 @@ Route::get('/rules', function () {
     return view('rules');
 })->name('rules');
 
+Route::get('/teams/industry', function () {
+    return view('teams-industry');
+})->name('teams.industry');
+
 Route::middleware('guest.company')->group(function () {
     Route::get('/register', function () {
         return view('register');
@@ -79,10 +83,6 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
     Route::get('/teams/university', function () {
         return view('teams-university');
     })->name('teams.university');
-
-    Route::get('/teams/industry', function () {
-        return view('teams-industry');
-    })->name('teams.industry');
 
     Route::get('/company/{company}/profile', function (App\Models\Company $company) {
         return view('company-profile', ['company' => $company]);

@@ -36,8 +36,8 @@
                   <x-mary-icon name="s-rocket-launch" class="w-8 h-8" />
                 </div>
                 <h3 class="text-xl font-title text-base-content mb-2">Preparation Time</h3>
-                <p class="text-warning text-3xl font-title">16 Days</p>
-                <p class="text-base-content/70 text-sm mt-2">Nov 13 - Nov 29, 2025</p>
+                <p class="text-warning text-3xl font-title">73 Days</p>
+                <p class="text-base-content/70 text-sm mt-2">Nov 13, 2025 - Jan 24, 2026</p>
               </div>
             </div>
 

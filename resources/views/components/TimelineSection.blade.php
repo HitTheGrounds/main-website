@@ -78,7 +78,7 @@
               </div>
             </div>
             <div class="timeline-end md:ml-8" data-aos="fade-left" data-aos-duration="2000">
-              <time class="font-title text-xl text-error">November 29th, 2025</time>
+              <time class="font-title text-xl text-error">January 24th, 2026</time>
               <div class="text-2xl md:text-3xl font-title text-error mt-2">Event Day</div>
               <p class="text-base-content/80 text-base md:text-lg mt-2 font-semibold">
                 The big day - Let the games begin! 🏏

@@ -197,15 +197,15 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 9.5 Write `tests/Feature/PublicBracketViewTest.php`: verify bracket accurately displays upcoming pairings, live matches with badges, finished winners with scores, and correct SF/Final connections
   - [x] 9.6 Run `php artisan test` and verify all tests pass
 
-- [ ] 10.0 Match Editing & Cascade Recalculation — Build match edit modal with bidirectional status transitions and automatic standings/NRR recalculation
-  - [ ] 10.1 Build `resources/views/livewire/scorer/match-edit-modal.blade.php` as a Livewire component: pre-fill all match data (teams, scores, status, bracket position), include bidirectional status selector (Upcoming ⇄ Live ⇄ Finished), include all score fields when editing a finished match, include confirmation modal before saving changes
-  - [ ] 10.2 Implement optimistic locking: check `updated_at` timestamp on save — if the match was modified by another scorer since the modal was opened, show a conflict warning and require the editor to reload before saving
-  - [ ] 10.3 Implement cascade recalculation on group match edit: when a finished group match's scores, winner, or is_draw are changed, call `TournamentStandingsService::recalculateForGroup()` to recompute all stats from scratch
-  - [ ] 10.4 Implement cascade recalculation on status revert: when a finished match is moved backward to `live` or `upcoming`, null out score fields (or keep them for recovery — design decision), call `TournamentStandingsService::recalculateForGroup()` to remove the match's contributions from standings
-  - [ ] 10.5 Implement knockout match edit safety: if editing a QF match's winner and the old winner already has an SF match entry, show a warning that the SF match references this winner and may become invalid
-  - [ ] 10.6 Write `tests/Feature/MatchEditCascadeTest.php`: verify editing a finished group match's score or winner immediately recalculates team stats, standings, and NRR for both teams involved
-  - [ ] 10.7 Write `tests/Feature/MatchStatusRevertCascadeTest.php`: verify reverting a finished match to live or upcoming recalculates standings and removes its points/NRR contribution
-  - [ ] 10.8 Run `php artisan test` and verify all tests pass
+- [x] 10.0 Match Editing & Cascade Recalculation — Build match edit modal with bidirectional status transitions and automatic standings/NRR recalculation
+  - [x] 10.1 Build `resources/views/livewire/scorer/match-edit-modal.blade.php` as a Livewire component: pre-fill all match data (teams, scores, status, bracket position), include bidirectional status selector (Upcoming ⇄ Live ⇄ Finished), include all score fields when editing a finished match, include confirmation modal before saving changes
+  - [x] 10.2 Implement optimistic locking: check `updated_at` timestamp on save — if the match was modified by another scorer since the modal was opened, show a conflict warning and require the editor to reload before saving
+  - [x] 10.3 Implement cascade recalculation on group match edit: when a finished group match's scores, winner, or is_draw are changed, call `TournamentStandingsService::recalculateForGroup()` to recompute all stats from scratch
+  - [x] 10.4 Implement cascade recalculation on status revert: when a finished match is moved backward to `live` or `upcoming`, null out score fields (or keep them for recovery — design decision), call `TournamentStandingsService::recalculateForGroup()` to remove the match's contributions from standings
+  - [x] 10.5 Implement knockout match edit safety: if editing a QF match's winner and the old winner already has an SF match entry, show a warning that the SF match references this winner and may become invalid
+  - [x] 10.6 Write `tests/Feature/MatchEditCascadeTest.php`: verify editing a finished group match's score or winner immediately recalculates team stats, standings, and NRR for both teams involved
+  - [x] 10.7 Write `tests/Feature/MatchStatusRevertCascadeTest.php`: verify reverting a finished match to live or upcoming recalculates standings and removes its points/NRR contribution
+  - [x] 10.8 Run `php artisan test` and verify all tests pass
 
 - [ ] 11.0 UI Polish, Responsive Optimization & Full Test Suite — Responsive layouts, loading indicators, edge case handling, and complete test suite verification
   - [ ] 11.1 Review and optimize all scorer dashboard views for mobile, tablet, and desktop responsive breakpoints

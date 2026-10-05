@@ -44,13 +44,18 @@ new class extends Component {
         $this->updateAvailableTeams();
     }
 
-    #[On('open-match-edit')]
+    public $original_updated_at = null;
+    public bool $sfConflictWarning = false;
+    
     public function loadMatch(int $matchId)
     {
         $match = TournamentMatch::find($matchId);
         if (!$match) return;
 
         $this->editingMatchId = $match->id;
+        $this->original_updated_at = $match->updated_at?->timestamp;
+        $this->sfConflictWarning = false;
+        
         $this->stage = $match->stage;
         $this->group_id = $match->group_id;
         $this->bracket_position = $match->bracket_position;
@@ -107,6 +112,7 @@ new class extends Component {
         $this->bracket_position = $this->stage === 'F' ? 1 : null;
         $this->team1_id = null;
         $this->team2_id = null;
+        $this->sfConflictWarning = false;
         $this->updateAvailableTeams();
     }
 
@@ -115,6 +121,11 @@ new class extends Component {
         $this->team1_id = null;
         $this->team2_id = null;
         $this->updateAvailableTeams();
+    }
+    
+    public function updatedOutcome()
+    {
+        $this->sfConflictWarning = false; // Reset warning if they change the outcome again
     }
 
     public function updateAvailableTeams()
@@ -219,6 +230,29 @@ new class extends Component {
             $this->addError('team2_id', 'These teams have already been paired in this stage.');
             return false;
         }
+        
+        // 10.5 Knockout edit safety
+        if ($this->editingMatchId && in_array($this->stage, ['QF', 'SF'])) {
+            $oldMatch = TournamentMatch::find($this->editingMatchId);
+            $newWinnerId = null;
+            if ($this->status === 'finished') {
+                $newWinnerId = $this->outcome === 'team1' ? $this->team1_id : ($this->outcome === 'team2' ? $this->team2_id : null);
+            }
+            
+            if ($oldMatch->status === 'finished' && $oldMatch->winner_id && $oldMatch->winner_id !== $newWinnerId) {
+                $nextStage = $this->stage === 'QF' ? 'SF' : 'F';
+                $hasSubsequent = TournamentMatch::where('stage', $nextStage)
+                    ->where(function($q) use ($oldMatch) {
+                        $q->where('team1_id', $oldMatch->winner_id)->orWhere('team2_id', $oldMatch->winner_id);
+                    })->exists();
+                    
+                if ($hasSubsequent && !$this->sfConflictWarning) {
+                    $this->addError('conflict', "Warning: Changing or removing the winner will invalidate the scheduled {$nextStage} match for the old winner. Click Save again to proceed anyway.");
+                    $this->sfConflictWarning = true;
+                    return false;
+                }
+            }
+        }
 
         return true;
     }
@@ -290,6 +324,15 @@ new class extends Component {
 
         if ($this->editingMatchId) {
             $match = TournamentMatch::find($this->editingMatchId);
+            
+            // 10.2 Optimistic Locking Check
+            if ($match->updated_at?->timestamp !== $this->original_updated_at) {
+                $this->addError('conflict', 'This match was modified by another scorer. Please close and reopen the edit modal to see their changes.');
+                $this->showConfirm = false;
+                $this->show = true;
+                return;
+            }
+            
             $oldStatus = $match->status;
             $match->update($data);
             
@@ -342,6 +385,15 @@ new class extends Component {
     
     <x-mary-modal wire:model="show" title="{{ $editingMatchId ? 'Edit Match' : 'Create / Schedule Match' }}" class="backdrop-blur" box-class="w-11/12 max-w-4xl" @keydown.escape.window="$wire.resetForm()">
         <form wire:submit.prevent="openConfirm" class="flex flex-col gap-6">
+            @error('conflict')
+                <div class="alert alert-warning shadow-sm">
+                    <x-mary-icon name="o-exclamation-triangle" class="w-6 h-6 shrink-0" />
+                    <div>
+                        <h3 class="font-bold">Attention Needed</h3>
+                        <div class="text-sm">{{ $message }}</div>
+                    </div>
+                </div>
+            @enderror
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <x-mary-select wire:model.live="stage" label="Stage" :options="[

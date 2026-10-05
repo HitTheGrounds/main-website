@@ -189,13 +189,13 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 8.8 Write `tests/Feature/KnockoutMatchEntryTest.php`: test scheduling QF/SF/Final as upcoming and live, verify QF and SF finished matches reject draws, Final allows balls 0-5, bracket position assignments are validated per stage, slot locking prevents rearrangement after SF creation
   - [x] 8.9 Run `php artisan test` and verify all tests pass
 
-- [ ] 9.0 Public Bracket — Dynamic Tournament Bracket Tree — Build the interactive visual tournament bracket with dynamic node states for upcoming, live, and finished matches
-  - [ ] 9.1 Add public bracket route in `routes/web.php`: `GET /bracket` (no auth required) or integrate into the existing `/scoreboard` page as a tab/section
-  - [ ] 9.2 Build `resources/views/livewire/public/tournament-bracket.blade.php` as a Livewire component: render a visual bracket tree (QF → SF → Final) using CSS/HTML, two halves (Top: slots 1+2 → SF1, Bottom: slots 3+4 → SF2) feeding into the Final
-  - [ ] 9.3 Implement dynamic node states: Upcoming nodes show team names with an "Upcoming" pill, Live nodes show teams with a pulsing animated "LIVE" badge, Finished nodes show scores/wickets and highlight the advancing winner in vibrant green
-  - [ ] 9.4 Make the bracket mobile-responsive: horizontal scroll on small screens or collapsible stage view
-  - [ ] 9.5 Write `tests/Feature/PublicBracketViewTest.php`: verify bracket accurately displays upcoming pairings, live matches with badges, finished winners with scores, and correct SF/Final connections
-  - [ ] 9.6 Run `php artisan test` and verify all tests pass
+- [x] 9.0 Public Bracket — Dynamic Tournament Bracket Tree — Build the interactive visual tournament bracket with dynamic node states for upcoming, live, and finished matches
+  - [x] 9.1 Add public bracket route in `routes/web.php`: `GET /bracket` (no auth required) or integrate into the existing `/scoreboard` page as a tab/section
+  - [x] 9.2 Build `resources/views/livewire/public/tournament-bracket.blade.php` as a Livewire component: render a visual bracket tree (QF → SF → Final) using CSS/HTML, two halves (Top: slots 1+2 → SF1, Bottom: slots 3+4 → SF2) feeding into the Final
+  - [x] 9.3 Implement dynamic node states: Upcoming nodes show team names with an "Upcoming" pill, Live nodes show teams with a pulsing animated "LIVE" badge, Finished nodes show scores/wickets and highlight the advancing winner in vibrant green
+  - [x] 9.4 Make the bracket mobile-responsive: horizontal scroll on small screens or collapsible stage view
+  - [x] 9.5 Write `tests/Feature/PublicBracketViewTest.php`: verify bracket accurately displays upcoming pairings, live matches with badges, finished winners with scores, and correct SF/Final connections
+  - [x] 9.6 Run `php artisan test` and verify all tests pass
 
 - [ ] 10.0 Match Editing & Cascade Recalculation — Build match edit modal with bidirectional status transitions and automatic standings/NRR recalculation
   - [ ] 10.1 Build `resources/views/livewire/scorer/match-edit-modal.blade.php` as a Livewire component: pre-fill all match data (teams, scores, status, bracket position), include bidirectional status selector (Upcoming ⇄ Live ⇄ Finished), include all score fields when editing a finished match, include confirmation modal before saving changes

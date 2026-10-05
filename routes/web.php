@@ -132,6 +132,12 @@ Route::middleware(['auth.company', 'company'])->group(function () {
     })->name('company.logout');
 });
 
+Route::middleware(['auth.company', 'scorer'])->group(function () {
+    Route::get('/scorer/dashboard', function () {
+        return view('scorer.dashboard');
+    })->name('scorer.dashboard');
+});
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

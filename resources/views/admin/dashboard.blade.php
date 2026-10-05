@@ -49,7 +49,7 @@
                         <div>
                             <h2 class="card-title text-lg">Users</h2>
                             <p class="text-3xl font-bold mt-2">{{ App\Models\User::whereNotNull('email_verified_at')->count() }}</p>
-                            <p class="text-sm text-success mt-1">Verified users <span class="text-warning"> (incl. {{ App\Models\User::where('is_admin', true)->count() }} admins)</span></p>
+                            <p class="text-sm text-success mt-1">Verified users <span class="text-warning"> ({{ App\Models\User::where('role', 'admin')->count() }} admins, {{ App\Models\User::where('role', 'scorer')->count() }} scorers)</span></p>
                         </div>
                         <div class="p-3 bg-accent/10 rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-accent">

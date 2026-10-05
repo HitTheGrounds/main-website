@@ -10,7 +10,7 @@ new class extends Component {
     {
         $user = request()->attributes->get('user');
 
-        if (!$user || !$user->is_admin) {
+        if (!$user || !$user->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 

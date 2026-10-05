@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\VerificationCode;
 use App\Notifications\VerificationCodeNotification;
 use App\Services\JWTService;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -55,21 +56,21 @@ new class extends Component {
             'email' => $validated['email'],
         ]);
 
-        // Explicitly set company_id and is_admin using update to bypass fillable restriction
+        // Explicitly set company_id and role using update to bypass fillable restriction
         $user->update([
             'company_id' => null,
-            'is_admin' => false,
+            'role'       => 'admin',
         ]);
 
         $this->userId = $user->id;
 
-        // Generate 6-digit verification code
+        // Generate 6-digit verification code (plain-text sent to user, hash stored in DB)
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Store verification code
+        // Store hashed verification code — never store the plain-text OTP
         VerificationCode::create([
-            'user_id' => $user->id,
-            'code' => $code,
+            'user_id'    => $user->id,
+            'code'       => Hash::make($code),
             'expires_at' => now()->addMinutes(15),
         ]);
 
@@ -101,11 +102,13 @@ new class extends Component {
             'verification_code' => ['required', 'string', 'size:6'],
         ]);
 
+        // Fetch valid (unused, unexpired) codes for this user and check via Hash::check
+        // This is necessary because bcrypt hashes cannot be queried directly
         $verificationCode = VerificationCode::where('user_id', $this->userId)
-            ->where('code', $this->verification_code)
             ->where('is_used', false)
             ->where('expires_at', '>', now())
-            ->first();
+            ->get()
+            ->first(fn ($record) => Hash::check($this->verification_code, $record->code));
 
         if (!$verificationCode) {
             $this->addError('verification_code', 'Invalid or expired verification code.');

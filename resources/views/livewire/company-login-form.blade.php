@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\VerificationCode;
 use App\Notifications\VerificationCodeNotification;
 use App\Services\JWTService;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
@@ -45,13 +46,13 @@ new class extends Component {
         RateLimiter::hit($key, 300); // 5 minutes
         $this->userId = $user->id;
 
-        // Generate 6-digit verification code
+        // Generate 6-digit verification code (plain-text sent to user, hash stored in DB)
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        // Store verification code
+        // Store hashed verification code — never store the plain-text OTP
         VerificationCode::create([
-            'user_id' => $user->id,
-            'code' => $code,
+            'user_id'    => $user->id,
+            'code'       => Hash::make($code),
             'expires_at' => now()->addMinutes(15),
         ]);
 
@@ -90,11 +91,13 @@ new class extends Component {
             ]);
         }
 
+        // Fetch valid (unused, unexpired) codes for this user and check via Hash::check
+        // This is necessary because bcrypt hashes cannot be queried directly
         $verificationCode = VerificationCode::where('user_id', $this->userId)
-            ->where('code', $this->verification_code)
             ->where('is_used', false)
             ->where('expires_at', '>', now())
-            ->first();
+            ->get()
+            ->first(fn ($record) => Hash::check($this->verification_code, $record->code));
 
         if (!$verificationCode) {
             RateLimiter::hit($key, 900); // 15 minutes
@@ -124,8 +127,14 @@ new class extends Component {
         $secure = config('app.env') !== 'local'; // Only use secure in production
         cookie()->queue('company_token', $token, config('app.jwt_ttl'), '/', null, $secure, true, false, 'strict');
 
-        // Redirect to dashboard
-        $this->redirect('/company/dashboard', navigate: true);
+        // Role-based redirect
+        $destination = match ($user->role ?? 'company') {
+            'admin'  => route('admin.dashboard'),
+            'scorer' => route('scorer.dashboard'),
+            default  => route('company.dashboard'),
+        };
+
+        $this->redirect($destination, navigate: true);
     }
 
     public function back(): void

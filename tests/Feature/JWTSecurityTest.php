@@ -60,7 +60,7 @@ class JWTSecurityTest extends TestCase
         $token = $jwtService->generateToken($user);
 
         $user->refresh();
-        $this->assertEquals($token, $user->jwt_token);
+        $this->assertEquals(hash('sha256', $token), $user->jwt_token);
         $this->assertNotNull($user->jwt_expires_at);
     }
 

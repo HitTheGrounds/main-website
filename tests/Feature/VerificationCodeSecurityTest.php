@@ -31,14 +31,14 @@ class VerificationCodeSecurityTest extends TestCase
 
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
+            'code' => \Illuminate\Support\Facades\Hash::make($code),
             'expires_at' => now()->addMinutes(15),
         ]);
 
         $storedCode = VerificationCode::where('user_id', $user->id)->first();
 
-        // Verify code is stored
-        $this->assertEquals($code, $storedCode->code);
+        // Verify code is stored as a hash
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check($code, $storedCode->code));
     }
 
     public function test_send_code_rate_limiting_prevents_spam(): void
@@ -65,7 +65,7 @@ class VerificationCodeSecurityTest extends TestCase
 
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
+            'code' => \Illuminate\Support\Facades\Hash::make($code),
             'expires_at' => now()->addMinutes(15),
         ]);
 
@@ -92,7 +92,7 @@ class VerificationCodeSecurityTest extends TestCase
         // Create expired code
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
+            'code' => \Illuminate\Support\Facades\Hash::make($code),
             'expires_at' => now()->subMinutes(1), // Expired 1 minute ago
         ]);
 
@@ -113,7 +113,7 @@ class VerificationCodeSecurityTest extends TestCase
         // Create used code
         VerificationCode::create([
             'user_id' => $user->id,
-            'code' => $code,
+            'code' => \Illuminate\Support\Facades\Hash::make($code),
             'expires_at' => now()->addMinutes(15),
             'is_used' => true,
         ]);
@@ -148,6 +148,7 @@ class VerificationCodeSecurityTest extends TestCase
             ->set('contact_person_name', 'Test Person')
             ->set('contact_email', 'spam@example.com')
             ->set('contact_person_phone', '+1234567890')
+            ->set('turnstile_token', 'dummy-token')
             ->call('register')
             ->assertHasErrors(['contact_email']);
     }
@@ -159,14 +160,14 @@ class VerificationCodeSecurityTest extends TestCase
         // Create expired code
         $expiredCode = VerificationCode::create([
             'user_id' => $user->id,
-            'code' => '111111',
+            'code' => \Illuminate\Support\Facades\Hash::make('111111'),
             'expires_at' => now()->subMinutes(1),
         ]);
 
         // Create used code
         $usedCode = VerificationCode::create([
             'user_id' => $user->id,
-            'code' => '222222',
+            'code' => \Illuminate\Support\Facades\Hash::make('222222'),
             'expires_at' => now()->addMinutes(15),
             'is_used' => true,
         ]);
@@ -174,7 +175,7 @@ class VerificationCodeSecurityTest extends TestCase
         // Create valid code
         $validCode = VerificationCode::create([
             'user_id' => $user->id,
-            'code' => '333333',
+            'code' => \Illuminate\Support\Facades\Hash::make('333333'),
             'expires_at' => now()->addMinutes(15),
         ]);
 

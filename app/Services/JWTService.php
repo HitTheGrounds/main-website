@@ -48,18 +48,18 @@ class JWTService
             'iss' => config('app.url'),
             'sub' => $user->id,
             'user' => [
-                'id' => $user->id,
-                'email' => $user->email,
-                'name' => $user->name,
+                'id'           => $user->id,
+                'email'        => $user->email,
+                'name'         => $user->name,
                 'company_name' => $user->company_name,
             ],
         ];
 
         $token = JWT::encode($payload, $this->secret, $this->algo);
 
-        // Store token in database
+        // Store a SHA-256 hash of the token — never store the raw JWT
         $user->update([
-            'jwt_token' => $token,
+            'jwt_token'      => hash('sha256', $token),
             'jwt_expires_at' => now()->addMinutes($this->ttl),
         ]);
 
@@ -74,9 +74,9 @@ class JWTService
         try {
             $decoded = JWT::decode($token, new Key($this->secret, $this->algo));
 
-            // Verify token exists in database and hasn't been revoked
+            // Compare the SHA-256 hash of the incoming token against the stored hash
             $user = User::where('id', $decoded->sub)
-                ->where('jwt_token', $token)
+                ->where('jwt_token', hash('sha256', $token))
                 ->first();
 
             if (! $user || ! $user->jwt_expires_at || $user->jwt_expires_at->isPast()) {

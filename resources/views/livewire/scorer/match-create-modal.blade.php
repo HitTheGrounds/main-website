@@ -487,7 +487,7 @@ new class extends Component {
 
             <x-slot:actions>
                 <x-mary-button label="Cancel" wire:click="$set('show', false); resetForm()" class="btn-ghost" />
-                <x-mary-button type="submit" label="{{ $status === 'finished' ? 'Review & Save' : 'Save Match' }}" class="btn-primary" />
+                <x-mary-button type="submit" label="{{ $status === 'finished' ? 'Review & Save' : 'Save Match' }}" class="btn-primary" spinner="openConfirm" />
             </x-slot:actions>
         </form>
     </x-mary-modal>
@@ -522,7 +522,7 @@ new class extends Component {
 
         <x-slot:actions>
             <x-mary-button label="Back to Edit" wire:click="cancelConfirm" class="btn-ghost" />
-            <x-mary-button label="Confirm & Save" wire:click="saveMatch" class="btn-primary" icon="o-check" />
+            <x-mary-button label="Confirm & Save" wire:click="saveMatch" class="btn-primary" icon="o-check" spinner="saveMatch" />
         </x-slot:actions>
     </x-mary-modal>
 </div>

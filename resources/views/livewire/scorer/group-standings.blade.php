@@ -179,7 +179,7 @@ new class extends Component {
 
         <x-slot:actions>
             <x-mary-button label="Cancel" wire:click="$set('showQualifyModal', false)" class="btn-ghost" />
-            <x-mary-button label="Confirm Qualification" wire:click="saveQualifications" class="btn-primary" icon="o-check" />
+            <x-mary-button label="Confirm Qualification" wire:click="saveQualifications" class="btn-primary" icon="o-check" spinner="saveQualifications" />
         </x-slot:actions>
     </x-mary-modal>
 </div>

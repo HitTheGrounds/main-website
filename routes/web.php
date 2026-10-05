@@ -44,6 +44,14 @@ Route::get('/teams/industry', function () {
     return view('teams-industry');
 })->name('teams.industry');
 
+Route::get('/teams/university', function () {
+    return view('teams-university');
+})->name('teams.university');
+
+Route::get('/support', function () {
+    return view('support');
+})->name('support');
+
 Route::middleware('guest.company')->group(function () {
     Route::get('/register', function () {
         return view('register');
@@ -87,10 +95,6 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
     Route::get('/admin/users', function () {
         return view('admin.users.index');
     })->name('admin.users');
-
-    Route::get('/teams/university', function () {
-        return view('teams-university');
-    })->name('teams.university');
 
     Route::get('/company/{company}/profile', function (App\Models\Company $company) {
         return view('company-profile', ['company' => $company]);
@@ -141,9 +145,7 @@ Route::middleware(['auth.company', 'company'])->group(function () {
 });
 
 Route::middleware(['auth.company', 'scorer'])->group(function () {
-    Route::get('/scorer/dashboard', function () {
-        return view('scorer.dashboard');
-    })->name('scorer.dashboard');
+    Volt::route('/scorer/dashboard', 'scorer.dashboard')->name('scorer.dashboard');
 });
 
 Route::view('dashboard', 'dashboard')

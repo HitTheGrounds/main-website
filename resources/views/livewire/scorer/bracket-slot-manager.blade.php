@@ -112,9 +112,7 @@ new class extends Component {
                         <!-- Swap Button for Slot 1 and 2 -->
                         @if(!isset($sfMatches[1]))
                             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                                <button wire:click="swapSlots(1, 2)" class="btn btn-circle btn-sm btn-primary shadow-lg" tooltip="Swap Slots 1 & 2">
-                                    <x-mary-icon name="o-arrows-up-down" class="w-4 h-4" />
-                                </button>
+                                <x-mary-button wire:click="swapSlots(1, 2)" class="btn-circle btn-sm btn-primary shadow-lg" tooltip="Swap Slots 1 & 2" icon="o-arrows-up-down" spinner />
                             </div>
                         @endif
                         
@@ -163,9 +161,7 @@ new class extends Component {
                         <!-- Swap Button for Slot 3 and 4 -->
                         @if(!isset($sfMatches[2]))
                             <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                                <button wire:click="swapSlots(3, 4)" class="btn btn-circle btn-sm btn-primary shadow-lg" tooltip="Swap Slots 3 & 4">
-                                    <x-mary-icon name="o-arrows-up-down" class="w-4 h-4" />
-                                </button>
+                                <x-mary-button wire:click="swapSlots(3, 4)" class="btn-circle btn-sm btn-primary shadow-lg" tooltip="Swap Slots 3 & 4" icon="o-arrows-up-down" spinner />
                             </div>
                         @endif
                         

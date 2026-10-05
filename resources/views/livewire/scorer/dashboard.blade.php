@@ -5,7 +5,7 @@ new class extends Component {
     public string $selectedStage = 'G';
 }; ?>
 
-<x-layouts.app>
+<div>
     <div class="container mx-auto px-4 py-8">
         <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div>
@@ -46,4 +46,4 @@ new class extends Component {
             </x-mary-tab>
         </x-mary-tabs>
     </div>
-</x-layouts.app>
+</div>

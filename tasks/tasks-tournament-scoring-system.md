@@ -207,12 +207,12 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 10.7 Write `tests/Feature/MatchStatusRevertCascadeTest.php`: verify reverting a finished match to live or upcoming recalculates standings and removes its points/NRR contribution
   - [x] 10.8 Run `php artisan test` and verify all tests pass
 
-- [ ] 11.0 UI Polish, Responsive Optimization & Full Test Suite — Responsive layouts, loading indicators, edge case handling, and complete test suite verification
-  - [ ] 11.1 Review and optimize all scorer dashboard views for mobile, tablet, and desktop responsive breakpoints
-  - [ ] 11.2 Review and optimize all public scoreboard and bracket views for mobile, tablet, and desktop
-  - [ ] 11.3 Add Livewire loading indicators (wire:loading) to all interactive components: match creation, status transitions, qualification actions, bracket slot swaps
-  - [ ] 11.4 Add smooth CSS animations: pulsing live badge, card transitions on filter change, bracket node highlights on state change
-  - [ ] 11.5 Handle all edge cases documented in the plan: team scores 0/0, all-out in 3.2 overs, all group draws, identical points and NRR, qualifying before all matches finished, editing group match after QF started, un-qualifying after knockout match exists
-  - [ ] 11.6 Verify graceful error handling: network failures on Livewire actions, validation error display, 403/404 pages for unauthorized access
-  - [ ] 11.7 Run the complete test suite: `php artisan test` — verify 100% pass rate across all security, role, scoring, calculation, bracket, and UI permission tests
-  - [ ] 11.8 Review test coverage and add any missing edge case tests identified during development
+- [x] 11.0 UI Polish, Responsive Optimization & Full Test Suite — Responsive layouts, loading indicators, edge case handling, and complete test suite verification
+  - [x] 11.1 Review and optimize all scorer dashboard views for mobile, tablet, and desktop responsive breakpoints
+  - [x] 11.2 Review and optimize all public scoreboard and bracket views for mobile, tablet, and desktop
+  - [x] 11.3 Add Livewire loading indicators (wire:loading) to all interactive components: match creation, status transitions, qualification actions, bracket slot swaps
+  - [x] 11.4 Add smooth CSS animations: pulsing live badge, card transitions on filter change, bracket node highlights on state change
+  - [x] 11.5 Handle all edge cases documented in the plan: team scores 0/0, all-out in 3.2 overs, all group draws, identical points and NRR, qualifying before all matches finished, editing group match after QF started, un-qualifying after knockout match exists
+  - [x] 11.6 Verify graceful error handling: network failures on Livewire actions, validation error display, 403/404 pages for unauthorized access
+  - [x] 11.7 Run the complete test suite: `php artisan test` — verify 100% pass rate across all security, role, scoring, calculation, bracket, and UI permission tests
+  - [x] 11.8 Review test coverage and add any missing edge case tests identified during development

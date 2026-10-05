@@ -111,27 +111,27 @@ Update the file after completing each sub-task, not just after completing an ent
   - [ ] 2.8 Update `resources/views/components/Navbar.blade.php` (line 66): replace `$user->is_admin == true` with `$user->isAdmin()`, add an `@elseif($user->isScorer())` branch with a link to `route('scorer.dashboard')`
   - [ ] 2.9 Update `resources/views/components/HeroSection.blade.php` (line 49): replace `$user->is_admin == true` with `$user->isAdmin()`, add scorer-specific CTA
   - [ ] 2.10 Update `resources/views/registrations.blade.php` (line 162): replace `$user->is_admin == true` with `$user->isAdmin()`
-  - [ ] 2.11 Update `resources/views/admin/dashboard.blade.php` (line 52): replace `User::where('is_admin', true)->count()` with `User::where('role', 'admin')->count()`, add a scorer count display: `User::where('role', 'scorer')->count()`
-  - [ ] 2.12 Update `resources/views/livewire/admin/users-list.blade.php`: replace all `is_admin` references with role-based logic — show role badges (Admin/Scorer/Company), replace the admin toggle with a role selector dropdown, update the filter to filter by role instead of `is_admin`
-  - [ ] 2.13 Update `resources/views/livewire/admin/approve-team.blade.php` (line 13): replace `$user->is_admin` with `$user->isAdmin()`
-  - [ ] 2.14 Update `resources/views/livewire/company-registration-form.blade.php` (line 83): replace `'is_admin' => false` with `'role' => 'company'`
-  - [ ] 2.15 Update `app/Console/Commands/SetUserAdmin.php`: rename to `SetUserRole.php`, update signature to `user:set-role {email} {role}` where role is `admin`, `scorer`, or `company`, update the logic to set `$user->role` accordingly
-  - [ ] 2.16 Update login redirect logic: after successful JWT login, inspect `$user->role` and redirect to `admin.dashboard`, `scorer.dashboard`, or `company.dashboard` accordingly. Add a null `company_id` guard for company users
-  - [ ] 2.17 Write `tests/Unit/UserModelRoleTest.php`: test `isAdmin()`, `isScorer()`, `isCompany()`, `hasRole()`, and backward-compatible `$user->is_admin` accessor
-  - [ ] 2.18 Write `tests/Feature/RoleBasedMiddlewareTest.php`: verify company users cannot access `/admin/*`, admin users can access `/admin/*`, scorer users are blocked from `/admin/*` and `/company/*`, company users are blocked from `/scorer/*`
-  - [ ] 2.19 Run migration on test database: `php artisan migrate:fresh --seed` and verify no errors
-  - [ ] 2.20 Run `php artisan test` and verify all tests pass
+  - [x] 2.11 Update `resources/views/admin/dashboard.blade.php` (line 52): replace `User::where('is_admin', true)->count()` with `User::where('role', 'admin')->count()`, add a scorer count display: `User::where('role', 'scorer')->count()`
+  - [x] 2.12 Update `resources/views/livewire/admin/users-list.blade.php`: replace all `is_admin` references with role-based logic — show role badges (Admin/Scorer/Company), replace the admin toggle with a role selector dropdown, update the filter to filter by role instead of `is_admin`
+  - [x] 2.13 Update `resources/views/livewire/admin/approve-team.blade.php` (line 13): replace `$user->is_admin` with `$user->isAdmin()`
+  - [x] 2.14 Update `resources/views/livewire/company-registration-form.blade.php` (line 83): replace `'is_admin' => false` with `'role' => 'company'`
+  - [x] 2.15 Update `app/Console/Commands/SetUserAdmin.php`: rename to `SetUserRole.php`, update signature to `user:set-role {email} {role}` where role is `admin`, `scorer`, or `company`, update the logic to set `$user->role` accordingly
+  - [x] 2.16 Update login redirect logic: after successful JWT login, inspect `$user->role` and redirect to `admin.dashboard`, `scorer.dashboard`, or `company.dashboard` accordingly. Add a null `company_id` guard for company users
+  - [x] 2.17 Write `tests/Unit/UserModelRoleTest.php`: test `isAdmin()`, `isScorer()`, `isCompany()`, `hasRole()`, and backward-compatible `$user->is_admin` accessor
+  - [x] 2.18 Write `tests/Feature/RoleBasedMiddlewareTest.php`: verify company users cannot access `/admin/*`, admin users can access `/admin/*`, scorer users are blocked from `/admin/*` and `/company/*`, company users are blocked from `/scorer/*`
+  - [x] 2.19 Run migration on test database: `php artisan migrate:fresh --seed` and verify no errors
+  - [x] 2.20 Run `php artisan test` and verify all tests pass
 
-- [ ] 3.0 Scorer Infrastructure — Create scorer middleware, admin UI for scorer account creation, and protected scorer route group
-  - [ ] 3.1 Create `app/Http/Middleware/EnsureUserIsScorer.php`: check `$user->isScorer()`, abort 403 if not a scorer
-  - [ ] 3.2 Register the `scorer` middleware alias in `bootstrap/app.php`: add `'scorer' => \App\Http\Middleware\EnsureUserIsScorer::class`
-  - [ ] 3.3 Add a protected scorer route group in `routes/web.php`: `Route::middleware(['auth.company', 'scorer'])->group(...)` with `GET /scorer/dashboard` pointing to `scorer.dashboard` view
-  - [ ] 3.4 Create `resources/views/scorer/dashboard.blade.php`: basic layout extending the app layout with a placeholder "Scorer Dashboard" heading (full UI built in Task 6.0)
-  - [ ] 3.5 Build `resources/views/livewire/admin/create-scorer-modal.blade.php`: a Livewire component form in the admin panel with name and email fields, that creates a new user with `role = 'scorer'`, `company_id = null`, and triggers the standard email verification OTP flow
-  - [ ] 3.6 Add a "Create Scorer Account" button on the admin users list page (`users-list.blade.php`) that opens the create-scorer modal
-  - [ ] 3.7 Write `tests/Feature/ScorerAccountCreationTest.php`: verify admin can create a scorer account, non-admin (company/scorer) cannot, scorer is saved with `role = 'scorer'` and `company_id = null`
-  - [ ] 3.8 Write `tests/Feature/ScorerRouteAccessTest.php`: verify scorer can access `/scorer/dashboard`, scorer is blocked from `/admin/*` and `/company/*`, company and admin users are blocked from `/scorer/*`
-  - [ ] 3.9 Run `php artisan test` and verify all tests pass
+- [x] 3.0 Scorer Infrastructure — Create scorer middleware, admin UI for scorer account creation, and protected scorer route group
+  - [x] 3.1 Create `app/Http/Middleware/EnsureUserIsScorer.php`: check `$user->isScorer()`, abort 403 if not a scorer
+  - [x] 3.2 Register the `scorer` middleware alias in `bootstrap/app.php`: add `'scorer' => \App\Http\Middleware\EnsureUserIsScorer::class`
+  - [x] 3.3 Add a protected scorer route group in `routes/web.php`: `Route::middleware(['auth.company', 'scorer'])->group(...)` with `GET /scorer/dashboard` pointing to `scorer.dashboard` view
+  - [x] 3.4 Create `resources/views/scorer/dashboard.blade.php`: basic layout extending the app layout with a placeholder "Scorer Dashboard" heading (full UI built in Task 6.0)
+  - [x] 3.5 Build `resources/views/livewire/admin/create-scorer-modal.blade.php`: a Livewire component form in the admin panel with name and email fields, that creates a new user with `role = 'scorer'`, `company_id = null`, and triggers the standard email verification OTP flow
+  - [x] 3.6 Add a "Create Scorer Account" button on the admin users list page (`users-list.blade.php`) that opens the create-scorer modal
+  - [x] 3.7 Write `tests/Feature/ScorerAccountCreationTest.php`: verify admin can create a scorer account, non-admin (company/scorer) cannot, scorer is saved with `role = 'scorer'` and `company_id = null`
+  - [x] 3.8 Write `tests/Feature/ScorerRouteAccessTest.php`: verify scorer can access `/scorer/dashboard`, scorer is blocked from `/admin/*` and `/company/*`, company and admin users are blocked from `/scorer/*`
+  - [x] 3.9 Run `php artisan test` and verify all tests pass
 
 - [ ] 4.0 Tournament Config & Groups — Create `config/tournament.php`, `tournament_groups` table, `group_teams` pivot table, and admin group management UI
   - [ ] 4.1 Create `config/tournament.php` with all rule values: `overs_per_match => 5`, `balls_per_over => ['G' => 4, 'QF' => 4, 'SF' => 4, 'F' => 6]`, `max_wickets => 11`, `points_win => 2`, `points_draw => 1`, `points_loss => 0`, `teams_qualify_per_group => 2`

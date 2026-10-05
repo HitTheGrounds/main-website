@@ -119,6 +119,12 @@ new class extends Component {
             $user->update(['email_verified_at' => now()]);
         }
 
+        // Guard against orphan company accounts
+        if ($user->isCompany() && is_null($user->company_id)) {
+            $this->addError('verification_code', 'Your account setup is incomplete (missing company profile). Please contact support.');
+            return;
+        }
+
         // Generate JWT token
         $jwtService = new JWTService();
         $token = $jwtService->generateToken($user);

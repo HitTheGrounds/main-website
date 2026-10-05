@@ -5,21 +5,21 @@ namespace App\Console\Commands;
 use App\Models\User;
 use Illuminate\Console\Command;
 
-class SetUserAdmin extends Command
+class SetUserRole extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'user:set-admin {email} {--revoke : Revoke admin privileges}';
+    protected $signature = 'user:set-role {email} {role}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Set or revoke admin privileges for a user by email';
+    protected $description = 'Set the role (company, admin, scorer) for a user by email';
 
     /**
      * Execute the console command.
@@ -27,7 +27,12 @@ class SetUserAdmin extends Command
     public function handle()
     {
         $email = $this->argument('email');
-        $revoke = $this->option('revoke');
+        $role = $this->argument('role');
+
+        if (!in_array($role, ['company', 'admin', 'scorer'])) {
+            $this->error("Invalid role '{$role}'. Must be one of: company, admin, scorer.");
+            return 1;
+        }
 
         $user = User::where('email', $email)->first();
 
@@ -36,15 +41,10 @@ class SetUserAdmin extends Command
             return 1;
         }
 
-        $isAdmin = !$revoke;
-        $user->is_admin = $isAdmin;
+        $user->role = $role;
         $user->save();
 
-        if ($isAdmin) {
-            $this->info("User '{$user->name}' ({$email}) is now an admin.");
-        } else {
-            $this->info("Admin privileges revoked for user '{$user->name}' ({$email}).");
-        }
+        $this->info("User '{$user->name}' ({$email}) is now assigned the role '{$role}'.");
 
         return 0;
     }

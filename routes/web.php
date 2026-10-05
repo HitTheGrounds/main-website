@@ -60,6 +60,10 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+    
+    Route::get('/admin/groups', function () {
+        return view('admin.groups');
+    })->name('admin.groups');
 
     Route::get('/admin/companies', function () {
         return view('admin.companies.index');

@@ -91,6 +91,10 @@
                                 <x-mary-icon name="o-users" class="w-5 h-5" />
                                 Users
                             </x-mary-menu-item>
+                            <x-mary-menu-item link="{{ route('admin.groups') }}" :active="request()->routeIs('admin.groups*')" wire:navigate>
+                                <x-mary-icon name="o-list-bullet" class="w-5 h-5" />
+                                Tournament Groups
+                            </x-mary-menu-item>
                         </x-mary-menu>
                     </div>
 

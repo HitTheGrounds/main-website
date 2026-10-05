@@ -81,4 +81,8 @@ class Team extends Model
         // Starting from minimum (6M, 2F), can add up to 3 male and 1 female
         return $totalCount === 12 && $maleCount === 9 && $femaleCount === 3;
     }
+    public function groupTeam(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(GroupTeam::class);
+    }
 }

@@ -26,7 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'company_id',
-        'is_admin',
+        'role',
         'jwt_token',
         'jwt_expires_at',
         'email_verified_at',
@@ -54,7 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'jwt_expires_at' => 'datetime',
-            'is_admin' => 'boolean',
+            'role' => 'string',
         ];
     }
 
@@ -84,5 +84,30 @@ class User extends Authenticatable
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isScorer(): bool
+    {
+        return $this->role === 'scorer';
+    }
+
+    public function isCompany(): bool
+    {
+        return $this->role === 'company';
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->isAdmin();
     }
 }

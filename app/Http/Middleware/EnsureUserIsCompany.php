@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureUserIsAdmin
+class EnsureUserIsCompany
 {
     /**
      * Handle an incoming request.
@@ -17,7 +17,7 @@ class EnsureUserIsAdmin
     {
         $user = $request->attributes->get('user');
 
-        if (!$user || !$user->isAdmin()) {
+        if (!$user || !$user->isCompany() || is_null($user->company_id)) {
             abort(403, 'Unauthorized');
         }
 

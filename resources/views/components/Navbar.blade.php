@@ -63,16 +63,21 @@
             $jwtService = new App\Services\JWTService();
             $user = $jwtService->getUserFromToken($token);
             if ($user) {
-                $isAdmin = $user->is_admin == true;
+                $isAdmin = $user->isAdmin();
             }
         }
       @endphp
 
       @if($user)
-        @if($isAdmin)
+        @if($user->isAdmin())
           <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
             <span class="hidden sm:inline">Admin Dashboard</span>
             <span class="sm:hidden">Admin</span>
+          </a>
+        @elseif($user->isScorer())
+          <a href="/scorer/dashboard" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+            <span class="hidden sm:inline">Scorer Portal</span>
+            <span class="sm:hidden">Scorer</span>
           </a>
         @else
           <a href="{{ route('company.dashboard') }}" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">

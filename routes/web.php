@@ -89,7 +89,7 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
     })->name('company.public-profile');
 });
 
-Route::middleware('auth.company')->group(function () {
+Route::middleware(['auth.company', 'company'])->group(function () {
     Route::get('/company/dashboard', function () {
         return view('company.dashboard');
     })->name('company.dashboard');

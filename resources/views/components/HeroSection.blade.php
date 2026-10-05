@@ -46,14 +46,16 @@
                 $jwtService = new App\Services\JWTService();
                 $user = $jwtService->getUserFromToken($token);
                 if ($user) {
-                    $isAdmin = $user->is_admin == true;
+                    $isAdmin = $user->isAdmin();
                 }
             }
           @endphp
 
           @if($user)
-            @if($isAdmin)
+            @if($user->isAdmin())
               <x-mary-button label="Admin Dashboard" link="{{ route('admin.dashboard') }}" class="btn btn-primary btn-md sm:btn-md lg:btn-lg" />
+            @elseif($user->isScorer())
+              <x-mary-button label="Scorer Portal" link="/scorer/dashboard" class="btn btn-primary btn-md sm:btn-md lg:btn-lg" />
             @else
               <x-mary-button label="Dashboard" link="{{ route('company.dashboard') }}" class="btn btn-primary btn-md sm:btn-md lg:btn-lg" />
             @endif

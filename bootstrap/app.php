@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest.company' => \App\Http\Middleware\EnsureCompanyGuest::class,
             'auth.company' => \App\Http\Middleware\EnsureCompanyAuthenticated::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'company' => \App\Http\Middleware\EnsureUserIsCompany::class,
         ]);
 
         // Add security headers to all web requests

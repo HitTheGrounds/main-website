@@ -178,16 +178,16 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 7.6 Write `tests/Feature/PublicScoreboardTest.php`: verify public guest can access `/scoreboard`, sees upcoming/live/finished cards, standings match finished games, no edit controls or scorer actions are present in the HTML
   - [x] 7.7 Run `php artisan test` and verify all tests pass
 
-- [ ] 8.0 Knockout Stages — QF/SF/Final Scheduling & Bracket Slots — Build knockout match creation with bracket position assignment, slot locking rules, and stage-specific validation
-  - [ ] 8.1 Add QF match creation flow to the scorer match-create modal: show bracket position selector (Slots 1-4) when stage = 'QF', populate Team 1 and Team 2 dropdowns from `group_teams.qualified = true` (8 teams), allow creating as Upcoming, Live, or Finished
-  - [ ] 8.2 Add SF match creation flow: show slot selector (SF 1 / SF 2) when stage = 'SF', populate Team 1 and Team 2 dropdowns from QF winners (`TournamentMatch::where('stage', 'QF')->whereNotNull('winner_id')->pluck('winner_id')`)
-  - [ ] 8.3 Add Final match creation flow: populate Team 1 and Team 2 from SF winners, when saving as finished validate balls field uses `config('tournament.balls_per_over.F') - 1` (0-5 range) instead of the default 0-3
-  - [ ] 8.4 Implement knockout draw rejection: when stage is 'QF', 'SF', or 'F' and status = 'finished', the "Tied" outcome option must be disabled/hidden and validation must reject `is_draw = true`
-  - [ ] 8.5 Build `resources/views/livewire/scorer/bracket-slot-manager.blade.php`: visual display of QF slots 1-4, show which match is in each slot, allow drag-and-drop or button swap of slot positions, show SF1 (slots 1+2) and SF2 (slots 3+4) mapping
-  - [ ] 8.6 Implement slot locking rule: once an SF match is created that references slots (e.g., SF1 created), lock slots 1 & 2 from rearrangement. Once SF2 is created, lock slots 3 & 4. Show a lock icon and disable swap for locked slots
-  - [ ] 8.7 Add `bracket_position` validation: QF must use 1-4, SF must use 1-2, F must use 1. Reject values outside the allowed range for each stage
-  - [ ] 8.8 Write `tests/Feature/KnockoutMatchEntryTest.php`: test scheduling QF/SF/Final as upcoming and live, verify QF and SF finished matches reject draws, Final allows balls 0-5, bracket position assignments are validated per stage, slot locking prevents rearrangement after SF creation
-  - [ ] 8.9 Run `php artisan test` and verify all tests pass
+- [x] 8.0 Knockout Stages — QF/SF/Final Scheduling & Bracket Slots — Build knockout match creation with bracket position assignment, slot locking rules, and stage-specific validation
+  - [x] 8.1 Add QF match creation flow to the scorer match-create modal: show bracket position selector (Slots 1-4) when stage = 'QF', populate Team 1 and Team 2 dropdowns from `group_teams.qualified = true` (8 teams), allow creating as Upcoming, Live, or Finished
+  - [x] 8.2 Add SF match creation flow: show slot selector (SF 1 / SF 2) when stage = 'SF', populate Team 1 and Team 2 dropdowns from QF winners (`TournamentMatch::where('stage', 'QF')->whereNotNull('winner_id')->pluck('winner_id')`)
+  - [x] 8.3 Add Final match creation flow: populate Team 1 and Team 2 from SF winners, when saving as finished validate balls field uses `config('tournament.balls_per_over.F') - 1` (0-5 range) instead of the default 0-3
+  - [x] 8.4 Implement knockout draw rejection: when stage is 'QF', 'SF', or 'F' and status = 'finished', the "Tied" outcome option must be disabled/hidden and validation must reject `is_draw = true`
+  - [x] 8.5 Build `resources/views/livewire/scorer/bracket-slot-manager.blade.php`: visual display of QF slots 1-4, show which match is in each slot, allow drag-and-drop or button swap of slot positions, show SF1 (slots 1+2) and SF2 (slots 3+4) mapping
+  - [x] 8.6 Implement slot locking rule: once an SF match is created that references slots (e.g., SF1 created), lock slots 1 & 2 from rearrangement. Once SF2 is created, lock slots 3 & 4. Show a lock icon and disable swap for locked slots
+  - [x] 8.7 Add `bracket_position` validation: QF must use 1-4, SF must use 1-2, F must use 1. Reject values outside the allowed range for each stage
+  - [x] 8.8 Write `tests/Feature/KnockoutMatchEntryTest.php`: test scheduling QF/SF/Final as upcoming and live, verify QF and SF finished matches reject draws, Final allows balls 0-5, bracket position assignments are validated per stage, slot locking prevents rearrangement after SF creation
+  - [x] 8.9 Run `php artisan test` and verify all tests pass
 
 - [ ] 9.0 Public Bracket — Dynamic Tournament Bracket Tree — Build the interactive visual tournament bracket with dynamic node states for upcoming, live, and finished matches
   - [ ] 9.1 Add public bracket route in `routes/web.php`: `GET /bracket` (no auth required) or integrate into the existing `/scoreboard` page as a tab/section

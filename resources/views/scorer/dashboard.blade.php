@@ -30,6 +30,7 @@ new class extends Component {
             </x-mary-tab>
             <x-mary-tab name="QF" label="Quarter-Finals" icon="o-trophy">
                 <div class="mt-4">
+                    <livewire:scorer.bracket-slot-manager />
                     <livewire:scorer.matches-list stage="QF" />
                 </div>
             </x-mary-tab>

@@ -14,6 +14,7 @@ new class extends Component {
 
     public string $stage = 'G';
     public ?int $group_id = null;
+    public ?int $bracket_position = null;
     
     public ?int $team1_id = null;
     public ?int $team2_id = null;
@@ -52,6 +53,7 @@ new class extends Component {
         $this->editingMatchId = $match->id;
         $this->stage = $match->stage;
         $this->group_id = $match->group_id;
+        $this->bracket_position = $match->bracket_position;
         $this->updateAvailableTeams();
         
         $this->team1_id = $match->team1_id;
@@ -102,6 +104,7 @@ new class extends Component {
     public function updatedStage()
     {
         $this->group_id = null;
+        $this->bracket_position = $this->stage === 'F' ? 1 : null;
         $this->team1_id = null;
         $this->team2_id = null;
         $this->updateAvailableTeams();
@@ -149,6 +152,13 @@ new class extends Component {
 
         if ($this->stage === 'G') {
             $rules['group_id'] = 'required|exists:tournament_groups,id';
+        } elseif ($this->stage === 'QF') {
+            $rules['bracket_position'] = 'required|integer|between:1,4';
+        } elseif ($this->stage === 'SF') {
+            $rules['bracket_position'] = 'required|integer|between:1,2';
+        } elseif ($this->stage === 'F') {
+            $this->bracket_position = 1;
+            $rules['bracket_position'] = 'required|integer|in:1';
         }
 
         if ($this->status === 'finished') {
@@ -170,13 +180,27 @@ new class extends Component {
                 'outcome' => 'required|in:team1,team2,tie',
             ]);
             
-            if ($this->stage !== 'G' && $this->outcome === 'tie') {
+            if (in_array($this->stage, ['QF', 'SF', 'F']) && $this->outcome === 'tie') {
                 $this->addError('outcome', 'Draws are not allowed in knockout stages.');
                 return false;
             }
         }
 
         $this->validate($rules);
+        
+        if (in_array($this->stage, ['QF', 'SF', 'F'])) {
+            $slotQuery = TournamentMatch::where('stage', $this->stage)
+                ->where('bracket_position', $this->bracket_position);
+                
+            if ($this->editingMatchId) {
+                $slotQuery->where('id', '!=', $this->editingMatchId);
+            }
+            
+            if ($slotQuery->exists()) {
+                $this->addError('bracket_position', 'This bracket slot is already occupied.');
+                return false;
+            }
+        }
         
         $query = TournamentMatch::where('stage', $this->stage)
             ->where(function($q) {
@@ -243,6 +267,7 @@ new class extends Component {
             'stage' => $this->stage,
             'status' => $this->status,
             'group_id' => $this->stage === 'G' ? $this->group_id : null,
+            'bracket_position' => in_array($this->stage, ['QF', 'SF', 'F']) ? $this->bracket_position : null,
             'team1_id' => $this->team1_id,
             'team2_id' => $this->team2_id,
             'batting_first_id' => $this->batting_first_id ?: null,
@@ -301,7 +326,7 @@ new class extends Component {
             'editingMatchId', 'team1_id', 'team2_id', 'batting_first_id', 'status',
             'team1_score', 'team1_overs', 'team1_balls', 'team1_wickets',
             'team2_score', 'team2_overs', 'team2_balls', 'team2_wickets',
-            'outcome'
+            'outcome', 'bracket_position'
         ]);
         $this->status = 'upcoming';
     }
@@ -328,6 +353,24 @@ new class extends Component {
 
                 @if($stage === 'G')
                     <x-mary-select wire:model.live="group_id" label="Group" :options="$groups" required placeholder="Select a Group" />
+                @elseif($stage === 'QF')
+                    <x-mary-select wire:model="bracket_position" label="Quarter-Final Slot" :options="[
+                        ['id' => 1, 'name' => 'Slot 1'],
+                        ['id' => 2, 'name' => 'Slot 2'],
+                        ['id' => 3, 'name' => 'Slot 3'],
+                        ['id' => 4, 'name' => 'Slot 4']
+                    ]" required placeholder="Select Bracket Slot" />
+                @elseif($stage === 'SF')
+                    <x-mary-select wire:model="bracket_position" label="Semi-Final Slot" :options="[
+                        ['id' => 1, 'name' => 'SF 1 (Winner QF 1 vs 2)'],
+                        ['id' => 2, 'name' => 'SF 2 (Winner QF 3 vs 4)']
+                    ]" required placeholder="Select Bracket Slot" />
+                @elseif($stage === 'F')
+                    <input type="hidden" wire:model="bracket_position" value="1" />
+                    <div class="form-control w-full">
+                        <label class="label"><span class="label-text font-semibold">Bracket Slot</span></label>
+                        <div class="px-4 py-3 bg-base-200 rounded-lg text-sm">The Final (Slot 1)</div>
+                    </div>
                 @endif
             </div>
 
@@ -376,12 +419,17 @@ new class extends Component {
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <x-mary-select wire:model="outcome" label="Match Outcome" :options="[
+                @php
+                    $outcomeOptions = [
                         ['id' => 'team1', 'name' => $team1_id ? $this->getTeamName($team1_id).' Won' : 'Team 1 Won'],
                         ['id' => 'team2', 'name' => $team2_id ? $this->getTeamName($team2_id).' Won' : 'Team 2 Won'],
-                        ['id' => 'tie', 'name' => 'Tie / Draw']
-                    ]" required placeholder="Select winner" />
+                    ];
+                    if ($stage === 'G') {
+                        $outcomeOptions[] = ['id' => 'tie', 'name' => 'Tie / Draw'];
+                    }
+                @endphp
+                <div class="mt-4">
+                    <x-mary-select wire:model="outcome" label="Match Outcome" :options="$outcomeOptions" required placeholder="Select winner" />
                 </div>
             @endif
 

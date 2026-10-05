@@ -1,0 +1,428 @@
+<?php
+
+use App\Models\Team;
+use App\Models\TournamentGroup;
+use App\Models\TournamentMatch;
+use App\Services\TournamentStandingsService;
+use Livewire\Volt\Component;
+use Livewire\Attributes\On;
+
+new class extends Component {
+    public bool $show = false;
+    public bool $showConfirm = false;
+    public ?int $editingMatchId = null;
+
+    public string $stage = 'G';
+    public ?int $group_id = null;
+    
+    public ?int $team1_id = null;
+    public ?int $team2_id = null;
+    public ?int $batting_first_id = null;
+    
+    public string $status = 'upcoming';
+
+    // Scores
+    public ?int $team1_score = null;
+    public ?int $team1_overs = null;
+    public ?int $team1_balls = null;
+    public ?int $team1_wickets = null;
+
+    public ?int $team2_score = null;
+    public ?int $team2_overs = null;
+    public ?int $team2_balls = null;
+    public ?int $team2_wickets = null;
+
+    public string $outcome = ''; // 'team1', 'team2', 'tie'
+
+    public $groups = [];
+    public $availableTeams = [];
+
+    public function mount()
+    {
+        $this->groups = TournamentGroup::all();
+        $this->updateAvailableTeams();
+    }
+
+    #[On('open-match-edit')]
+    public function loadMatch(int $matchId)
+    {
+        $match = TournamentMatch::find($matchId);
+        if (!$match) return;
+
+        $this->editingMatchId = $match->id;
+        $this->stage = $match->stage;
+        $this->group_id = $match->group_id;
+        $this->updateAvailableTeams();
+        
+        $this->team1_id = $match->team1_id;
+        $this->team2_id = $match->team2_id;
+        $this->batting_first_id = $match->batting_first_id;
+        $this->status = $match->status;
+        
+        $this->team1_score = $match->team1_score;
+        $this->team1_overs = $match->team1_overs;
+        $this->team1_balls = $match->team1_balls;
+        $this->team1_wickets = $match->team1_wickets;
+        
+        $this->team2_score = $match->team2_score;
+        $this->team2_overs = $match->team2_overs;
+        $this->team2_balls = $match->team2_balls;
+        $this->team2_wickets = $match->team2_wickets;
+        
+        if ($match->status === 'finished') {
+            if ($match->is_draw) {
+                $this->outcome = 'tie';
+            } elseif ($match->winner_id === $this->team1_id) {
+                $this->outcome = 'team1';
+            } elseif ($match->winner_id === $this->team2_id) {
+                $this->outcome = 'team2';
+            }
+        } else {
+            $this->outcome = '';
+        }
+        
+        $this->show = true;
+    }
+
+    public function getBallsPerOverProperty()
+    {
+        return config("tournament.balls_per_over.{$this->stage}", 4);
+    }
+
+    public function getMaxOversProperty()
+    {
+        return config('tournament.overs_per_match', 5);
+    }
+
+    public function getMaxWicketsProperty()
+    {
+        return config('tournament.max_wickets', 11);
+    }
+
+    public function updatedStage()
+    {
+        $this->group_id = null;
+        $this->team1_id = null;
+        $this->team2_id = null;
+        $this->updateAvailableTeams();
+    }
+
+    public function updatedGroupId()
+    {
+        $this->team1_id = null;
+        $this->team2_id = null;
+        $this->updateAvailableTeams();
+    }
+
+    public function updateAvailableTeams()
+    {
+        if ($this->stage === 'G') {
+            if ($this->group_id) {
+                $group = TournamentGroup::find($this->group_id);
+                $this->availableTeams = $group ? $group->teams()->get() : collect();
+            } else {
+                $this->availableTeams = collect();
+            }
+        } elseif ($this->stage === 'QF') {
+            $this->availableTeams = Team::whereHas('groupTeam', function($q) {
+                $q->where('qualified', true);
+            })->get();
+        } elseif ($this->stage === 'SF') {
+            $this->availableTeams = Team::whereIn('id', function($q) {
+                $q->select('winner_id')->from('matches')->where('stage', 'QF')->whereNotNull('winner_id');
+            })->get();
+        } elseif ($this->stage === 'F') {
+            $this->availableTeams = Team::whereIn('id', function($q) {
+                $q->select('winner_id')->from('matches')->where('stage', 'SF')->whereNotNull('winner_id');
+            })->get();
+        }
+    }
+
+    public function validateMatch()
+    {
+        $rules = [
+            'stage' => 'required|in:G,QF,SF,F',
+            'team1_id' => 'required|exists:teams,id|different:team2_id',
+            'team2_id' => 'required|exists:teams,id',
+            'status' => 'required|in:upcoming,live,finished',
+        ];
+
+        if ($this->stage === 'G') {
+            $rules['group_id'] = 'required|exists:tournament_groups,id';
+        }
+
+        if ($this->status === 'finished') {
+            $maxOvers = $this->maxOvers;
+            $maxBalls = $this->ballsPerOver - 1;
+            $maxWickets = $this->maxWickets;
+
+            $rules = array_merge($rules, [
+                'team1_score' => 'required|integer|min:0',
+                'team1_overs' => "required|integer|min:0|max:{$maxOvers}",
+                'team1_balls' => "required|integer|min:0|max:{$maxBalls}",
+                'team1_wickets' => "required|integer|min:0|max:{$maxWickets}",
+                
+                'team2_score' => 'required|integer|min:0',
+                'team2_overs' => "required|integer|min:0|max:{$maxOvers}",
+                'team2_balls' => "required|integer|min:0|max:{$maxBalls}",
+                'team2_wickets' => "required|integer|min:0|max:{$maxWickets}",
+                
+                'outcome' => 'required|in:team1,team2,tie',
+            ]);
+            
+            if ($this->stage !== 'G' && $this->outcome === 'tie') {
+                $this->addError('outcome', 'Draws are not allowed in knockout stages.');
+                return false;
+            }
+        }
+
+        $this->validate($rules);
+        
+        $query = TournamentMatch::where('stage', $this->stage)
+            ->where(function($q) {
+                $q->where(function($q2) {
+                    $q2->where('team1_id', $this->team1_id)->where('team2_id', $this->team2_id);
+                })->orWhere(function($q2) {
+                    $q2->where('team1_id', $this->team2_id)->where('team2_id', $this->team1_id);
+                });
+            });
+            
+        if ($this->editingMatchId) {
+            $query->where('id', '!=', $this->editingMatchId);
+        }
+
+        if ($query->exists()) {
+            $this->addError('team2_id', 'These teams have already been paired in this stage.');
+            return false;
+        }
+
+        return true;
+    }
+
+    public function openConfirm()
+    {
+        if ($this->validateMatch()) {
+            if ($this->status === 'finished') {
+                $this->showConfirm = true;
+                $this->show = false;
+            } else {
+                $this->saveMatch();
+            }
+        }
+    }
+
+    public function cancelConfirm()
+    {
+        $this->showConfirm = false;
+        $this->show = true;
+    }
+
+    public function saveMatch()
+    {
+        if (!$this->validateMatch()) {
+            $this->showConfirm = false;
+            $this->show = true;
+            return;
+        }
+
+        $winnerId = null;
+        $isDraw = false;
+        if ($this->status === 'finished') {
+            if ($this->outcome === 'team1') {
+                $winnerId = $this->team1_id;
+            } elseif ($this->outcome === 'team2') {
+                $winnerId = $this->team2_id;
+            } else {
+                $isDraw = true;
+            }
+        }
+        
+        $user = request()->attributes->get('user') ?? auth()->user();
+
+        $data = [
+            'stage' => $this->stage,
+            'status' => $this->status,
+            'group_id' => $this->stage === 'G' ? $this->group_id : null,
+            'team1_id' => $this->team1_id,
+            'team2_id' => $this->team2_id,
+            'batting_first_id' => $this->batting_first_id ?: null,
+            
+            'team1_score' => $this->status === 'finished' ? $this->team1_score : null,
+            'team1_overs' => $this->status === 'finished' ? $this->team1_overs : null,
+            'team1_balls' => $this->status === 'finished' ? $this->team1_balls : null,
+            'team1_wickets' => $this->status === 'finished' ? $this->team1_wickets : null,
+            
+            'team2_score' => $this->status === 'finished' ? $this->team2_score : null,
+            'team2_overs' => $this->status === 'finished' ? $this->team2_overs : null,
+            'team2_balls' => $this->status === 'finished' ? $this->team2_balls : null,
+            'team2_wickets' => $this->status === 'finished' ? $this->team2_wickets : null,
+            
+            'is_draw' => $isDraw,
+            'winner_id' => $winnerId,
+        ];
+        
+        $needsRecalc = false;
+
+        if ($this->editingMatchId) {
+            $match = TournamentMatch::find($this->editingMatchId);
+            $oldStatus = $match->status;
+            $match->update($data);
+            
+            if (($oldStatus === 'finished' || $this->status === 'finished') && $this->stage === 'G' && $this->group_id) {
+                $needsRecalc = true;
+            }
+            $this->dispatch('match-updated');
+        } else {
+            $data['entered_by'] = $user ? $user->id : null;
+            TournamentMatch::create($data);
+            
+            if ($this->status === 'finished' && $this->stage === 'G' && $this->group_id) {
+                $needsRecalc = true;
+            }
+            $this->dispatch('match-created');
+        }
+
+        if ($needsRecalc) {
+            $group = TournamentGroup::find($this->group_id);
+            if ($group) {
+                app(TournamentStandingsService::class)->recalculateForGroup($group);
+            }
+        }
+
+        $this->showConfirm = false;
+        $this->show = false;
+        
+        $this->resetForm();
+    }
+    
+    public function resetForm()
+    {
+        $this->reset([
+            'editingMatchId', 'team1_id', 'team2_id', 'batting_first_id', 'status',
+            'team1_score', 'team1_overs', 'team1_balls', 'team1_wickets',
+            'team2_score', 'team2_overs', 'team2_balls', 'team2_wickets',
+            'outcome'
+        ]);
+        $this->status = 'upcoming';
+    }
+    
+    public function getTeamName($id)
+    {
+        return Team::find($id)?->team_name ?? 'Unknown';
+    }
+}; ?>
+
+<div>
+    <x-mary-button label="Create Match" wire:click="$set('show', true)" class="btn-primary" icon="o-plus" />
+    
+    <x-mary-modal wire:model="show" title="{{ $editingMatchId ? 'Edit Match' : 'Create / Schedule Match' }}" class="backdrop-blur" box-class="w-11/12 max-w-4xl" @keydown.escape.window="$wire.resetForm()">
+        <form wire:submit.prevent="openConfirm" class="flex flex-col gap-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-mary-select wire:model.live="stage" label="Stage" :options="[
+                    ['id' => 'G', 'name' => 'Group Stage'],
+                    ['id' => 'QF', 'name' => 'Quarter-Finals'],
+                    ['id' => 'SF', 'name' => 'Semi-Finals'],
+                    ['id' => 'F', 'name' => 'The Final']
+                ]" required />
+
+                @if($stage === 'G')
+                    <x-mary-select wire:model.live="group_id" label="Group" :options="$groups" required placeholder="Select a Group" />
+                @endif
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-mary-select wire:model="team1_id" label="Team 1" :options="$availableTeams" option-label="team_name" option-value="id" required placeholder="Select Team 1" />
+                <x-mary-select wire:model="team2_id" label="Team 2" :options="$availableTeams" option-label="team_name" option-value="id" required placeholder="Select Team 2" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-mary-select wire:model="batting_first_id" label="Batting First (Optional)" :options="[
+                    ['id' => $team1_id, 'name' => $team1_id ? $this->getTeamName($team1_id) : 'Team 1'],
+                    ['id' => $team2_id, 'name' => $team2_id ? $this->getTeamName($team2_id) : 'Team 2']
+                ]" placeholder="Select team that batted first" />
+
+                <x-mary-select wire:model.live="status" label="Match Status" :options="[
+                    ['id' => 'upcoming', 'name' => 'Upcoming'],
+                    ['id' => 'live', 'name' => 'Live'],
+                    ['id' => 'finished', 'name' => 'Finished']
+                ]" required />
+            </div>
+
+            @if($status === 'finished')
+                <div class="divider">Match Results</div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Team 1 Score -->
+                    <div class="card bg-base-200 p-4">
+                        <h3 class="font-bold mb-4">{{ $team1_id ? $this->getTeamName($team1_id) : 'Team 1' }} Score</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-mary-input wire:model="team1_score" label="Runs" type="number" min="0" required />
+                            <x-mary-input wire:model="team1_wickets" label="Wickets" type="number" min="0" max="{{ $this->maxWickets }}" required />
+                            <x-mary-input wire:model="team1_overs" label="Overs" type="number" min="0" max="{{ $this->maxOvers }}" required />
+                            <x-mary-input wire:model="team1_balls" label="Balls" type="number" min="0" max="{{ $this->ballsPerOver - 1 }}" required />
+                        </div>
+                    </div>
+
+                    <!-- Team 2 Score -->
+                    <div class="card bg-base-200 p-4">
+                        <h3 class="font-bold mb-4">{{ $team2_id ? $this->getTeamName($team2_id) : 'Team 2' }} Score</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-mary-input wire:model="team2_score" label="Runs" type="number" min="0" required />
+                            <x-mary-input wire:model="team2_wickets" label="Wickets" type="number" min="0" max="{{ $this->maxWickets }}" required />
+                            <x-mary-input wire:model="team2_overs" label="Overs" type="number" min="0" max="{{ $this->maxOvers }}" required />
+                            <x-mary-input wire:model="team2_balls" label="Balls" type="number" min="0" max="{{ $this->ballsPerOver - 1 }}" required />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <x-mary-select wire:model="outcome" label="Match Outcome" :options="[
+                        ['id' => 'team1', 'name' => $team1_id ? $this->getTeamName($team1_id).' Won' : 'Team 1 Won'],
+                        ['id' => 'team2', 'name' => $team2_id ? $this->getTeamName($team2_id).' Won' : 'Team 2 Won'],
+                        ['id' => 'tie', 'name' => 'Tie / Draw']
+                    ]" required placeholder="Select winner" />
+                </div>
+            @endif
+
+            <x-slot:actions>
+                <x-mary-button label="Cancel" wire:click="$set('show', false); resetForm()" class="btn-ghost" />
+                <x-mary-button type="submit" label="{{ $status === 'finished' ? 'Review & Save' : 'Save Match' }}" class="btn-primary" />
+            </x-slot:actions>
+        </form>
+    </x-mary-modal>
+
+    <!-- Confirmation Modal -->
+    <x-mary-modal wire:model="showConfirm" title="Confirm Match Results" class="backdrop-blur">
+        <div class="text-center mb-6">
+            <h2 class="text-xl font-bold text-success mb-2">
+                @if($outcome === 'team1')
+                    {{ $this->getTeamName($team1_id) }} Won
+                @elseif($outcome === 'team2')
+                    {{ $this->getTeamName($team2_id) }} Won
+                @else
+                    Match Drawn
+                @endif
+            </h2>
+            <p class="text-sm opacity-70">Please review the scores carefully before saving. Standings will be automatically updated.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 text-center">
+            <div class="p-4 bg-base-200 rounded-lg">
+                <div class="font-bold mb-2">{{ $this->getTeamName($team1_id) }}</div>
+                <div class="text-2xl">{{ $team1_score }} / {{ $team1_wickets }}</div>
+                <div class="text-sm opacity-70">in {{ $team1_overs }}.{{ $team1_balls }} overs</div>
+            </div>
+            <div class="p-4 bg-base-200 rounded-lg">
+                <div class="font-bold mb-2">{{ $this->getTeamName($team2_id) }}</div>
+                <div class="text-2xl">{{ $team2_score }} / {{ $team2_wickets }}</div>
+                <div class="text-sm opacity-70">in {{ $team2_overs }}.{{ $team2_balls }} overs</div>
+            </div>
+        </div>
+
+        <x-slot:actions>
+            <x-mary-button label="Back to Edit" wire:click="cancelConfirm" class="btn-ghost" />
+            <x-mary-button label="Confirm & Save" wire:click="saveMatch" class="btn-primary" icon="o-check" />
+        </x-slot:actions>
+    </x-mary-modal>
+</div>

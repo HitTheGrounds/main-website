@@ -12,6 +12,10 @@ Route::get('/awards', function () {
     return view('awards');
 })->name('awards');
 
+Route::get('/scoreboard', function () {
+    return view('scoreboard');
+})->name('scoreboard');
+
 Route::get('/partners', function () {
     return view('partners');
 })->name('partners');

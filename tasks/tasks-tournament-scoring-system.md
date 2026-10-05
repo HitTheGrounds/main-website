@@ -169,14 +169,14 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 6.11 Write `tests/Feature/ScorerGroupMatchEntryTest.php`: test score validation (overs max 5, balls 0-3, wickets 0-11), draws allowed in group stage, group standings auto-update on finished match, duplicate pairing rejection, same-team rejection
   - [x] 6.12 Run `php artisan test` and verify all tests pass
 
-- [ ] 7.0 Public Scoreboard — Match Cards, Standings & Filtering — Build public-facing match result cards with status badges, group standings tables, and status filter tabs
-  - [ ] 7.1 Add public scoreboard route in `routes/web.php`: `GET /scoreboard` (no auth required) pointing to `scoreboard` view
-  - [ ] 7.2 Create `resources/views/scoreboard.blade.php`: public scoreboard page layout extending the public layout, with sections for match cards and group standings
-  - [ ] 7.3 Build `resources/views/livewire/public/match-cards.blade.php` as a Livewire component: status filter tabs (`All | 🟢 Live | 🕐 Upcoming | ✅ Finished`), render match cards with 3 visual states — Upcoming card (stage badge, Team 1 vs Team 2, "Upcoming" badge), Live card (Team 1 vs Team 2, pulsing "LIVE • Match in Progress" badge, batting first indicator), Finished card (innings runs, overs, wickets for both teams, bold winning margin badge)
-  - [ ] 7.4 Build `resources/views/livewire/public/group-standings.blade.php` as a Livewire component: tables for each group showing Pos, Team, P, W, L, D, Pts, NRR, "Qualified" badge on top 2 teams, strictly reflecting finished matches only
-  - [ ] 7.5 Ensure no edit controls, action buttons, or scorer-specific links are leaked to the public views — verify all scorer actions are hidden from guests
-  - [ ] 7.6 Write `tests/Feature/PublicScoreboardTest.php`: verify public guest can access `/scoreboard`, sees upcoming/live/finished cards, standings match finished games, no edit controls or scorer actions are present in the HTML
-  - [ ] 7.7 Run `php artisan test` and verify all tests pass
+- [x] 7.0 Public Scoreboard — Match Cards, Standings & Filtering — Build public-facing match result cards with status badges, group standings tables, and status filter tabs
+  - [x] 7.1 Add public scoreboard route in `routes/web.php`: `GET /scoreboard` (no auth required) pointing to `scoreboard` view
+  - [x] 7.2 Create `resources/views/scoreboard.blade.php`: public scoreboard page layout extending the public layout, with sections for match cards and group standings
+  - [x] 7.3 Build `resources/views/livewire/public/match-cards.blade.php` as a Livewire component: status filter tabs (`All | 🟢 Live | 🕐 Upcoming | ✅ Finished`), render match cards with 3 visual states — Upcoming card (stage badge, Team 1 vs Team 2, "Upcoming" badge), Live card (Team 1 vs Team 2, pulsing "LIVE • Match in Progress" badge, batting first indicator), Finished card (innings runs, overs, wickets for both teams, bold winning margin badge)
+  - [x] 7.4 Build `resources/views/livewire/public/group-standings.blade.php` as a Livewire component: tables for each group showing Pos, Team, P, W, L, D, Pts, NRR, "Qualified" badge on top 2 teams, strictly reflecting finished matches only
+  - [x] 7.5 Ensure no edit controls, action buttons, or scorer-specific links are leaked to the public views — verify all scorer actions are hidden from guests
+  - [x] 7.6 Write `tests/Feature/PublicScoreboardTest.php`: verify public guest can access `/scoreboard`, sees upcoming/live/finished cards, standings match finished games, no edit controls or scorer actions are present in the HTML
+  - [x] 7.7 Run `php artisan test` and verify all tests pass
 
 - [ ] 8.0 Knockout Stages — QF/SF/Final Scheduling & Bracket Slots — Build knockout match creation with bracket position assignment, slot locking rules, and stage-specific validation
   - [ ] 8.1 Add QF match creation flow to the scorer match-create modal: show bracket position selector (Slots 1-4) when stage = 'QF', populate Team 1 and Team 2 dropdowns from `group_teams.qualified = true` (8 teams), allow creating as Upcoming, Live, or Finished

@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.public>
     <div class="container mx-auto px-4 py-8">
         <div class="text-center mb-10">
             <h1 class="text-4xl font-extrabold text-base-content tracking-tight">Tournament Scoreboard</h1>
@@ -27,4 +27,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.public>

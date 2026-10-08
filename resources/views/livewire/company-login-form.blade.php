@@ -125,7 +125,7 @@ new class extends Component {
         cookie()->queue('company_token', $token, config('app.jwt_ttl'), '/', null, $secure, true, false, 'strict');
 
         // Redirect to dashboard
-        $this->redirect('/company/dashboard', navigate: true);
+        $this->redirect($user->is_admin ? '/admin/dashboard' : '/company/dashboard', navigate: true);
     }
 
     public function back(): void

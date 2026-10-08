@@ -91,7 +91,7 @@ php artisan migrate --seed
 ```
 
 > [!NOTE]
-> The seeder creates a test user (`test@example.com`). Admin access is managed through the admin area; promote your user as needed.
+> The seeder creates a test user (`test@example.com`) and an admin user (`admin@example.com`). To promote any other user, run `php artisan user:set-admin <email>`.
 
 ---
 

@@ -10,20 +10,53 @@
                 <p class="mt-4 text-base-content/75 text-lg">Hit the Grounds 2025 - Tournament Rules</p>
             </header>
 
-            <nav aria-label="Rule sections" class="mb-16 md:mb-24 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3" data-aos="fade-up">
-                <a href="#match-structure" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Match Structure</a>
-                <a href="#first-over" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">First Over - Special Rules</a>
-                <a href="#bowling" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Bowling Rules</a>
-                <a href="#fielding-wides" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Fielding and Wide Rules</a>
-                <a href="#special-situations" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Special Situations</a>
-                <a href="#finals" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Finals - Special Rules</a>
-                <a href="#general" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">General Regulations</a>
-                <a href="#umpire" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Umpire Authority</a>
-            </nav>
+            <div class="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-14">
+                <aside class="hidden lg:block">
+                    <nav aria-label="Rule sections" class="sticky top-28 flex flex-col">
+                    <a href="#match-structure" data-spy="match-structure" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Match Structure
+                    </a>
+                    <a href="#first-over" data-spy="first-over" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>First Over - Special Rules
+                    </a>
+                    <a href="#bowling" data-spy="bowling" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Bowling Rules
+                    </a>
+                    <a href="#fielding-wides" data-spy="fielding-wides" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Fielding and Wide Rules
+                    </a>
+                    <a href="#special-situations" data-spy="special-situations" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Special Situations
+                    </a>
+                    <a href="#finals" data-spy="finals" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Finals - Special Rules
+                    </a>
+                    <a href="#general" data-spy="general" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>General Regulations
+                    </a>
+                    <a href="#umpire" data-spy="umpire" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Umpire Authority
+                    </a>
+                    </nav>
+                </aside>
 
-            <div class="space-y-16 md:space-y-24">
+                <div class="min-w-0">
+                    <nav aria-label="Rule sections" class="lg:hidden sticky top-[4.5rem] z-30 -mx-4 sm:-mx-6 mb-10 bg-base-100/90 backdrop-blur-md">
+                        <div id="chip-row" class="relative flex gap-2 overflow-x-auto snap-x px-4 sm:px-6 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                        <a href="#match-structure" data-spy="match-structure" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Match Structure</a>
+                        <a href="#first-over" data-spy="first-over" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">First Over - Special Rules</a>
+                        <a href="#bowling" data-spy="bowling" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Bowling Rules</a>
+                        <a href="#fielding-wides" data-spy="fielding-wides" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Fielding and Wide Rules</a>
+                        <a href="#special-situations" data-spy="special-situations" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Special Situations</a>
+                        <a href="#finals" data-spy="finals" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Finals - Special Rules</a>
+                        <a href="#general" data-spy="general" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">General Regulations</a>
+                        <a href="#umpire" data-spy="umpire" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Umpire Authority</a>
+                        </div>
+                    </nav>
 
-        <section id="match-structure" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+            <div class="space-y-14 md:space-y-24">
+
+        <section id="match-structure" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Match Structure</h2>
             <img src="/images/rulebook_illustrations/orange/header_match_structure.avif" alt="Match Structure" class="mt-6 w-full max-w-md h-auto ">
@@ -49,7 +82,7 @@
           </div>
         </section>
 
-        <section id="first-over" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="first-over" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">First Over - Special Rules</h2>
             <img src="/images/rulebook_illustrations/orange/header_first_over.avif" alt="First Over" class="mt-6 w-full max-w-md h-auto ">
@@ -84,7 +117,7 @@
           </div>
         </section>
 
-        <section id="bowling" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="bowling" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Bowling Rules</h2>
             <img src="/images/rulebook_illustrations/orange/header_bowling_rules.avif" alt="Bowling Rules" class="mt-6 w-full max-w-md h-auto ">
@@ -118,7 +151,7 @@
           </div>
         </section>
 
-        <section id="fielding-wides" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="fielding-wides" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Fielding and Wide Rules</h2>
             <img src="/images/rulebook_illustrations/orange/header_fielding.avif" alt="Fielding Rules" class="mt-6 w-full max-w-md h-auto ">
@@ -142,7 +175,7 @@
           </div>
         </section>
 
-        <section id="special-situations" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="special-situations" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Special Situations</h2>
             <img src="/images/rulebook_illustrations/orange/header_special_situations.avif" alt="Special Situations" class="mt-6 w-full max-w-md h-auto ">
@@ -170,7 +203,7 @@
           </div>
         </section>
 
-        <section id="finals" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="finals" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Finals - Special Rules</h2>
             <img src="/images/rulebook_illustrations/orange/header_finals.avif" alt="Finals" class="mt-6 w-full max-w-md h-auto ">
@@ -187,7 +220,7 @@
           </div>
         </section>
 
-        <section id="general" class="scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="general" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
             <h2 class="font-heading text-3xl sm:text-4xl text-base-content">General Regulations</h2>
             <img src="/images/rulebook_illustrations/orange/header_general_regulations.avif" alt="General Regulations" class="mt-6 w-full max-w-md h-auto ">
@@ -215,7 +248,7 @@
           </div>
         </section>
 
-        <section id="umpire" class="scroll-mt-28 rounded-2xl bg-secondary text-secondary-content p-8 sm:p-12 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
+        <section id="umpire" class="scroll-mt-36 lg:scroll-mt-28 rounded-2xl bg-secondary text-secondary-content p-8 sm:p-12 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5">
             <h2 class="font-heading text-3xl sm:text-4xl">Umpire Authority</h2>
             <img src="/images/rulebook_illustrations/orange/header_umpire_authority.avif" alt="Umpire Authority" class="mt-6 w-full max-w-md h-auto">
@@ -243,6 +276,30 @@
         </section>
 
             </div>
+                </div>
+            </div>
         </div>
     </div>
+    <script>
+        (function () {
+            const links = document.querySelectorAll('[data-spy]');
+            if (!links.length || !('IntersectionObserver' in window)) return;
+            const byId = {};
+            links.forEach(l => (byId[l.dataset.spy] = byId[l.dataset.spy] || []).push(l));
+            const row = document.getElementById('chip-row');
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (!e.isIntersecting) return;
+                    links.forEach(l => l.removeAttribute('aria-current'));
+                    (byId[e.target.id] || []).forEach(l => {
+                        l.setAttribute('aria-current', 'true');
+                        if (row && row.contains(l)) {
+                            row.scrollTo({ left: l.offsetLeft - 16, behavior: 'smooth' });
+                        }
+                    });
+                });
+            }, { rootMargin: '-25% 0px -65% 0px' });
+            Object.keys(byId).forEach(id => { const el = document.getElementById(id); if (el) io.observe(el); });
+        })();
+    </script>
 </x-layouts.public>

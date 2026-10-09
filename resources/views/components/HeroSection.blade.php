@@ -81,6 +81,7 @@
     <div class="lg:col-span-5 reveal reveal-d2">
       <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
         <div data-stage class="relative aspect-[4/5] w-full">
+          <img src="/hero/field.webp" alt="" aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 w-[112%] max-w-none -translate-x-1/2 -translate-y-1/2 select-none">
           <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
             <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
             <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>
@@ -90,7 +91,6 @@
             <circle cx="316" cy="96" r="11" fill="#FF6A13"/>
           </svg>
         </div>
-        <p data-hint class="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-base-content/60 transition-opacity duration-700">Drag to rotate</p>
       </div>
     </div>
   </div>

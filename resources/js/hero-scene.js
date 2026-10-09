@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 const mount = document.getElementById('hero-3d');
@@ -35,8 +34,8 @@ async function init() {
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
-    renderer.domElement.className = 'absolute inset-0 h-full w-full touch-pan-y cursor-grab active:cursor-grabbing opacity-0 transition-opacity duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)]';
-    renderer.domElement.setAttribute('aria-label', 'Interactive 3D cricketer on a throne of bats. Drag to rotate.');
+    renderer.domElement.className = 'absolute inset-0 h-full w-full pointer-events-none opacity-0 transition-opacity duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)]';
+    renderer.domElement.setAttribute('aria-label', 'A cricketer seated on a throne of bats.');
     renderer.domElement.setAttribute('role', 'img');
     stage.appendChild(renderer.domElement);
 
@@ -105,24 +104,6 @@ async function init() {
         pivot.add(obj);
     }
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = false;
-    controls.enablePan = false;
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.07;
-    controls.rotateSpeed = 0.7;
-    controls.minPolarAngle = Math.PI * 0.38;
-    controls.maxPolarAngle = Math.PI * 0.56;
-    controls.target.set(0, 0, 0);
-
-    let lastInput = -Infinity;
-    const hint = mount.querySelector('[data-hint]');
-    controls.addEventListener('start', () => {
-        lastInput = performance.now();
-        if (hint) hint.style.opacity = '0';
-    });
-    controls.addEventListener('end', () => { lastInput = performance.now(); });
-
     function resize() {
         const { clientWidth: w, clientHeight: h } = stage;
         if (!w || !h) return;
@@ -144,9 +125,6 @@ async function init() {
         const dt = clock.getDelta();
         const t = clock.elapsedTime;
         if (!reduceMotion) mixer.update(dt);
-        const idle = performance.now() - lastInput > 2500;
-        if (!reduceMotion && idle) pivot.rotation.y = Math.sin(t * 0.45) * 0.35;
-        controls.update();
         renderer.render(scene, camera);
     }
     frame();

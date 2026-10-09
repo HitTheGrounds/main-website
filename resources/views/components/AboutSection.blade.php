@@ -2,8 +2,8 @@
     class="hero min-h-screen relative overflow-hidden bg-secondary text-secondary-content">
     <!-- Line-and-circle motif -->
     <svg aria-hidden="true" class="absolute -left-24 -top-24 w-[32rem] h-[32rem] opacity-30 hidden sm:block" viewBox="0 0 400 400" fill="none">
-      <circle cx="200" cy="200" r="180" stroke="#F6F2E8" stroke-width="1.5" stroke-dasharray="2 8" stroke-linecap="round"/>
-      <circle cx="200" cy="200" r="120" stroke="#F6F2E8" stroke-width="1.5"/>
+      <circle cx="200" cy="200" r="180" stroke="#F4F1EA" stroke-width="1.5" stroke-dasharray="2 8" stroke-linecap="round"/>
+      <circle cx="200" cy="200" r="120" stroke="#F4F1EA" stroke-width="1.5"/>
       <circle cx="200" cy="200" r="20" fill="#FF6A13"/>
     </svg>
 

@@ -1,4 +1,5 @@
- <div class="navbar bg-base-100 border-b-2 border-secondary px-2 sm:px-4 md:px-6">
+ <header class="sticky top-0 z-40 px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none">
+  <div class="navbar pointer-events-auto max-w-6xl mx-auto rounded-full bg-[#FBF9F4]/90 backdrop-blur-xl ring-1 ring-black/5 shadow-[0_12px_32px_-16px_rgba(31,27,22,0.25)] px-3 sm:px-5 min-h-0 py-1.5">
     <div class="navbar-start">
       <!-- Mobile Menu Dropdown -->
       <div class="dropdown lg:hidden">
@@ -18,7 +19,7 @@
         </div>
         <ul
           tabindex="0"
-          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow border border-base-300">
+          class="menu menu-sm dropdown-content bg-base-100 rounded-2xl z-[1] mt-5 w-56 p-2 shadow border border-base-300">
           <li><a href="/" class="{{ request()->routeIs('home') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Home</a></li>
           {{-- <li><a href="{{ route('registrations') }}" class="{{ request()->routeIs('registrations') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Registrations</a></li> --}}
           <li><a href="{{ route('rules') }}" class="{{ request()->routeIs('rules') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Rules</a></li>
@@ -69,21 +70,22 @@
 
       @if($user)
         @if($isAdmin)
-          <a href="{{ route('admin.dashboard') }}" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+          <a href="{{ route('admin.dashboard') }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
             <span class="hidden sm:inline">Admin Dashboard</span>
             <span class="sm:hidden">Admin</span>
           </a>
         @else
-          <a href="{{ route('company.dashboard') }}" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+          <a href="{{ route('company.dashboard') }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
             <span class="hidden sm:inline">Dashboard</span>
             <span class="sm:hidden">Dashboard</span>
           </a>
         @endif
       @else
-        <a href="{{ route('login') }}" class="btn btn-primary btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+        <a href="{{ route('login') }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
           <span class="hidden sm:inline">Company Login</span>
           <span class="sm:hidden">Login</span>
         </a>
       @endif
     </div>
   </div>
+</header>

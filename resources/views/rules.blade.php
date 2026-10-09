@@ -10,15 +10,15 @@
                 <p class="mt-4 text-base-content/75 text-lg">Hit the Grounds 2025 - Tournament Rules</p>
             </header>
 
-            <nav aria-label="Rule sections" class="mb-16 md:mb-24 flex flex-wrap gap-2" data-aos="fade-up">
-                <a href="#match-structure" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Match Structure</a>
-                <a href="#first-over" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">First Over - Special Rules</a>
-                <a href="#bowling" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Bowling Rules</a>
-                <a href="#fielding-wides" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Fielding and Wide Rules</a>
-                <a href="#special-situations" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Special Situations</a>
-                <a href="#finals" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Finals - Special Rules</a>
-                <a href="#general" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">General Regulations</a>
-                <a href="#umpire" class="rounded-full border-2 border-base-content/20 px-4 py-1.5 text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Umpire Authority</a>
+            <nav aria-label="Rule sections" class="mb-16 md:mb-24 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3" data-aos="fade-up">
+                <a href="#match-structure" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Match Structure</a>
+                <a href="#first-over" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">First Over - Special Rules</a>
+                <a href="#bowling" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Bowling Rules</a>
+                <a href="#fielding-wides" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Fielding and Wide Rules</a>
+                <a href="#special-situations" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Special Situations</a>
+                <a href="#finals" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Finals - Special Rules</a>
+                <a href="#general" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">General Regulations</a>
+                <a href="#umpire" class="rounded-full border-2 border-base-content/20 px-4 py-2.5 text-center text-sm font-semibold text-base-content transition-colors duration-300 hover:border-base-content hover:bg-base-200">Umpire Authority</a>
             </nav>
 
             <div class="space-y-16 md:space-y-24">

@@ -80,21 +80,24 @@
                 <p class="text-base-content/80 text-base md:text-lg leading-relaxed mb-6">
                   Celebrating individual excellence across various categories. These awards recognize players who shine in specific aspects of the game.
                 </p>
-<ul class="divide-y divide-base-content/20 border-y border-base-content/20 text-left">
-                  <li class="flex items-center gap-4 py-4 text-lg font-semibold text-base-content">
-                    <span class="grid size-11 shrink-0 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14.2 17.6 6.6a2.2 2.2 0 0 1 3.1 3.1L13.1 17.3z"/><path d="m10 14.2-4.6 4.6M13.1 17.3l-1 1"/><circle cx="6" cy="6" r="2"/></svg>
-                    </span>Best Batsman
+                <ul class="grid grid-cols-3 gap-4 text-left">
+                  <li class="border-t-2 border-base-content pt-4">
+                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="9.2" y="1.5" width="5.6" height="12.5" rx="1.6"/><path d="M12 4.5v7"/><path d="M12 14v6.5"/><path d="M10.6 20.5h2.8"/></g><circle cx="19" cy="19.2" r="1.9"/></svg>
+                    </span>
+                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Batsman</p>
                   </li>
-                  <li class="flex items-center gap-4 py-4 text-lg font-semibold text-base-content">
-                    <span class="grid size-11 shrink-0 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M6.3 6.2c3.2 2.3 3.2 9.3 0 11.6M17.7 6.2c-3.2 2.3-3.2 9.3 0 11.6"/></svg>
-                    </span>Best Bowler
+                  <li class="border-t-2 border-base-content pt-4">
+                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14.5" cy="12" r="7"/><path d="M11.2 6.3c2.4 3.3 2.4 8 0 11.4"/><path d="M12.4 8.2l-1.3.6M13.2 11l-1.5.2M13.2 13.8l-1.5-.2M12.4 16.2l-1.3-.6" stroke-width="1.2"/><path d="M1.5 8.5h3.5M0.8 12h4M1.5 15.5H5"/></svg>
+                    </span>
+                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Bowler</p>
                   </li>
-                  <li class="flex items-center gap-4 py-4 text-lg font-semibold text-base-content">
-                    <span class="grid size-11 shrink-0 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20.5c0-3.9 3.1-6.2 7-6.2s7 2.3 7 6.2"/><path d="M15.2 5.2c1.8.4 2.9 1.7 3.3 3.4"/></svg>
-                    </span>Best Female Player
+                  <li class="border-t-2 border-base-content pt-4">
+                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="5"/><path d="M12 13.5v7.5M8.8 18h6.4"/></svg>
+                    </span>
+                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Female Player</p>
                   </li>
                 </ul>
               </div>

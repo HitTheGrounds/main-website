@@ -6,10 +6,13 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 const mount = document.getElementById('hero-3d');
 
+const UNIT = 100;
+
 // Scene layout: tweak these to re-pose the models.
 const LAYOUT = {
     throne: { pos: [0, 0, 0], scale: 1 },
-    cricketer: { pos: [0, -0.1, 0.75], scale: 0.88 },
+    // Mixamo export is in centimetre-scaled units, so UNIT brings it back to ~1.9 tall
+    cricketer: { pos: [0, -0.8, 0.15], scale: 0.88 * UNIT },
 };
 
 function webglAvailable() {
@@ -79,11 +82,19 @@ async function init() {
 
     let throne, cricketer;
     try {
-        [throne, cricketer] = await Promise.all([load('/models/Throne.glb'), load('/models/Cricketer.glb')]);
+        [throne, cricketer] = await Promise.all([load('/models/Throne.glb'), load('/models/CricketerSitting.glb')]);
     } catch (e) {
         renderer.dispose();
         renderer.domElement.remove();
         return; // fallback card stays visible
+    }
+
+    // Seated cricketer: loop the Mixamo sitting clip
+    const mixer = new THREE.AnimationMixer(cricketer.scene);
+    if (cricketer.animations.length) {
+        const action = mixer.clipAction(cricketer.animations[0]);
+        action.play();
+        if (reduceMotion) { action.paused = true; }
     }
 
     for (const [gltf, cfg] of [[throne, LAYOUT.throne], [cricketer, LAYOUT.cricketer]]) {
@@ -129,7 +140,9 @@ async function init() {
     function frame() {
         requestAnimationFrame(frame);
         if (!visible || document.hidden) return;
-        const t = clock.getElapsedTime();
+        const dt = clock.getDelta();
+        const t = clock.elapsedTime;
+        if (!reduceMotion) mixer.update(dt);
         const idle = performance.now() - lastInput > 2500;
         if (!reduceMotion && idle) pivot.rotation.y = Math.sin(t * 0.45) * 0.35;
         controls.update();

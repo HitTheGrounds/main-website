@@ -11,40 +11,61 @@
         </p>
       </header>
 
-      <ol>
-        <!-- Event Announcement -->
-        <li class="grid gap-3 border-t-2 border-base-content py-8 md:grid-cols-12 md:gap-10" data-aos="fade-up">
-          <time class="md:col-span-5 font-heading text-3xl sm:text-4xl text-base-content">October 11th, 2025</time>
-          <div class="md:col-span-7">
-            <h2 class="font-heading text-2xl md:text-3xl text-base-content">Event Announcement</h2>
-            <p class="mt-2 text-base-content/75 text-lg">Official announcement of Hit the Grounds 2025</p>
+      <ol class="max-w-5xl">
+        <li class="relative grid grid-cols-[3.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,15rem)_3.5rem_minmax(0,1fr)] gap-x-4 md:gap-x-6 pb-10 last:pb-0" data-aos="fade-up">
+          <time class="hidden md:block pt-4 text-right text-sm font-semibold uppercase tracking-[0.18em] text-base-content">October 11th, 2025</time>
+          <div class="relative flex justify-center">
+            <span aria-hidden="true" class="absolute left-1/2 top-14 -bottom-10 w-px -translate-x-1/2 bg-base-content/25"></span>
+            <span class="relative z-10 grid size-14 place-items-center rounded-full border-2 bg-base-100 border-base-content text-base-content">
+              <x-mary-icon name="o-megaphone" class="w-6 h-6" />
+            </span>
+          </div>
+          <div class="rounded-xl p-6 sm:p-7 bg-base-100 border-2 border-base-content/15 text-base-content">
+            <time class="md:hidden mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-base-content">October 11th, 2025</time>
+            <h2 class="font-heading text-2xl md:text-3xl">Event Announcement</h2>
+            <p class="mt-2 text-lg text-base-content/75">Official announcement of Hit the Grounds 2025</p>
           </div>
         </li>
-
-        <!-- Open Registrations -->
-        <li class="grid gap-3 border-t border-base-content/25 py-8 md:grid-cols-12 md:gap-10" data-aos="fade-up">
-          <time class="md:col-span-5 font-heading text-3xl sm:text-4xl text-base-content">October 21st, 2025</time>
-          <div class="md:col-span-7">
-            <h2 class="font-heading text-2xl md:text-3xl text-base-content">Open Registrations</h2>
-            <p class="mt-2 text-base-content/75 text-lg">Team registration opens - secure your spot!</p>
+        <li class="relative grid grid-cols-[3.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,15rem)_3.5rem_minmax(0,1fr)] gap-x-4 md:gap-x-6 pb-10 last:pb-0" data-aos="fade-up">
+          <time class="hidden md:block pt-4 text-right text-sm font-semibold uppercase tracking-[0.18em] text-base-content">October 21st, 2025</time>
+          <div class="relative flex justify-center">
+            <span aria-hidden="true" class="absolute left-1/2 top-14 -bottom-10 w-px -translate-x-1/2 bg-base-content/25"></span>
+            <span class="relative z-10 grid size-14 place-items-center rounded-full border-2 bg-base-100 border-base-content text-base-content">
+              <x-mary-icon name="o-clipboard-document-check" class="w-6 h-6" />
+            </span>
+          </div>
+          <div class="rounded-xl p-6 sm:p-7 bg-base-100 border-2 border-base-content/15 text-base-content">
+            <time class="md:hidden mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-base-content">October 21st, 2025</time>
+            <h2 class="font-heading text-2xl md:text-3xl">Open Registrations</h2>
+            <p class="mt-2 text-lg text-base-content/75">Team registration opens - secure your spot!</p>
           </div>
         </li>
-
-        <!-- Registration Closing -->
-        <li class="grid gap-3 border-t border-base-content/25 py-8 md:grid-cols-12 md:gap-10" data-aos="fade-up">
-          <time class="md:col-span-5 font-heading text-3xl sm:text-4xl text-base-content">November 12th, 2025</time>
-          <div class="md:col-span-7">
-            <h2 class="font-heading text-2xl md:text-3xl text-base-content">Registration Closing</h2>
-            <p class="mt-2 text-base-content/75 text-lg">Last chance to register your team</p>
+        <li class="relative grid grid-cols-[3.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,15rem)_3.5rem_minmax(0,1fr)] gap-x-4 md:gap-x-6 pb-10 last:pb-0" data-aos="fade-up">
+          <time class="hidden md:block pt-4 text-right text-sm font-semibold uppercase tracking-[0.18em] text-base-content">November 12th, 2025</time>
+          <div class="relative flex justify-center">
+            <span aria-hidden="true" class="absolute left-1/2 top-14 -bottom-10 w-px -translate-x-1/2 bg-base-content/25"></span>
+            <span class="relative z-10 grid size-14 place-items-center rounded-full border-2 bg-base-100 border-base-content text-base-content">
+              <x-mary-icon name="o-clock" class="w-6 h-6" />
+            </span>
+          </div>
+          <div class="rounded-xl p-6 sm:p-7 bg-base-100 border-2 border-base-content/15 text-base-content">
+            <time class="md:hidden mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-base-content">November 12th, 2025</time>
+            <h2 class="font-heading text-2xl md:text-3xl">Registration Closing</h2>
+            <p class="mt-2 text-lg text-base-content/75">Last chance to register your team</p>
           </div>
         </li>
-
-        <!-- Event Day -->
-        <li class="grid gap-3 border-y-2 border-base-content py-10 md:grid-cols-12 md:gap-10" data-aos="fade-up">
-          <time class="md:col-span-5 font-heading text-4xl sm:text-5xl text-primary">January 24th, 2026</time>
-          <div class="md:col-span-7">
-            <h2 class="font-heading text-3xl md:text-4xl text-base-content">Event Day</h2>
-            <p class="mt-2 text-lg font-semibold text-base-content/85">The big day - Let the games begin! 🏏</p>
+        <li class="relative grid grid-cols-[3.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,15rem)_3.5rem_minmax(0,1fr)] gap-x-4 md:gap-x-6 pb-10 last:pb-0" data-aos="fade-up">
+          <time class="hidden md:block pt-4 text-right text-sm font-semibold uppercase tracking-[0.18em] text-primary-ink">January 24th, 2026</time>
+          <div class="relative flex justify-center">
+            
+            <span class="relative z-10 grid size-14 place-items-center rounded-full border-2 bg-primary border-primary text-primary-content">
+              <x-mary-icon name="o-trophy" class="w-6 h-6" />
+            </span>
+          </div>
+          <div class="rounded-xl p-6 sm:p-7 bg-primary text-primary-content">
+            <time class="md:hidden mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">January 24th, 2026</time>
+            <h2 class="font-heading text-2xl md:text-3xl">Event Day</h2>
+            <p class="mt-2 text-lg text-primary-content/90 font-semibold">The big day - Let the games begin! 🏏</p>
           </div>
         </li>
       </ol>

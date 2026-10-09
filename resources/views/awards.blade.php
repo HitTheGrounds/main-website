@@ -81,21 +81,21 @@
                   Celebrating individual excellence across various categories. These awards recognize players who shine in specific aspects of the game.
                 </p>
                 <ul class="grid grid-cols-3 gap-4 text-left">
-                  <li class="border-t-2 border-base-content pt-4">
+                  <li>
                     <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(45 12 12)"><rect x="9.2" y="1.5" width="5.6" height="12.5" rx="1.6"/><path d="M12 4.5v7"/><path d="M12 14v6.5"/><path d="M10.6 20.5h2.8"/></g><circle cx="19" cy="19.2" r="1.9"/></svg>
+                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M243.31,81.37,190.63,28.69a16,16,0,0,0-22.63,0L60.69,136a16,16,0,0,0,0,22.63l20.68,20.68-47,47a8,8,0,0,0,11.32,11.32l47-47,20.68,20.68a16,16,0,0,0,22.63,0L243.31,104a16,16,0,0,0,0-22.63ZM124.69,200,104,179.31l29.66-29.65a8,8,0,0,0-11.32-11.32L92.69,168,72,147.31,107.31,112H160v52.69ZM232,92.69l-56,56V104a8,8,0,0,0-8-8H123.31l56-56L232,92.68ZM60,88A28,28,0,1,0,32,60,28,28,0,0,0,60,88Zm0-40A12,12,0,1,1,48,60,12,12,0,0,1,60,48Z"></path></svg>
                     </span>
                     <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Batsman</p>
                   </li>
-                  <li class="border-t-2 border-base-content pt-4">
+                  <li>
                     <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="14.5" cy="12" r="7"/><path d="M11.2 6.3c2.4 3.3 2.4 8 0 11.4"/><path d="M12.4 8.2l-1.3.6M13.2 11l-1.5.2M13.2 13.8l-1.5-.2M12.4 16.2l-1.3-.6" stroke-width="1.2"/><path d="M1.5 8.5h3.5M0.8 12h4M1.5 15.5H5"/></svg>
+                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM72.09,195.91c.82-1,1.64-1.93,2.42-2.91A8,8,0,1,0,62,183l-1.34,1.62a87.82,87.82,0,0,1,0-113.24L62,73A8,8,0,1,0,74.51,63c-.78-1-1.6-2-2.42-2.91a87.84,87.84,0,0,1,111.82,0c-.82,1-1.64,1.92-2.42,2.91A8,8,0,1,0,194,73l1.34-1.62a87.82,87.82,0,0,1,0,113.24L194,183a8,8,0,1,0-12.48,10c.78,1,1.6,1.95,2.42,2.91a87.84,87.84,0,0,1-111.82,0Zm23.8-50.59a104.5,104.5,0,0,1-4.48,17.35,8,8,0,0,1-15.09-5.34,87.1,87.1,0,0,0,3.79-14.65,8,8,0,1,1,15.78,2.64Zm0-34.64a8,8,0,0,1-6.57,9.21A8.52,8.52,0,0,1,88,120a8,8,0,0,1-7.88-6.68,87.1,87.1,0,0,0-3.79-14.65,8,8,0,0,1,15.09-5.34A104.5,104.5,0,0,1,95.89,110.68Zm78.91,56.86a8,8,0,0,1-10.21-4.87,104.5,104.5,0,0,1-4.48-17.35,8,8,0,1,1,15.78-2.64,87.1,87.1,0,0,0,3.79,14.65A8,8,0,0,1,174.8,167.54Zm-14.69-56.86a104.5,104.5,0,0,1,4.48-17.35,8,8,0,0,1,15.09,5.34,87.1,87.1,0,0,0-3.79,14.65A8,8,0,0,1,168,120a8.52,8.52,0,0,1-1.33-.11A8,8,0,0,1,160.11,110.68Z"></path></svg>
                     </span>
                     <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Bowler</p>
                   </li>
-                  <li class="border-t-2 border-base-content pt-4">
+                  <li>
                     <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="5"/><path d="M12 13.5v7.5M8.8 18h6.4"/></svg>
+                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M208,96a80,80,0,1,0-88,79.6V200H88a8,8,0,0,0,0,16h32v24a8,8,0,0,0,16,0V216h32a8,8,0,0,0,0-16H136V175.6A80.11,80.11,0,0,0,208,96ZM64,96a64,64,0,1,1,64,64A64.07,64.07,0,0,1,64,96Z"></path></svg>
                     </span>
                     <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Female Player</p>
                   </li>

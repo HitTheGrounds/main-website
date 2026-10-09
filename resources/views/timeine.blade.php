@@ -12,7 +12,7 @@
                   <x-mary-icon name="s-calendar" class="w-8 h-8" />
                 </div>
                 <h3 class="text-xl font-title text-base-content mb-2">Tournament Duration</h3>
-                <p class="text-primary text-3xl font-title">1 Day</p>
+                <p class="text-primary-ink text-3xl font-title">1 Day</p>
                 <p class="text-base-content/70 text-sm mt-2">Full day of cricket action</p>
               </div>
             </div>

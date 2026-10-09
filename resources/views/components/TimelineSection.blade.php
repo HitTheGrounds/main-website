@@ -5,7 +5,7 @@
       <div class="text-center mb-12 md:mb-16" data-aos="fade-up" data-aos-duration="1000">
         <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
           <span class="text-base-content">Event </span>
-          <span class="text-primary">Timeline</span>
+          <span class="text-primary-ink">Timeline</span>
         </h2>
         <p class="text-base-content/80 text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
           Mark your calendars! Here are the key dates for Hit the Grounds 2025.
@@ -91,9 +91,9 @@
 
       <!-- Countdown or CTA Card -->
       <div class="mt-16 max-w-3xl mx-auto" data-aos="fade-up" data-aos-duration="1500">
-        <div class="card bg-gradient-to-r from-primary/20 to-accent/20 shadow-xl border border-primary">
+        <div class="card bg-base-200 border-2 border-secondary">
           <div class="card-body text-center p-8">
-            <h3 class="text-2xl md:text-3xl font-title text-primary mb-4">
+            <h3 class="text-2xl md:text-3xl font-title text-primary-ink mb-4">
               Don't Miss Out!
             </h3>
             <p class="text-base-content/80 text-base md:text-lg mb-6">

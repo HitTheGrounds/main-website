@@ -1,7 +1,7 @@
 
 <section class="bg-base-200 py-16 md:py-24">
   <div class="container mx-auto px-4">
-    <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 font-title" data-aos="zoom-in">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 font-title" data-aos="fade-up">
       Meet the Contenders
     </h2>
 

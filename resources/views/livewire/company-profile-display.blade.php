@@ -65,7 +65,7 @@ new class extends Component {
         <div data-aos="fade-up" data-aos-delay="100">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-3xl font-bold">
-                    <span class="text-primary">Registered</span>
+                    <span class="text-primary-ink">Registered</span>
                     <span class="text-base-content">Teams</span>
                 </h2>
             </div>

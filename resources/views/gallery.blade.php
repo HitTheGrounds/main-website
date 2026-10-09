@@ -43,7 +43,7 @@
             </div>
 
             <div class="gallery-title-wrapper absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div class="gallery-title bg-black/60 backdrop-blur-sm px-8 py-4 rounded-lg inline-block">
+                <div class="gallery-title bg-secondary text-secondary-content px-8 py-4 rounded-lg inline-block">
                     <h1 class="font-bold font-title">Hit the Grounds Memories</h1>
                 </div>
             </div>

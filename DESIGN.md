@@ -38,6 +38,7 @@ Hex values are the source of truth (sampled from the kit). daisyUI themes take O
 | **base-300** | Pitch Dust | `#D9D1BC` | `oklch(86% 0.04 90)` | Borders, dividers, footer band |
 | **base-content** | Deep Navy Ink | `#0E1F4D` | `oklch(26% 0.09 265)` | All body text and headings on cream (≈14:1) |
 | **primary** | Signal Orange | `#FF6A13` | `oklch(70% 0.19 45)` | Primary buttons, big display words, key discs and rules. **Never** small text on cream (≈2.7:1) |
+| **primary-ink** (Tailwind token `text-primary-ink`) | Burnt Orange Ink | `#B8480A` | `oklch(53% 0.15 45)` | Orange *text* on cream at any size (≈4.9:1). Bright Signal Orange stays for fills and hero-scale display type |
 | **primary-content** | Navy on Orange | `#0E1F4D` | `oklch(26% 0.09 265)` | Text on orange buttons (≈5.5:1; white on orange fails) |
 | **secondary** | Deep Navy | `#0E1F4D` | `oklch(26% 0.09 265)` | Secondary buttons, dark bands, stage backdrops, footer variant |
 | **secondary-content** | Cream on Navy | `#F6F2E8` | `oklch(96% 0.014 90)` | Text on navy surfaces (≈14:1) |

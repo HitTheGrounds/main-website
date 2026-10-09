@@ -188,7 +188,7 @@ new class extends Component {
     @else
         <!-- Verification Form -->
         <div class="text-center">
-            <h1 class="text-2xl font-bold text-primary">{{ __('Verify Your Email') }}</h1>
+            <h1 class="text-2xl font-bold text-primary-ink">{{ __('Verify Your Email') }}</h1>
             <p class="mt-1 text-sm text-base-content/70">
                 {{ __("We've sent a 6-digit verification code to") }} {{ $email }}
             </p>

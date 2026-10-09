@@ -10,9 +10,9 @@ const UNIT = 100;
 
 // Scene layout: tweak these to re-pose the models.
 const LAYOUT = {
-    throne: { pos: [0, 0, 0], scale: 1 },
+    throne: { pos: [0, -0.14, 0], scale: 0.85 },
     // Mixamo export is in centimetre-scaled units, so UNIT brings it back to ~1.9 tall
-    cricketer: { pos: [0, -0.8, 0.15], scale: 0.88 * UNIT },
+    cricketer: { pos: [0, -0.84, 0.12], scale: 0.88 * UNIT },
 };
 
 function webglAvailable() {

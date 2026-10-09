@@ -33,7 +33,7 @@
 
       <!-- Logo -->
       <a href="/" class="px-1 sm:px-4 flex items-center gap-2 cursor-pointer">
-        <img src="/nav_logo_dark.avif" alt="HIT THE GROUNDS" class="h-8 sm:h-10 md:h-12 block">
+        <img src="/nav_logo_orange.avif" alt="HIT THE GROUNDS" class="h-8 sm:h-10 md:h-12 block">
         <img src="/cse.avif" alt="CSE" class="h-8 sm:h-10 md:h-12 hidden lg:block ml-5">
       </a>
     </div>

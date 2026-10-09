@@ -45,7 +45,7 @@ async function init() {
     scene.environmentIntensity = 0.7;
 
     const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-    camera.position.set(0, 0.3, 5.6);
+    camera.position.set(0, -0.12, 5.1);
 
     // Warm key from the front, orange rim from behind to tie into the theme
     const key = new THREE.DirectionalLight(0xfff1e0, 2.2);

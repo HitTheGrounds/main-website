@@ -60,37 +60,38 @@
           <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </a>
       </div>
+
+      <div class="hero-stats reveal reveal-d3 mt-10 flex gap-8 sm:gap-12 border-t border-base-300 pt-6 max-w-md">
+        <div>
+          <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="20">0+</div>
+          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</div>
+        </div>
+        <div>
+          <div class="font-heading text-3xl sm:text-4xl text-primary-ink" data-count="300">0+</div>
+          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
+        </div>
+        <div>
+          <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="100">0%</div>
+          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Entertainment</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Pitch diagram + stats (double bezel) -->
+    <!-- Interactive 3D canvas (falls back to the field diagram) -->
     <div class="lg:col-span-5 reveal reveal-d2">
       <div class="bezel-shell">
-        <div class="bezel-core p-5 sm:p-7">
-          <svg viewBox="0 0 400 300" class="w-full h-auto text-base-content" fill="none" role="img" aria-label="Cricket field diagram">
-            <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
-            <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>
-            <rect x="184" y="62" width="32" height="176" rx="3" fill="#EBE6DB" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M178 84h44M178 216h44" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M193 76v8M200 76v8M207 76v8M193 216v8M200 216v8M207 216v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <path d="M200 216C262 196 290 120 316 96" stroke="#FF6A13" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>
-            <circle cx="316" cy="96" r="11" fill="#FF6A13"/>
-            <path d="M311 92c4 3 6 7 6 12" stroke="#FBF9F4" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-
-          <div class="hero-stats mt-4 grid grid-cols-3 divide-x divide-base-300 border-t border-base-300 pt-5">
-            <div class="px-2 text-center">
-              <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="20">0+</div>
-              <div class="mt-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</div>
-            </div>
-            <div class="px-2 text-center">
-              <div class="font-heading text-3xl sm:text-4xl text-primary-ink" data-count="300">0+</div>
-              <div class="mt-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
-            </div>
-            <div class="px-2 text-center">
-              <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="100">0%</div>
-              <div class="mt-1 text-[9px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Entertainment</div>
-            </div>
+        <div id="hero-3d" class="bezel-core relative overflow-hidden" style="background: radial-gradient(70% 55% at 50% 58%, rgb(255 106 19 / 0.14), transparent 70%), #FBF9F4;">
+          <div data-stage class="relative aspect-[4/5] w-full">
+            <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
+              <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
+              <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>
+              <rect x="184" y="62" width="32" height="176" rx="3" fill="#EBE6DB" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M178 84h44M178 216h44" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M200 216C262 196 290 120 316 96" stroke="#FF6A13" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>
+              <circle cx="316" cy="96" r="11" fill="#FF6A13"/>
+            </svg>
           </div>
+          <p data-hint class="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-base-content/60 transition-opacity duration-700">Drag to rotate</p>
         </div>
       </div>
     </div>
@@ -139,3 +140,5 @@ document.addEventListener('DOMContentLoaded', function () {
   if (statsContainer) observer.observe(statsContainer);
 });
 </script>
+
+@vite(['resources/js/hero-scene.js'])

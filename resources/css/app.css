@@ -290,3 +290,5 @@ h1, h2, h3 { text-wrap: balance; }
   .pixel { animation: none; }
   .js .reveal { opacity: 1; transform: none; filter: none; }
 }
+
+#hero-3d[data-ready] [data-fallback] { opacity: 0; }

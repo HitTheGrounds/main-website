@@ -79,20 +79,18 @@
 
     <!-- Interactive 3D canvas (falls back to the field diagram) -->
     <div class="lg:col-span-5 reveal reveal-d2">
-      <div class="bezel-shell">
-        <div id="hero-3d" class="bezel-core relative overflow-hidden" style="background: radial-gradient(70% 55% at 50% 58%, rgb(255 106 19 / 0.14), transparent 70%), #FBF9F4;">
-          <div data-stage class="relative aspect-[4/5] w-full">
-            <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
-              <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
-              <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>
-              <rect x="184" y="62" width="32" height="176" rx="3" fill="#EBE6DB" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M178 84h44M178 216h44" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M200 216C262 196 290 120 316 96" stroke="#FF6A13" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>
-              <circle cx="316" cy="96" r="11" fill="#FF6A13"/>
-            </svg>
-          </div>
-          <p data-hint class="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-base-content/60 transition-opacity duration-700">Drag to rotate</p>
+      <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
+        <div data-stage class="relative aspect-[4/5] w-full">
+          <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
+            <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
+            <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>
+            <rect x="184" y="62" width="32" height="176" rx="3" fill="#EBE6DB" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M178 84h44M178 216h44" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M200 216C262 196 290 120 316 96" stroke="#FF6A13" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>
+            <circle cx="316" cy="96" r="11" fill="#FF6A13"/>
+          </svg>
         </div>
+        <p data-hint class="pointer-events-none absolute inset-x-0 bottom-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] text-base-content/60 transition-opacity duration-700">Drag to rotate</p>
       </div>
     </div>
   </div>

@@ -68,23 +68,23 @@
           <div data-aos="fade-up" data-aos-duration="1000">
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold font-title text-center mb-8">
               <span class="text-base-content">Best Performing </span>
-              <span class="text-success">Players</span>
+              <span class="text-primary-ink">Players</span>
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div class="flex justify-center" data-aos="fade-up" data-aos-duration="1200">
                 <img src="/award/award_3.avif" alt="Best Performing Players Trophy" class="w-full max-w-md object-contain">
               </div>
               <div class="text-center md:text-left" data-aos="fade-left" data-aos-duration="1200">
-                <div class="badge badge-success badge-lg mb-4">Individual Awards</div>
-                <h3 class="text-2xl sm:text-3xl font-title text-success mb-4">Excellence Recognition</h3>
+                <div class="badge badge-lg mb-4 border-0 bg-secondary text-secondary-content">Individual Awards</div>
+                <h3 class="text-2xl sm:text-3xl font-title text-primary-ink mb-4">Excellence Recognition</h3>
                 <p class="text-base-content/80 text-base md:text-lg leading-relaxed mb-6">
                   Celebrating individual excellence across various categories. These awards recognize players who shine in specific aspects of the game.
                 </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="badge badge-success badge-outline w-full py-3">Best Batsman</div>
-                  <div class="badge badge-success badge-outline w-full py-3">Best Bowler</div>
-                  <div class="badge badge-success badge-outline w-full py-3">Best Female Player</div>
-                </div>
+                <ul class="divide-y divide-base-content/20 border-y border-base-content/20 text-left">
+                  <li class="flex items-center gap-3 py-3 text-lg font-semibold text-base-content"><span class="size-1.5 shrink-0 bg-primary"></span>Best Batsman</li>
+                  <li class="flex items-center gap-3 py-3 text-lg font-semibold text-base-content"><span class="size-1.5 shrink-0 bg-primary"></span>Best Bowler</li>
+                  <li class="flex items-center gap-3 py-3 text-lg font-semibold text-base-content"><span class="size-1.5 shrink-0 bg-primary"></span>Best Female Player</li>
+                </ul>
               </div>
             </div>
           </div>

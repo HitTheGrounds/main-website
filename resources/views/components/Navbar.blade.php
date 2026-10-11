@@ -25,7 +25,7 @@
           <li><a href="{{ route('rules') }}" class="{{ request()->routeIs('rules') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Rules</a></li>
           <li><a href="{{ route('timeline') }}" class="{{ request()->routeIs('timeline') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Timeline</a></li>
           <li><a href="{{ route('awards') }}" class="{{ request()->routeIs('awards') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Awards</a></li>
-          <li><a href="{{ route('rankings') }}" class="{{ request()->routeIs('rankings') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Past Rankings</a></li>
+          <li><a href="{{ route('seasons') }}" class="{{ request()->routeIs('seasons') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Past Seasons</a></li>
           {{-- <li><a href="{{ route('partners') }}" class="{{ request()->routeIs('partners') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Partners</a></li> --}}
           <li><a href="{{ route('memories') }}" class="{{ request()->routeIs('memories') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Memories</a></li>
         </ul>
@@ -45,7 +45,7 @@
           <li><a href="{{ route("rules") }}" class="{{ request()->routeIs('rules') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Rules</a></li>
           <li><a href="{{ route("timeline") }}" class="{{ request()->routeIs('timeline') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Timeline</a></li>
           <li><a href="{{ route("awards") }}" class="{{ request()->routeIs('awards') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Awards</a></li>
-          <li><a href="{{ route("rankings") }}" class="{{ request()->routeIs('rankings') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Past Rankings</a></li>
+          <li><a href="{{ route("seasons") }}" class="{{ request()->routeIs('seasons') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Past Seasons</a></li>
           {{-- <li><a href="{{ route("partners") }}" class="{{ request()->routeIs('partners') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Partners</a></li> --}}
           <li><a href="{{ route("memories") }}" class="{{ request()->routeIs('memories') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Memories</a></li>
       </ul>

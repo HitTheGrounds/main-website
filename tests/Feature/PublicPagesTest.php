@@ -108,12 +108,17 @@ class PublicPagesTest extends TestCase
         ]);
     }
 
-    public function test_past_rankings_page_can_be_rendered(): void
+    public function test_past_seasons_page_can_be_rendered(): void
     {
-        $response = $this->get(route('rankings'));
+        $response = $this->get(route('seasons'));
 
         $response->assertOk();
-        $response->assertSee(['Past', 'Rankings', 'GTN', 'Synopsys', 'Codegen', 'Virtusa', 'SimCentric Technologies', 'DirectFN', '99X', 'WSO2', '2025', '2015']);
+        $response->assertSee(['Past', 'Seasons', 'GTN', 'Synopsys', 'Codegen', 'Virtusa', 'SimCentric Technologies', 'DirectFN', '99X', 'WSO2', '2025', '2015']);
+    }
+
+    public function test_there_is_no_past_rankings_route(): void
+    {
+        $this->get('/past-rankings')->assertNotFound();
     }
 
     public function test_awards_page_can_be_rendered(): void

@@ -20,9 +20,9 @@ Route::get('/timeline', function () {
     return view('timeine');
 })->name('timeline');
 
-Route::get('/past-rankings', function () {
-    return view('past-rankings');
-})->name('rankings');
+Route::get('/past-seasons', function () {
+    return view('past-seasons');
+})->name('seasons');
 
 Route::get('/memories', function () {
     return view('memories');

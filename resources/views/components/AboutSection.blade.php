@@ -63,9 +63,11 @@
           </div>
         </div>
 
-        <!-- Main logo box -->
-        <div class="card z-10 w-4/5 h-4/5 absolute inset-0 m-auto flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#FFF8F0_0%,#FFE0C2_52%,#FFB270_100%)] p-6 sm:p-8" data-aos="fade-up" data-aos-duration="1500" data-aos-easing="ease-in-out" data-aos-delay="300">
-          <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="w-full h-auto object-contain drop-shadow-[0_10px_18px_rgba(130,45,0,0.18)]">
+        <!-- Main logo box: frosted glass -->
+        <div class="card z-10 absolute inset-0 m-auto flex h-4/5 w-4/5 items-center justify-center overflow-hidden border border-white/30 bg-white/10 p-6 shadow-[0_30px_60px_-20px_rgb(0_0_0_/_.55),inset_0_1px_0_rgb(255_255_255_/_.45)] backdrop-blur-xl backdrop-saturate-150 sm:p-8" data-aos="fade-up" data-aos-duration="1500" data-aos-easing="ease-in-out" data-aos-delay="300">
+          <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgb(255_255_255_/_.28)_0%,rgb(255_255_255_/_.06)_38%,transparent_60%)]" aria-hidden="true"></div>
+          <div class="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-primary/25 blur-3xl" aria-hidden="true"></div>
+          <img src="/images/htg-logo-orange.avif" alt="HIT THE GROUNDS 2026" width="1500" height="710" class="relative w-full h-auto object-contain drop-shadow-[0_8px_20px_rgba(255,106,19,0.35)]">
         </div>
       </div>
     </x-PageContainer>

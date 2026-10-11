@@ -80,6 +80,25 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_timeline_countdown_cards_count_the_days_left(): void
+    {
+        $this->travelTo(\Carbon\Carbon::create(2026, 10, 12, 12, 0, 0, 'Asia/Colombo'));
+
+        $this->get(route('timeline'))
+            ->assertOk()
+            ->assertSee(['Countdown to the Tournament', '40 Days', 'Until November 21, 2026', 'Registration Closes In', '39 Days', 'Open Oct 14 - Nov 20, 2026']);
+    }
+
+    public function test_timeline_countdown_cards_after_the_event(): void
+    {
+        $this->travelTo(\Carbon\Carbon::create(2026, 11, 25, 12, 0, 0, 'Asia/Colombo'));
+
+        $this->get(route('timeline'))
+            ->assertOk()
+            ->assertSee(['Done', 'Closed'])
+            ->assertDontSee(['Countdown to the Tournament', 'Registration Closes In']);
+    }
+
     public function test_timeline_page_can_be_rendered(): void
     {
         $response = $this->get(route('timeline'));
@@ -95,10 +114,6 @@ class PublicPagesTest extends TestCase
             'Close Registration',
             'November 21st, 2026',
             'Event Day',
-            '26 Days',
-            'Oct 14 - Nov 8, 2026',
-            '13 Days',
-            'Nov 9 - Nov 21, 2026',
         ]);
         $response->assertDontSee([
             'October 11th, 2025',

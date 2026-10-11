@@ -25,7 +25,7 @@ new class extends Component {
                 <span class="text-base-content">Teams</span>
             </h1>
             <p class="text-base-content/80 text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
-                Registered industry teams for Hit the Grounds 2025
+                Registered industry teams for Hit the Grounds 2026
             </p>
         </div>
 

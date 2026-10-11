@@ -7,7 +7,7 @@
                     <span class="text-primary">Rules </span>
                     <span class="text-base-content">& Regulations</span>
                 </h1>
-                <p class="mt-4 text-base-content/75 text-lg">Hit the Grounds 2025 - Tournament Rules</p>
+                <p class="mt-4 text-base-content/75 text-lg">Hit the Grounds 2026 - Tournament Rules</p>
             </header>
 
             <div class="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-14">

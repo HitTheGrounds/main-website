@@ -128,7 +128,7 @@ Leave these left aligned, because centred text hurts reading or scanning:
 - **Do not name a public folder after a route.** A folder called `public/memories/` shadows the `/memories` page. Photos live in `public/images/memories/`.
 - **Committee portraits:** 512px square, cropped to head and shoulders with the face centred, consistent framing across all people. Filenames are the first name (`akindu.avif`).
 - **Memories photos:** longest side 1200px, quality about 55. Always shown in original colour. Sponsor and photographer strips baked into the photos are left in place. The list lives in `resources/views/memories.blade.php`: add a photo by dropping `memory-N.avif` into `public/images/memories/` and adding one line there (portrait photos also need an entry in `$sizes`).
-- **Award trophy renders** (`public/award/award_1..3.avif`) are green. We recolour them in CSS with the `aw-gold`, `aw-orange`, `aw-silver`, `aw-violet` and `aw-final` classes instead of shipping new files.
+- **Award trophies** are one green render (`public/award/award_1.avif`, champion, tinted gold with the `aw-gold` CSS class) plus pre-recoloured silver, bronze and violet versions of it. Keep any new award trophy in the same family: same shape, different accent colour.
 - Every `<img>` has `alt` text describing the photo (or `alt=""` with `aria-hidden` when decorative), explicit `width` and `height`, and `loading="lazy"` below the fold.
 
 ---
@@ -149,8 +149,8 @@ Leave these left aligned, because centred text hurts reading or scanning:
 ## 9. Page notes
 
 - **Home:** hero, About (photo background with a dark overlay), "Beyond the boundary" (dot-grid background), Contenders, Registration, Partners, Committee.
-- **Awards:** cream hero with the three trophy renders, an orange ticker, team honours, player honours, the two caps (orange and purple, IPL style, compact and static), skill awards (6, 4, green dot, Player of the Match), closing call to action. Award names and descriptions are fixed content.
-- **Past Rankings:** centred title, then one block per year (newest first) with a solid year numeral and two cards: Champions (dark) and 1st Runners-up (light), each with the company logo on a light tile and the company name. Logos live in `public/images/rankings/`. A logo that only exists in white goes on a dark tile (DirectFN).
+- **Awards:** the hero is a real-time 3D podium (`resources/js/awards-podium.js`, three.js): three stepped blocks (champion, runners-up, MVP) on a turntable under a spotlight, each carrying its trophy; it turns slowly, can be dragged, tilts with the pointer, and pauses off-screen and for reduced motion. The same three trophies show as flat images when WebGL is unavailable. The rest of the page: cream-themed sections with the champion trophy render beside two smaller recolours of the same trophy (silver for runners-up (`award_silver.avif`; only the bright accents are recoloured, the dark green body stays). The MVP trophy (framed with its own backdrop) also sits in the hero. The two MVP awards use the batter-and-star trophy (`mvp_male.avif` in copper, `mvp_female.avif` recoloured to violet) on dark cards that blend into the image's own backdrop, an orange ticker, team honours, player honours, the two caps (orange and purple, IPL style, compact and static), skill awards (6, 4, green dot, Player of the Match), closing call to action. Award names and descriptions are fixed content.
+- **Past Seasons** (`/past-seasons`): title, an orange ticker of champions, then a real 3D stage (`resources/js/past-seasons-3d.js`, three.js): a turntable with all five seasons' podiums standing around a ring (runners-up and champion blocks with logo cards, a crown over the champion, and the year on a front step). The turntable physically rotates to bring each season to the front: auto every 7 seconds (paused on hover, focus and drag), prev/next buttons, year tabs, or drag to spin and it settles on the nearest season. It pauses off-screen and for reduced motion. Without WebGL the older flat carousel is shown instead. Below it: a "Full circle" section and a call to action. Logos live in `public/images/rankings/`. A white-only logo goes on a dark card (DirectFN).
 - **Memories:** centred title and a masonry collage of 21 full-colour photos (2, 3 or 4 columns by width).
 - **Timeline, Rules, Registrations, Teams:** centred headings, structured content left aligned inside.
 - **Auth pages (login, register):** a narrow centred form inside the full-width container.
@@ -182,7 +182,6 @@ Leave these left aligned, because centred text hurts reading or scanning:
 These are places where the live site does not yet follow the rules above:
 
 - The Registration, Partners and Teams (industry) page headings are uppercase. They should be sentence case like the other pages.
-- The Rules page and the Teams (industry) page still say "Hit the Grounds 2025" in their subtitles.
 - The "Industry Teams" tile on the home page still zooms its photo on hover, which section 8 says to avoid.
 - The `registrations` page and the home Registration section use a `max-w-4xl` column, and the home Timeline list uses `max-w-5xl`. These are intentional reading widths but are narrower than the rest of the page.
 - Five automated tests were already failing before the redesign (team size rules, a removed support page, the university teams page being behind login, and a captcha token in a registration test). They are unrelated to design but should be fixed or removed.

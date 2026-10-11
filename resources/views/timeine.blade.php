@@ -1,3 +1,10 @@
+@php
+    // Whole days left, counted in Sri Lanka time so the number changes at local midnight.
+    $today = now('Asia/Colombo')->startOfDay();
+    $eventDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 21, 0, 0, 0, 'Asia/Colombo'), false);
+    $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 20, 0, 0, 0, 'Asia/Colombo'), false);
+@endphp
+
 <x-layouts.public>
     <x-TimelineSection />
 
@@ -12,15 +19,19 @@
           </div>
 
           <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
-            <h3 class="text-lg font-semibold text-base-content">Registration Period</h3>
-            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">26 Days</p>
-            <p class="mt-3 text-base-content/75">Oct 14 - Nov 8, 2026</p>
+            <h3 class="text-lg font-semibold text-base-content">{{ $eventDays > 0 ? 'Countdown to the Tournament' : 'The Tournament' }}</h3>
+            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">
+              {{ $eventDays > 1 ? $eventDays . ' Days' : ($eventDays === 1 ? '1 Day' : ($eventDays === 0 ? 'Today' : 'Done')) }}
+            </p>
+            <p class="mt-3 text-base-content/75">{{ $eventDays > 0 ? 'Until November 21, 2026' : 'November 21, 2026' }}</p>
           </div>
 
           <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
-            <h3 class="text-lg font-semibold text-base-content">Preparation Time</h3>
-            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">13 Days</p>
-            <p class="mt-3 text-base-content/75">Nov 9 - Nov 21, 2026</p>
+            <h3 class="text-lg font-semibold text-base-content">{{ $regDays >= 0 ? 'Registration Closes In' : 'Registration' }}</h3>
+            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">
+              {{ $regDays > 1 ? $regDays . ' Days' : ($regDays === 1 ? '1 Day' : ($regDays === 0 ? 'Last Day' : 'Closed')) }}
+            </p>
+            <p class="mt-3 text-base-content/75">Open Oct 14 - Nov 20, 2026</p>
           </div>
 
         </div>

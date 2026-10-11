@@ -11,7 +11,7 @@
       <div class="reveal border-t border-base-content pt-6 text-center">
         <h3 class="font-heading text-2xl sm:text-3xl text-base-content">Championship clash</h3>
         <p class="mx-auto mt-3 max-w-[40ch] text-base sm:text-lg leading-relaxed text-base-content/75">
-          Where university teams face off against industry teams in a thrilling battle for the title.
+          Where university teams and industry teams engaging in a thrilling battle for the title.
         </p>
       </div>
 

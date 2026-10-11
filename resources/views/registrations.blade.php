@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-xl mb-2">Access the Registration Form</h3>
-                                    <p class="text-base-content/80">Registration can be completed through the <span class="font-semibold">Hit the Grounds 2025</span> official website. Click the registration button below to access the registration page and start the process.</p>
+                                    <p class="text-base-content/80">Registration can be completed through the <span class="font-semibold">Hit the Grounds 2026</span> official website. Click the registration button below to access the registration page and start the process.</p>
                                 </div>
                             </div>
 

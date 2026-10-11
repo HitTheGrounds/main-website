@@ -20,13 +20,15 @@ Route::get('/timeline', function () {
     return view('timeine');
 })->name('timeline');
 
-Route::get('/gallery', function () {
-    return view('gallery');
-})->name('gallery');
+Route::get('/past-seasons', function () {
+    return view('past-seasons');
+})->name('seasons');
 
-Route::get('/committee', function () {
-    return view('committee');
-})->name('committee');
+Route::get('/memories', function () {
+    return view('memories');
+})->name('memories');
+
+Route::permanentRedirect('/gallery', '/memories')->name('gallery');
 
 Route::get('/registrations', function () {
     return view('registrations');
@@ -40,7 +42,7 @@ Route::get('/teams/industry', function () {
     return view('teams-industry');
 })->name('teams.industry');
 
-Route::middleware('guest.company')->group(function () {
+Route::middleware(['guest.company', 'throttle:auth-pages'])->group(function () {
     Route::get('/register', function () {
         return view('register');
     })->name('register'); // Primary name for Laravel compatibility
@@ -53,7 +55,7 @@ Route::middleware('guest.company')->group(function () {
 // Hidden admin registration route (for users without company)
 Route::get('/admin/register', function () {
     return view('admin.register');
-})->name('admin.register');
+})->middleware('throttle:auth-pages')->name('admin.register');
 
 // Admin routes (protected by admin middleware)
 Route::middleware(['auth.company', 'admin'])->group(function () {

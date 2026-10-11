@@ -1,3 +1,4 @@
 import AOS from "aos";
 
-AOS.init()
+// Play each reveal once, on the first scroll past it
+AOS.init({ once: true })

@@ -13,7 +13,7 @@
 
             <!-- Company Details Card -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+                <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <h2 class="card-title">Company Information</h2>
                         <div class="space-y-3">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
 
-                <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+                <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <h2 class="card-title">Status</h2>
                         <div class="space-y-3">
@@ -59,7 +59,7 @@
             </div>
 
         <!-- Teams Section -->
-        <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+        <div class="card bg-base-100 border-base-300 border-2">
             <div class="card-body">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="card-title">My Teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</h2>

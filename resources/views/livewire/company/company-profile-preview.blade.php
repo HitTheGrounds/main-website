@@ -20,7 +20,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+    <div class="card bg-base-100 border-base-300 border-2">
         <div class="card-body">
             <h2 class="card-title mb-4">Profile Preview</h2>
 
@@ -79,7 +79,7 @@ new class extends Component {
             <div class="grid grid-cols-2 gap-4">
                 <div class="stat bg-base-200 rounded-lg">
                     <div class="stat-title">Registered Teams</div>
-                    <div class="stat-value text-primary">{{ $company->teams->count() }}</div>
+                    <div class="stat-value text-primary-ink">{{ $company->teams->count() }}</div>
                     <div class="stat-desc">Out of 2 maximum</div>
                 </div>
                 <div class="stat bg-base-200 rounded-lg">

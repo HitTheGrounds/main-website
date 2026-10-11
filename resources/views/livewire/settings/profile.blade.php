@@ -68,8 +68,8 @@ new #[Layout('components.layouts.app')] class extends Component {
             <x-mary-input wire:model="name" label="{{ __('Name') }}" type="text" required autofocus autocomplete="name" />
 
             <div>
-                <x-mary-input wire:model="email" label="{{ __('Email') }}" type="email" readonly disabled class="bg-gray-100" />
-                <p class="mt-1 text-sm text-gray-600">{{ __('Email cannot be modified') }}</p>
+                <x-mary-input wire:model="email" label="{{ __('Email') }}" type="email" readonly disabled class="bg-base-200" />
+                <p class="mt-1 text-sm opacity-70">{{ __('Email cannot be modified') }}</p>
 
                 @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
                     <x-mary-alert color="warning" class="mt-4">

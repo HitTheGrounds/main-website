@@ -18,15 +18,14 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
+<x-PageContainer class="min-h-screen">
         <div class="text-center mb-12" data-aos="fade-up">
             <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
-                <span class="text-primary">Industry </span>
+                <span class="text-primary-ink">Industry </span>
                 <span class="text-base-content">Teams</span>
             </h1>
             <p class="text-base-content/80 text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
-                Registered industry teams for Hit the Grounds 2025
+                Registered industry teams for Hit the Grounds 2026
             </p>
         </div>
 
@@ -50,14 +49,14 @@ new class extends Component {
                             @else
                                 <div class="avatar placeholder">
                                     <div class="w-32 h-32 rounded-lg transition-all">
-                                    <x-mary-icon name="o-building-office-2" class="w-full h-full text-primary/50" />
+                                    <x-mary-icon name="o-building-office-2" class="w-full h-full text-primary-ink/50" />
                                     </div>
                                 </div>
                             @endif
                         </div>
 
                         <!-- Team Name -->
-                        <h3 class="card-title text-xl font-bold text-center justify-center mb-2 group-hover:text-primary transition-colors">
+                        <h3 class="card-title text-xl font-bold text-center justify-center mb-2 group-hover:text-primary-ink transition-colors">
                             {{ $team->team_name }}
                         </h3>
 
@@ -84,5 +83,4 @@ new class extends Component {
             @endforelse
         </div>
 
-    </div>
-</div>
+</x-PageContainer>

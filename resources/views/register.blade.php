@@ -1,5 +1,5 @@
 <x-layouts.public>
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" data-aos="fade-up" data-aos-duration="1500">
+    <x-PageContainer class="min-h-screen flex items-center justify-center" data-aos="fade-up" data-aos-duration="1500">
         <div class="max-w-md w-full">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-base-content">Company Registration</h2>
@@ -8,5 +8,5 @@
 
             <livewire:company-registration-form />
         </div>
-    </div>
+    </x-PageContainer>
 </x-layouts.public>

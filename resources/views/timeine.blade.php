@@ -1,48 +1,40 @@
+@php
+    // Whole days left, counted in Sri Lanka time so the number changes at local midnight.
+    $today = now('Asia/Colombo')->startOfDay();
+    $eventDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 21, 0, 0, 0, 'Asia/Colombo'), false);
+    $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 20, 0, 0, 0, 'Asia/Colombo'), false);
+@endphp
+
 <x-layouts.public>
     <x-TimelineSection />
-    <section class="bg-base-200 py-12 sm:py-16 md:py-20">
-      <div class="container mx-auto px-4 sm:px-6 md:px-8">
-        <div class="max-w-5xl mx-auto">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
 
-            <!-- Quick Stats Card -->
-            <div class="card bg-base-100 shadow-lg border border-base-300">
-              <div class="card-body text-center">
-                <div class="bg-primary text-primary-content rounded-full w-16 h-16 shadow-lg flex items-center justify-center mx-auto mb-4">
-                  <x-mary-icon name="s-calendar" class="w-8 h-8" />
-                </div>
-                <h3 class="text-xl font-title text-base-content mb-2">Tournament Duration</h3>
-                <p class="text-primary text-3xl font-title">1 Day</p>
-                <p class="text-base-content/70 text-sm mt-2">Full day of cricket action</p>
-              </div>
-            </div>
+    <section class="bg-base-200">
+      <x-PageContainer>
+        <div class="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
 
-            <!-- Registration Period Card -->
-            <div class="card bg-base-100 shadow-lg border border-base-300">
-              <div class="card-body text-center">
-                <div class="bg-success text-success-content rounded-full w-16 h-16 shadow-lg flex items-center justify-center mx-auto mb-4">
-                  <x-mary-icon name="s-user-group" class="w-8 h-8" />
-                </div>
-                <h3 class="text-xl font-title text-base-content mb-2">Registration Period</h3>
-                <p class="text-success text-3xl font-title">22 Days</p>
-                <p class="text-base-content/70 text-sm mt-2">Oct 21 - Nov 12, 2025</p>
-              </div>
-            </div>
-
-            <!-- Preparation Time Card -->
-            <div class="card bg-base-100 shadow-lg border border-base-300">
-              <div class="card-body text-center">
-                <div class="bg-warning text-warning-content rounded-full w-16 h-16 shadow-lg flex items-center justify-center mx-auto mb-4">
-                  <x-mary-icon name="s-rocket-launch" class="w-8 h-8" />
-                </div>
-                <h3 class="text-xl font-title text-base-content mb-2">Preparation Time</h3>
-                <p class="text-warning text-3xl font-title">73 Days</p>
-                <p class="text-base-content/70 text-sm mt-2">Nov 13, 2025 - Jan 24, 2026</p>
-              </div>
-            </div>
-
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
+            <h3 class="text-lg font-semibold text-base-content">Tournament Duration</h3>
+            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">1 Day</p>
+            <p class="mt-3 text-base-content/75">Full day of cricket action</p>
           </div>
+
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
+            <h3 class="text-lg font-semibold text-base-content">{{ $eventDays > 0 ? 'Countdown to the Tournament' : 'The Tournament' }}</h3>
+            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">
+              {{ $eventDays > 1 ? $eventDays . ' Days' : ($eventDays === 1 ? '1 Day' : ($eventDays === 0 ? 'Today' : 'Done')) }}
+            </p>
+            <p class="mt-3 text-base-content/75">{{ $eventDays > 0 ? 'Until November 21, 2026' : 'November 21, 2026' }}</p>
+          </div>
+
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
+            <h3 class="text-lg font-semibold text-base-content">{{ $regDays >= 0 ? 'Registration Closes In' : 'Registration' }}</h3>
+            <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">
+              {{ $regDays > 1 ? $regDays . ' Days' : ($regDays === 1 ? '1 Day' : ($regDays === 0 ? 'Last Day' : 'Closed')) }}
+            </p>
+            <p class="mt-3 text-base-content/75">Open Oct 14 - Nov 20, 2026</p>
+          </div>
+
         </div>
-      </div>
+      </x-PageContainer>
     </section>
 </x-layouts.public>

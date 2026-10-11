@@ -18,7 +18,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Team Info Card -->
             <div class="lg:col-span-1">
-                <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+                <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="card-title">Team Information</h2>
@@ -105,7 +105,7 @@
 
             <!-- Team Members Card -->
             <div class="lg:col-span-2">
-                <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+                <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <!-- Team Composition Progress -->
                         <div class="mb-4 p-4 bg-base-200 rounded-lg">

@@ -1,13 +1,15 @@
 <div
     class="hero min-h-screen relative overflow-hidden bg-base-100 bg-cover bg-center bg-no-repeat text-base-content"
-    style="background-image: url('/images/courtyard_orange_edges_transparent.png');">
+    style="background-image: url('/images/about.jpeg');">
+    <div class="absolute inset-0 bg-black/60" aria-hidden="true"></div>
+
     <x-PageContainer class="hero-content flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 z-10">
       <!-- Text Content -->
       <div class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12" data-aos="fade-up" data-aos-duration="1000">
-      <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-base-content font-title">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white font-title">
         Bridging Excellence in Technology and Sport
       </h2>
-      <p class="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed text-base-content/90">
+      <p class="text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed text-white/90">
         Hit the Grounds is the annual cricket tournament hosted by the Department of Computer Science and Engineering (CSE), celebrating sportsmanship, teamwork, and university spirit. This exciting event brings together students, faculty, and alumni for a high-energy showcase of skill and team-spirit.
         <br />
         Set against the vibrant backdrop of campus life, the tournament encourages friendly competition and connection, featuring teams from different CSE batches as well as teams from the industry. More than a game, it's a celebration of community, talent, and the love of cricket

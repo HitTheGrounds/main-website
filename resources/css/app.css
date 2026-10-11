@@ -382,3 +382,8 @@ h1, h2, h3 { text-wrap: balance; }
 @media (prefers-reduced-motion: reduce) {
   .mem-tile, .mem-tile::before, .mem-tile::after { transition: none; }
 }
+
+/* Memories: JS lays the photos out in columns left to right */
+.mem-grid[data-js] { display: flex; gap: 1rem; columns: auto; }
+.mem-grid[data-js] .mem-col { display: flex; flex: 1 1 0; min-width: 0; flex-direction: column; gap: 1rem; }
+.mem-grid[data-js] .mem-item { margin-bottom: 0; }

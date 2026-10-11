@@ -2,21 +2,21 @@
     // Interleaved so neighbouring tiles come from different matches
     $memories = [
         [10, 'The champions trophy on its plinth'],
+        [6, 'A fielder in blue smiling and clapping'],
         [1, 'A bowler in mid-delivery stride'],
         [11, 'Players working on a wooden installation'],
         [2, 'A batter swinging at the crease'],
         [12, 'A match in progress on the ground'],
         [3, 'Darts stuck in a dartboard'],
         [13, 'Players in purple jerseys on the sidelines'],
-        [4, 'The maroon-jersey team posing together'],
         [14, 'The blue-jersey team taking a selfie'],
         [5, 'A blue-jersey team group photo'],
         [15, 'The purple-jersey team after dark'],
-        [6, 'A fielder in blue smiling and clapping'],
         [16, 'The teal-jersey team posing together'],
         [7, 'Bamboo decoration beside a sponsor backdrop'],
         [17, 'Players walking across the field'],
         [8, 'Players gathered at the scoreboard'],
+        [4, 'The maroon-jersey team posing together'],
         [18, 'The wicketkeeper and umpire at the stumps'],
         [9, 'A batter playing a shot'],
         [19, 'Players in orange watching from the bank'],
@@ -73,7 +73,7 @@
             <div class="mem-grid columns-2 gap-4 md:columns-3 xl:columns-4">
                 @foreach ($memories as $i => [$n, $alt])
                     @php [$w, $h] = $sizes[$n] ?? [1200, 800]; @endphp
-                    <div class="mb-4 break-inside-avoid" data-aos="fade-up" data-aos-delay="{{ ($i % 4) * 80 }}">
+                    <div class="mem-item mb-4 break-inside-avoid" data-r="{{ $h / $w }}" data-aos="fade-up" data-aos-delay="{{ ($i % 4) * 80 }}">
                         <figure class="mem-tile" style="aspect-ratio: {{ $w }} / {{ $h }}">
                             <img src="/images/memories/memory-{{ sprintf('%02d', $n) }}.avif" alt="{{ $alt }}" width="{{ $w }}" height="{{ $h }}" loading="lazy" decoding="async">
                         </figure>
@@ -84,6 +84,35 @@
     </section>
 
     <script>
+        // Fill the collage left to right: each photo goes into the shortest column,
+        // so the first photos in the list sit in the top row.
+        (() => {
+            const grid = document.querySelector('.mem-grid');
+            const items = [...grid.querySelectorAll('.mem-item')];
+            let current = 0;
+            const count = () => (innerWidth >= 1280 ? 4 : innerWidth >= 768 ? 3 : 2);
+            const layout = () => {
+                const n = count();
+                if (n === current) return;
+                current = n;
+                const cols = Array.from({ length: n }, () => {
+                    const c = document.createElement('div');
+                    c.className = 'mem-col';
+                    c.height = 0;
+                    return c;
+                });
+                items.forEach((item) => {
+                    const target = cols.reduce((a, b) => (b.height < a.height ? b : a));
+                    target.append(item);
+                    target.height += parseFloat(item.dataset.r);
+                });
+                grid.replaceChildren(...cols);
+                grid.dataset.js = '';
+            };
+            layout();
+            addEventListener('resize', layout);
+        })();
+
         // Point the light at the cursor
         document.querySelectorAll('.mem-tile').forEach((tile) => {
             const follow = (e) => {

@@ -108,6 +108,14 @@ class PublicPagesTest extends TestCase
         ]);
     }
 
+    public function test_past_rankings_page_can_be_rendered(): void
+    {
+        $response = $this->get(route('rankings'));
+
+        $response->assertOk();
+        $response->assertSee(['Past', 'Rankings', 'GTN', 'Synopsys', 'Codegen', 'Virtusa', 'SimCentric Technologies', 'DirectFN', '99X', 'WSO2', '2025', '2015']);
+    }
+
     public function test_awards_page_can_be_rendered(): void
     {
         $response = $this->get(route('awards'));

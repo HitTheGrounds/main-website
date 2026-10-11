@@ -20,6 +20,10 @@ Route::get('/timeline', function () {
     return view('timeine');
 })->name('timeline');
 
+Route::get('/past-rankings', function () {
+    return view('past-rankings');
+})->name('rankings');
+
 Route::get('/memories', function () {
     return view('memories');
 })->name('memories');

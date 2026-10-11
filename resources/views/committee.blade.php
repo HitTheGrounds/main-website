@@ -8,7 +8,7 @@
 
             <!-- Event Co-Chairs -->
             <h2 class="text-3xl sm:text-4xl font-bold font-title text-center mb-8" data-aos="fade-up">
-                <span class="text-primary">Event </span>
+                <span class="text-primary-ink">Event </span>
                 <span class="text-base-content">Co-Chairs</span>
             </h2>
 
@@ -113,7 +113,7 @@
 
             <!-- Technical Support -->
             <h2 class="text-3xl sm:text-4xl font-bold font-title text-center mb-8 mt-12" data-aos="fade-up">
-                <span class="text-primary">Technical </span>
+                <span class="text-primary-ink">Technical </span>
                 <span class="text-base-content">Committee</span>
             </h2>
 
@@ -183,7 +183,7 @@
 
             <!-- Partnership Support -->
             <h2 class="text-3xl sm:text-4xl font-bold font-title text-center mb-8 mt-12" data-aos="fade-up">
-                <span class="text-primary">Partnership </span>
+                <span class="text-primary-ink">Partnership </span>
                 <span class="text-base-content">Committee</span>
             </h2>
 

@@ -5,7 +5,7 @@
       <div class="text-center mb-12 md:mb-16">
         <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
           <span class="text-base-content">Register </span>
-          <span class="text-primary">Now</span>
+          <span class="text-primary-ink">Now</span>
         </h2>
         <p class="text-base-content/80 text-base sm:text-lg md:text-xl max-w-3xl mx-auto">
           Step up to the game and be a part of the action - Register Now !!
@@ -19,7 +19,7 @@
           <!-- Company Details Section -->
           <div class="card bg-base-200 shadow-xl border border-base-300">
             <div class="card-body">
-              <h3 class="card-title text-2xl md:text-3xl font-title text-primary mb-6">
+              <h3 class="card-title text-2xl md:text-3xl font-title text-primary-ink mb-6">
                 <Icon name="mdi:office-building" class="text-3xl" />
                 Company Details
               </h3>
@@ -114,7 +114,7 @@
           <!-- Team Details Section -->
           <div class="card bg-base-200 shadow-xl border border-base-300">
             <div class="card-body">
-              <h3 class="card-title text-2xl md:text-3xl font-title text-primary mb-6">
+              <h3 class="card-title text-2xl md:text-3xl font-title text-primary-ink mb-6">
                 <Icon name="mdi:account-group" class="text-3xl" />
                 Team Details
               </h3>
@@ -236,7 +236,7 @@
           </div>
 
           <!-- Submit Button -->
-          <div class="card bg-gradient-to-r from-primary/20 to-accent/20 shadow-xl border border-primary">
+          <div class="card bg-base-200 border-2 border-secondary">
             <div class="card-body text-center">
               <button type="submit" class="btn btn-primary btn-lg w-full md:w-auto md:px-16 text-lg">
                 <Icon name="mdi:send" class="text-2xl" />

@@ -53,7 +53,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+    <div class="card bg-base-100 border-base-300 border-2">
         <div class="card-body">
             <!-- Filter tabs -->
             <div class="tabs tabs-boxed mb-4">

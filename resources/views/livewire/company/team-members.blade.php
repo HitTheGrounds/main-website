@@ -147,7 +147,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 shadow-sm border-base-300 border-1">
+    <div class="card bg-base-100 border-base-300 border-2">
         <div class="card-body">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>

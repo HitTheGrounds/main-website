@@ -29,10 +29,6 @@
   <div class="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-12 sm:py-16 lg:py-20 grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
     <!-- Copy -->
     <div class="lg:col-span-7">
-      <p class="reveal inline-flex items-center gap-2 rounded-full bg-base-200 ring-1 ring-black/5 px-3 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em]">
-        <span class="size-1.5 rounded-full bg-primary"></span>
-        CSE · University of Moratuwa
-      </p>
 
       <h1 class="reveal reveal-d1 mt-6 font-heading text-[clamp(3rem,9vw,6rem)] text-base-content">
         <span class="sr-only">CSE </span>Hit the<br>
@@ -71,8 +67,6 @@
           <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
         </div>
         <div>
-          <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="100">0%</div>
-          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Entertainment</div>
         </div>
       </div>
     </div>

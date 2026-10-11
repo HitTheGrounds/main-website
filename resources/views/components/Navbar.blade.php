@@ -1,5 +1,5 @@
  <header class="sticky top-0 z-40 px-3 sm:px-6 pt-3 sm:pt-4 pointer-events-none">
-  <div class="navbar pointer-events-auto max-w-6xl mx-auto rounded-full bg-[#FBF9F4]/90 backdrop-blur-xl ring-1 ring-black/5 shadow-[0_12px_32px_-16px_rgba(31,27,22,0.25)] px-3 sm:px-5 min-h-0 py-1.5">
+  <div class="navbar pointer-events-auto w-full rounded-full bg-[#FBF9F4]/90 backdrop-blur-xl ring-1 ring-black/5 shadow-[0_12px_32px_-16px_rgba(31,27,22,0.25)] px-3 sm:px-5 min-h-0 py-1.5">
     <div class="navbar-start">
       <!-- Mobile Menu Dropdown -->
       <div class="dropdown lg:hidden">
@@ -34,7 +34,6 @@
       <!-- Logo -->
       <a href="/" class="px-1 sm:px-4 flex items-center gap-2 cursor-pointer">
         <img src="/nav_logo_orange.avif" alt="HIT THE GROUNDS" class="h-8 sm:h-10 md:h-12 block">
-        <img src="/cse.avif" alt="CSE" class="h-8 sm:h-10 md:h-12 hidden xl:block ml-5">
       </a>
     </div>
 

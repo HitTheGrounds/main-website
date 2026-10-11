@@ -1,5 +1,5 @@
-<section class="bg-base-100 py-24 md:py-32">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+<section class="bg-base-100">
+  <x-PageContainer>
     <h2 class="font-heading text-[clamp(2.25rem,6vw,4rem)] text-base-content mb-10 md:mb-14" data-aos="fade-up">
       Meet the <span class="text-primary">Contenders</span>
     </h2>
@@ -17,5 +17,5 @@
         </span>
       </div>
     </a>
-  </div>
+  </x-PageContainer>
 </section>

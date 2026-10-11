@@ -1,6 +1,6 @@
 
-  <section class="bg-base-100 py-12 sm:py-16 md:py-20 lg:py-24">
-    <div class="container mx-auto px-4 sm:px-6 md:px-8">
+  <section class="bg-base-100">
+    <x-PageContainer>
       <!-- Section Header -->
       <div class="text-center mb-12 md:mb-16">
         <h2 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
@@ -250,5 +250,5 @@
 
         </form>
       </div>
-    </div>
+    </x-PageContainer>
   </section>

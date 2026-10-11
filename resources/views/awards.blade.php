@@ -1,7 +1,7 @@
 <x-layouts.public>
     <!-- Hero Section -->
-    <section class="py-12 sm:py-16 md:py-20 lg:py-24">
-      <div class="container mx-auto px-4 sm:px-6 md:px-8">
+    <section>
+      <x-PageContainer>
         <div class="max-w-4xl mx-auto text-center">
           <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-6" data-aos="fade-up" data-aos-duration="1000">
             <span class="text-base-content">Awards & </span>
@@ -12,13 +12,13 @@
             Here are the awards that will honor the best of the best!
           </p>
         </div>
-      </div>
+      </x-PageContainer>
     </section>
 
     <!-- Awards Section -->
-    <section class="bg-base-100 py-12 sm:py-16 md:py-20">
-      <div class="container mx-auto px-4 sm:px-6 md:px-8">
-        <div class="max-w-7xl mx-auto space-y-20">
+    <section class="bg-base-100">
+      <x-PageContainer>
+        <div class="space-y-20">
 
           <!-- Champions Section -->
           <div data-aos="fade-up" data-aos-duration="1000">
@@ -105,12 +105,12 @@
           </div>
 
         </div>
-      </div>
+      </x-PageContainer>
     </section>
 
     <!-- Call to Action Section -->
-    <section class="bg-base-200 py-12 sm:py-16 md:py-20" data-aos="fade-up" data-aos-duration="1500">
-      <div class="container mx-auto px-4 sm:px-6 md:px-8">
+    <section class="bg-base-200" data-aos="fade-up" data-aos-duration="1500">
+      <x-PageContainer>
         <div class="card bg-base-100 shadow-xl border border-primary max-w-4xl mx-auto">
           <div class="card-body text-center py-8 md:py-12">
             <h2 class="card-title text-3xl sm:text-4xl md:text-5xl font-title text-primary-ink justify-center mb-4">
@@ -124,6 +124,6 @@
             </div>
           </div>
         </div>
-      </div>
+      </x-PageContainer>
     </section>
 </x-layouts.public>

@@ -2,9 +2,8 @@
     
 
     <!-- Contact Cards Section -->
-    <section class="bg-base-100 py-12 sm:py-16 md:py-20">
-        <div class="container mx-auto px-4 sm:px-6 md:px-8">
-            <div class="max-w-6xl mx-auto">
+    <section class="bg-base-100">
+        <x-PageContainer>
 
             <!-- Event Co-Chairs -->
             <h2 class="text-3xl sm:text-4xl font-bold font-title text-center mb-8" data-aos="fade-up">
@@ -251,7 +250,6 @@
                 </div>
             </div>
 
-            </div>
-        </div>
+        </x-PageContainer>
     </section>
 </x-layouts.public>

@@ -1,5 +1,5 @@
-  <section class="bg-base-100 py-16 md:py-24">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+  <section class="bg-base-100">
+    <x-PageContainer>
 
       <header class="mb-14 md:mb-20" data-aos="fade-up">
         <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
@@ -82,5 +82,5 @@
           <x-mary-button label="Register Now" link="{{ route('register') }}" class="btn btn-primary btn-lg rounded-full" />
         </div>
       </div>
-    </div>
+    </x-PageContainer>
   </section>

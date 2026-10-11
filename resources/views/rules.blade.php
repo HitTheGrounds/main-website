@@ -1,6 +1,6 @@
 <x-layouts.public>
-    <div class="min-h-screen bg-base-100 py-16 md:py-24 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto">
+    <div class="min-h-screen bg-base-100">
+        <x-PageContainer>
 
             <header class="mb-10 md:mb-14" data-aos="fade-up">
                 <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
@@ -278,7 +278,7 @@
             </div>
                 </div>
             </div>
-        </div>
+        </x-PageContainer>
     </div>
     <script>
         (function () {

@@ -26,7 +26,7 @@
     <span class="pixel hidden sm:block" style="bottom:10%;right:10%;width:12px;height:12px;animation-delay:-4s"></span>
   </div>
 
-  <div class="relative mx-auto w-full max-w-6xl px-4 sm:px-6 py-12 sm:py-16 lg:py-20 grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+  <x-PageContainer class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
     <!-- Copy -->
     <div class="lg:col-span-7">
 
@@ -87,7 +87,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </x-PageContainer>
 </section>
 
 <script>

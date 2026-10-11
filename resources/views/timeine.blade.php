@@ -1,8 +1,8 @@
 <x-layouts.public>
     <x-TimelineSection />
 
-    <section class="bg-base-200 py-16 md:py-24">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <section class="bg-base-200">
+      <x-PageContainer>
         <div class="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
 
           <div class="border-t-2 border-base-content pt-6" data-aos="fade-up">
@@ -24,6 +24,6 @@
           </div>
 
         </div>
-      </div>
+      </x-PageContainer>
     </section>
 </x-layouts.public>

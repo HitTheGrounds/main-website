@@ -21,8 +21,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
+<x-PageContainer class="min-h-screen">
         <!-- Company Header Section -->
         <div class="card bg-base-100 shadow-sm border-base-300 border mb-8" data-aos="fade-up">
             <div class="card-body">
@@ -123,5 +122,4 @@ new class extends Component {
                 Back to Teams
             </a>
         </div>
-    </div>
-</div>
+</x-PageContainer>

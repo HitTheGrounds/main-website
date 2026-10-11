@@ -1,5 +1,5 @@
 <x-layouts.public>
-    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <x-PageContainer class="min-h-screen">
         <div class="max-w-4xl mx-auto">
             <div class="text-center mb-12" data-aos="fade-up">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
@@ -210,7 +210,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </x-PageContainer>
 
     <!-- Registration Closed Modal -->
     <dialog id="registration_closed_modal" class="modal modal-bottom sm:modal-middle">

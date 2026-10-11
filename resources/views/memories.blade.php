@@ -2,6 +2,7 @@
     <section class="animated-3d-gallery-sec relative overflow-hidden">
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/hero/0_Background.avif'); z-index: 0;"></div>
         <div class="backdrop-blur-md h-full w-full relative">
+          <x-PageContainer class="min-h-screen overflow-hidden">
             <div class="anim-3d-gallery-wrapper">
                 @php
                     $galleryPath = public_path('storage/gallery');
@@ -47,6 +48,7 @@
                     <h1 class="font-bold font-title">Hit the Grounds Memories</h1>
                 </div>
             </div>
+          </x-PageContainer>
         </div>
     </section>
 
@@ -72,7 +74,8 @@
         .rotating-gallery-container {
             position: relative;
             width: 100%;
-            height: 100vh;
+            height: 100%;
+            min-height: calc(100vh - 10rem);
             display: flex;
             align-items: center;
             justify-content: center;

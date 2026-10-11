@@ -1,5 +1,5 @@
-<section class="bg-base-100 py-16 sm:py-20 md:py-28 relative overflow-hidden">
-    <div class="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
+<section class="bg-base-100 relative overflow-hidden">
+    <x-PageContainer class="z-10">
         <div class="text-center mb-16 md:mb-20">
             <div class="text-center mb-12" data-aos="fade-up">
                 <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
@@ -69,5 +69,5 @@
             </div>
 
         </div>
-    </div>
+    </x-PageContainer>
 </section>

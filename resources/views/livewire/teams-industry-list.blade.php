@@ -18,8 +18,7 @@ new class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
+<x-PageContainer class="min-h-screen">
         <div class="text-center mb-12" data-aos="fade-up">
             <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-4">
                 <span class="text-primary-ink">Industry </span>
@@ -84,5 +83,4 @@ new class extends Component {
             @endforelse
         </div>
 
-    </div>
-</div>
+</x-PageContainer>

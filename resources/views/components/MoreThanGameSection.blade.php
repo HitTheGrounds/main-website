@@ -1,8 +1,8 @@
-<section class="relative overflow-hidden bg-base-200 py-24 md:py-32">
+<section class="relative overflow-hidden bg-base-200">
   <!-- Interactive dot-grid background -->
   <canvas id="beyond-bg" aria-hidden="true" class="absolute inset-0 h-full w-full"></canvas>
 
-  <div class="relative mx-auto max-w-6xl px-4 sm:px-6">
+  <x-PageContainer>
     <h2 class="reveal font-heading text-[clamp(2.25rem,6vw,4rem)] text-base-content mb-14 md:mb-20">
       Beyond the <span class="text-primary">boundary.</span>
     </h2>
@@ -36,7 +36,7 @@
         </p>
       </div>
     </div>
-  </div>
+  </x-PageContainer>
 </section>
 
 <script>

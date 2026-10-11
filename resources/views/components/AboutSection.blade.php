@@ -1,7 +1,7 @@
 <div
     class="hero min-h-screen relative overflow-hidden bg-base-100 bg-cover bg-center bg-no-repeat text-base-content"
     style="background-image: url('/images/courtyard_orange_edges_transparent.png');">
-    <div class="hero-content flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 max-w-6xl z-10 px-4 sm:px-6 md:px-8 py-12 sm:py-16 lg:py-20 ">
+    <x-PageContainer class="hero-content flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 z-10">
       <!-- Text Content -->
       <div class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12" data-aos="fade-up" data-aos-duration="1000">
       <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-base-content font-title">
@@ -66,5 +66,5 @@
         style="background-image: url('/logo.avif');">
         </div>
       </div>
-    </div>
+    </x-PageContainer>
 </div>

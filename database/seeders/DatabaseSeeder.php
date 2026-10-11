@@ -16,15 +16,16 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $adminCompany = Company::create([
+            'name' => 'CSE Admin',
+            'description' => 'Administrators of CSE',
         ]);
 
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'is_admin' => true,
+            'company_id' => $adminCompany->id,
         ]);
 
         $company = Company::create([

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Support\IpThrottle;
 use App\Models\VerificationCode;
 use App\Notifications\VerificationCodeNotification;
 use App\Services\JWTService;
@@ -18,6 +19,8 @@ new class extends Component {
 
     public function sendCode(): void
     {
+        IpThrottle::hit('send-code', 10, 300, 'contact_email');
+
         $this->validate([
             'contact_email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
         ]);
@@ -76,6 +79,8 @@ new class extends Component {
 
     public function verify(): void
     {
+        IpThrottle::hit('verify-code', 20, 900, 'verification_code');
+
         $this->validate([
             'verification_code' => ['required', 'string', 'size:6'],
         ]);

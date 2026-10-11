@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Support\IpThrottle;
 use App\Models\Company;
 use App\Models\VerificationCode;
 use App\Notifications\VerificationCodeNotification;
@@ -31,6 +32,8 @@ new class extends Component {
 
     public function register(): void
     {
+        IpThrottle::hit('register', 5, 600, 'contact_email');
+
         if (!config('registration.enabled')) {
             throw ValidationException::withMessages([
                 'contact_email' => 'Registrations are currently closed.',
@@ -119,6 +122,8 @@ new class extends Component {
 
     public function verify(): void
     {
+        IpThrottle::hit('verify-code', 20, 900, 'verification_code');
+
         $this->validate([
             'verification_code' => ['required', 'string', 'size:6'],
         ]);

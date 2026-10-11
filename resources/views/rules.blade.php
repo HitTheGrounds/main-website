@@ -270,7 +270,7 @@
         <section class="border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <h2 class="lg:col-span-5 font-heading text-3xl sm:text-4xl text-base-content">Questions?</h2>
           <div class="lg:col-span-7">
-            <p class="text-base-content/80 text-lg leading-relaxed">If you have any questions about the rules and regulations, please contact the <a href="{{ route('committee') }}" class="text-primary-ink underline decoration-2 underline-offset-4 font-semibold">organizing committee</a>.</p>
+            <p class="text-base-content/80 text-lg leading-relaxed">If you have any questions about the rules and regulations, please contact the <a href="{{ route('home') }}#committee" class="text-primary-ink underline decoration-2 underline-offset-4 font-semibold">organizing committee</a>.</p>
             <p class="mt-3 text-sm text-base-content/70">Organized by the Department of Computer Science & Engineering, University of Moratuwa</p>
           </div>
         </section>

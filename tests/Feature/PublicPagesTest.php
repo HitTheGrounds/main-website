@@ -46,7 +46,31 @@ class PublicPagesTest extends TestCase
         $response->assertOk();
         $response->assertSee(route('memories'), false);
         $response->assertDontSee(route('partners'), false);
-        $response->assertDontSee(route('committee'), false);
+    }
+
+    public function test_committee_content_is_on_home_page_and_standalone_page_is_removed(): void
+    {
+        $committeeUrl = route('home').'#committee';
+
+        $homeResponse = $this->get(route('home'));
+
+        $homeResponse->assertOk();
+        $homeResponse->assertSee('id="committee"', false);
+        $homeResponse->assertSeeText('Committee Leads');
+
+        $this->get(route('rules'))
+            ->assertOk()
+            ->assertSee($committeeUrl, false);
+
+        $this->get(route('registrations'))
+            ->assertOk()
+            ->assertSee($committeeUrl, false);
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee($committeeUrl, false);
+
+        $this->get('/committee')->assertNotFound();
     }
 
     public function test_support_page_can_be_rendered(): void

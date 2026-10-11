@@ -26,10 +26,6 @@ Route::get('/memories', function () {
 
 Route::permanentRedirect('/gallery', '/memories')->name('gallery');
 
-Route::get('/committee', function () {
-    return view('committee');
-})->name('committee');
-
 Route::get('/registrations', function () {
     return view('registrations');
 })->name('registrations');

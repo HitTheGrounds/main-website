@@ -131,7 +131,7 @@ class PublicPagesTest extends TestCase
             'Super Striker of the Tournament',
             '4s of the Tournament',
             'Green Dot Ball Award',
-            'Player of the Match: Final',
+            'Player of the Match',
             'most sixes hit',
             'most fours hit',
             'most dot balls delivered',

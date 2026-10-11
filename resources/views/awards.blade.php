@@ -11,33 +11,16 @@
                     <span class="text-base-content">Awards &amp; </span><span class="text-primary">Recognition</span>
                 </h1>
 
-                <div class="relative h-[340px] w-full [perspective:1200px] sm:h-[520px] lg:h-[620px] lg:flex-1" aria-hidden="true" data-aos="fade-up" data-aos-delay="120">
-                    <div class="aw-glow absolute inset-0" style="background: radial-gradient(52% 52% at 50% 52%, rgb(255 106 19 / .2), transparent 72%)"></div>
-                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <div class="aw-spin size-[280px] rounded-full border-2 border-dashed border-primary/50 sm:size-[460px]"></div>
+                {{-- 3D podium (resources/js/awards-podium.js). The 2D trophies below are the fallback when WebGL is off. --}}
+                <div id="awards-podium" role="img" aria-label="A rotating 3D podium with the champion, runners-up and MVP trophies"
+                     class="group relative h-[400px] w-full overflow-hidden rounded-[2rem] shadow-[0_30px_60px_-30px_rgb(31_27_22_/_.6)] sm:h-[520px] lg:h-[620px] lg:flex-1"
+                     style="background: radial-gradient(70% 60% at 50% 38%, #3a2113 0%, #14100d 62%, #0b0907 100%)" data-aos="fade-up" data-aos-delay="120">
+                    <div data-fallback class="absolute inset-0 transition-opacity duration-700" aria-hidden="true">
+                        <div class="aw-float absolute bottom-10 left-[4%] sm:bottom-14"><img src="/award/award_silver.avif" alt="" class="h-[110px] w-auto sm:h-[220px]"></div>
+                        <div class="aw-float absolute bottom-10 right-[4%] sm:bottom-14"><img src="/award/mvp_male.avif" alt="" width="437" height="848" class="h-[130px] w-auto sm:h-[250px]"></div>
+                        <div class="aw-float absolute inset-x-0 bottom-6 flex justify-center"><img src="/award/award_gold.avif" alt="" class="h-[250px] w-auto sm:h-[430px]"></div>
                     </div>
-                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <div class="aw-spin-r size-[200px] rounded-full border border-base-content/15 sm:size-[350px]"></div>
-                    </div>
-                    <div class="aw-glow absolute bottom-4 left-1/2 h-12 w-[300px] -translate-x-1/2 rounded-[50%]"
-                         style="background: radial-gradient(closest-side, rgb(255 106 19 / .7), transparent)"></div>
-
-                    <div class="aw-float absolute bottom-14 left-0 [animation-delay:-2s] [perspective:800px] sm:left-[2%]">
-                        <img src="/award/award_2.avif" alt="" class="aw-sway aw-silver h-[105px] w-auto [animation-delay:-3s] sm:h-[210px] lg:h-[240px]">
-                    </div>
-                    <div class="aw-float absolute bottom-12 right-0 [animation-delay:-4s] [perspective:800px] sm:right-[3%]">
-                        <img src="/award/award_3.avif" alt="" class="aw-sway aw-gold h-[120px] w-auto [animation-delay:-1s] sm:h-[240px] lg:h-[270px]">
-                    </div>
-                    <div class="aw-float absolute inset-x-0 bottom-0 z-10 flex justify-center [perspective:1000px]">
-                        <img src="/award/award_1.avif" alt="" class="aw-sway aw-orange h-[290px] w-auto sm:h-[470px] lg:h-[550px]">
-                    </div>
-
-                    <span class="aw-spark" style="left: 12%; animation-delay: 0s"></span>
-                    <span class="aw-spark" style="left: 26%; animation-delay: 1.4s; width: 6px; height: 6px"></span>
-                    <span class="aw-spark" style="left: 41%; animation-delay: 3.1s"></span>
-                    <span class="aw-spark" style="left: 58%; animation-delay: .7s; width: 7px; height: 7px"></span>
-                    <span class="aw-spark" style="left: 72%; animation-delay: 2.2s"></span>
-                    <span class="aw-spark" style="left: 86%; animation-delay: 4.3s; width: 6px; height: 6px"></span>
+                    <p class="pointer-events-none absolute bottom-3 left-0 right-0 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-base-100/45 opacity-0 transition-opacity duration-500 group-data-[ready]:opacity-100" aria-hidden="true">Drag to spin</p>
                 </div>
             </div>
         </x-PageContainer>
@@ -84,7 +67,7 @@
                          style="background: radial-gradient(75% 42% at 50% 36%, rgb(255 106 19 / .22), transparent 75%), #EBE6DB">
                     <div class="relative flex h-[160px] w-[38%] shrink-0 items-center justify-center [perspective:900px] sm:h-[400px] sm:w-auto sm:shrink sm:items-end">
                         <span class="absolute left-7 top-5 hidden text-[110px] font-extrabold leading-none tracking-tighter text-transparent [-webkit-text-stroke:1.5px_rgb(31_27_22_/_.2)] sm:block" aria-hidden="true">02</span>
-                        <img src="/award/award_2.avif" alt="Runners-up shield" class="aw-tilt aw-float aw-silver relative h-[125px] w-auto [animation-delay:-2s] sm:h-[340px]">
+                        <img src="/award/award_silver.avif" alt="Runners-up silver trophy" class="aw-tilt aw-float relative h-[125px] w-auto drop-shadow-[0_24px_24px_rgb(31_27_22_/_.4)] [animation-delay:-2s] sm:h-[340px]">
                     </div>
                     <div class="flex-1 px-4 py-5 text-center sm:px-9 sm:pb-10 sm:pt-2">
                         <h3 class="font-heading text-2xl text-base-content sm:text-4xl">1st Runners-up</h3>
@@ -105,13 +88,14 @@
 
             <div class="grid gap-5 sm:gap-7 lg:grid-cols-2">
                 @foreach ([
-                    ['Male', 'Best overall male player of the season.', 'aw-orange', 'rgb(255 106 19 / .3)', ''],
-                    ['Female', 'Best overall female player of the season.', 'aw-violet', 'rgb(139 92 246 / .28)', '[animation-delay:-3s]'],
-                ] as [$gender, $text, $tint, $glow, $delay])
+                    ['Male', 'Best overall male player of the season.', 'male', 'rgb(255 106 19 / .28)', ''],
+                    ['Female', 'Best overall female player of the season.', 'female', 'rgb(139 92 246 / .28)', '[animation-delay:-3s]'],
+                ] as [$gender, $text, $file, $glow, $delay])
                     <article class="aw-card flex items-center rounded-[2rem] border border-base-300 bg-[#FBFAF6]" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                        <div class="flex h-[175px] w-[34%] shrink-0 items-end justify-center [perspective:800px] [mask-image:linear-gradient(90deg,#000_62%,transparent)] sm:h-[320px] sm:w-2/5 sm:[mask-image:none]"
-                             style="background: radial-gradient(70% 70% at 50% 75%, {{ $glow }}, transparent 72%)">
-                            <img src="/award/award_3.avif" alt="Most Valuable Player award" class="aw-tilt aw-float {{ $tint }} h-[150px] w-auto {{ $delay }} sm:h-[290px]">
+                        <div class="flex h-[200px] w-[34%] shrink-0 items-end justify-center [perspective:800px] sm:h-[340px] sm:w-2/5"
+                             style="background: radial-gradient(70% 70% at 50% 62%, {{ $glow }}, transparent 72%)">
+                            <img src="/award/mvp_{{ $file }}.avif" alt="Most Valuable Player ({{ $gender }}) trophy" width="437" height="848" loading="lazy"
+                                 class="aw-tilt aw-float mb-3 h-[170px] w-auto drop-shadow-[0_20px_22px_rgb(31_27_22_/_.4)] {{ $delay }} sm:mb-5 sm:h-[300px]">
                         </div>
                         <div class="w-full p-4 text-center sm:p-8">
                             <span class="inline-block rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-secondary-content">MVP</span>
@@ -200,13 +184,11 @@
                     <div class="pointer-events-none absolute left-1/2 top-[52px] hidden -translate-x-1/2 sm:block" aria-hidden="true">
                         <div class="aw-spin size-[210px] rounded-full border-2 border-dashed border-amber-300/55"></div>
                     </div>
-                    <span class="pointer-events-none absolute right-4 top-3 hidden text-5xl sm:block font-extrabold leading-none tracking-tight text-transparent [-webkit-text-stroke:1.5px_rgb(255_206_92_/_.4)]" aria-hidden="true">FINAL</span>
                     <div class="relative mt-3 flex h-[105px] items-end sm:mt-8 sm:h-[150px] justify-center [perspective:700px]" aria-hidden="true">
                         <img src="/award/award_2.avif" alt="" class="aw-tilt aw-final h-[105px] w-auto sm:h-[150px]">
                     </div>
                     <div class="relative text-center">
-                        <span class="inline-block rounded-full bg-[#FFC440] px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-secondary">Match winner</span>
-                        <h3 class="mt-3 font-heading text-[17px] leading-tight sm:text-2xl">Player of the Match: Final</h3>
+                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">Player of the Match</h3>
                         <p class="mt-2 text-[13px] leading-snug sm:mt-2.5 sm:text-base sm:leading-relaxed text-base-100/78">Awarded to the standout performer in the final.</p>
                     </div>
                 </article>
@@ -231,4 +213,6 @@
             </div>
         </x-PageContainer>
     </section>
+
+    @vite(['resources/js/awards-podium.js'])
 </x-layouts.public>

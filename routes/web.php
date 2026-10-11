@@ -20,9 +20,11 @@ Route::get('/timeline', function () {
     return view('timeine');
 })->name('timeline');
 
-Route::get('/gallery', function () {
-    return view('gallery');
-})->name('gallery');
+Route::get('/memories', function () {
+    return view('memories');
+})->name('memories');
+
+Route::permanentRedirect('/gallery', '/memories')->name('gallery');
 
 Route::get('/committee', function () {
     return view('committee');

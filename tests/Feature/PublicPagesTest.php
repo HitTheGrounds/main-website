@@ -16,11 +16,20 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_gallery_page_can_be_rendered(): void
+    public function test_memories_page_can_be_rendered(): void
+    {
+        $response = $this->get(route('memories'));
+
+        $response->assertOk();
+        $response->assertSeeText('Hit the Grounds Memories');
+    }
+
+    public function test_legacy_gallery_url_redirects_to_memories(): void
     {
         $response = $this->get(route('gallery'));
 
-        $response->assertStatus(200);
+        $response->assertStatus(301);
+        $response->assertRedirectToRoute('memories');
     }
 
     public function test_partners_page_can_be_rendered(): void

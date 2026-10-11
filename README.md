@@ -28,7 +28,7 @@ The main website for **CSE Hit The Grounds**, built with **Laravel 12**, **Livew
 
 It includes:
 
-* 🌐 **Public pages:** home, timeline, rules, awards, committee, partners, gallery
+* 🌐 **Public pages:** home, timeline, rules, awards, committee, partners, memories
 * 🎓 **Teams:** university and industry team listings
 * 📝 **Registration:** company and team sign-up
 * 🔐 **Admin area:** for managing teams

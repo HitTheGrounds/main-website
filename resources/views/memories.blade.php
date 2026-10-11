@@ -33,7 +33,7 @@
                             <div class="gallery-row">
                                 @foreach ($rowImages as $index => $image)
                                     <div class="gallery-cell">
-                                        <img src="{{ asset('storage/gallery/' . $image) }}" alt="Gallery Image">
+                                        <img src="{{ asset('storage/gallery/' . $image) }}" alt="Memory from Hit the Grounds">
                                     </div>
                                 @endforeach
                             </div>

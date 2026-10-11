@@ -3,4 +3,5 @@
     <x-MoreThanGameSection />
     <x-AboutSection />
     <x-ContendersSection />
+    <x-CommitteeSection />
 </x-layouts.public>

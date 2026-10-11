@@ -3,9 +3,9 @@
     style="background-image: url('/images/about.jpeg');">
     <div class="absolute inset-0 bg-black/60" aria-hidden="true"></div>
 
-    <x-PageContainer class="hero-content flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 z-10">
+    <x-PageContainer class="hero-content max-w-none flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 z-10">
       <!-- Text Content -->
-      <div class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12" data-aos="fade-up" data-aos-duration="1000">
+      <div class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12 text-center" data-aos="fade-up" data-aos-duration="1000">
       <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white font-title">
         Bridging Excellence in Technology and Sport
       </h2>

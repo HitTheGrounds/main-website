@@ -1,17 +1,17 @@
   <section class="bg-base-100">
     <x-PageContainer>
 
-      <header class="mb-14 md:mb-20" data-aos="fade-up">
+      <header class="mb-14 text-center md:mb-20" data-aos="fade-up">
         <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
           <span class="text-base-content">Event </span>
           <span class="text-primary">Timeline</span>
         </h1>
-        <p class="mt-4 max-w-2xl text-lg text-base-content/75">
+        <p class="mx-auto mt-4 max-w-2xl text-lg text-base-content/75">
           Mark your calendars! Here are the key dates for Hit the Grounds 2026.
         </p>
       </header>
 
-      <ol class="max-w-5xl">
+      <ol class="mx-auto max-w-5xl">
         <li class="relative grid grid-cols-[3.5rem_minmax(0,1fr)] md:grid-cols-[minmax(0,15rem)_3.5rem_minmax(0,1fr)] gap-x-4 md:gap-x-6 pb-10 last:pb-0" data-aos="fade-up">
           <time class="hidden md:block pt-4 text-right text-sm font-semibold uppercase tracking-[0.18em] text-base-content">October 12th, 2026</time>
           <div class="relative flex justify-center">

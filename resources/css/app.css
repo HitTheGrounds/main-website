@@ -347,3 +347,38 @@ h1, h2, h3 { text-wrap: balance; }
   .aw-card:hover, .aw-card:hover .aw-tilt { transform: none; }
   .aw-card:hover::after { animation: none; }
 }
+
+/* ---- Memories page ---- */
+.mem-tile {
+  --mem-x: 50%;
+  --mem-y: 50%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--color-base-300);
+  transition: filter .5s var(--ease-out-expo);
+}
+.mem-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* A soft light that follows the cursor, and a thin orange frame */
+.mem-tile::before,
+.mem-tile::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; }
+.mem-tile::before {
+  background: radial-gradient(circle 220px at var(--mem-x) var(--mem-y), rgb(255 255 255 / .38), transparent 70%);
+  opacity: 0;
+  transition: opacity .45s var(--ease-out-expo);
+}
+.mem-tile::after {
+  box-shadow: inset 0 0 0 0 var(--color-primary);
+  transition: box-shadow .45s var(--ease-out-expo);
+}
+
+@media (hover: hover) {
+  .mem-tile:hover::before { opacity: 1; }
+  .mem-tile:hover::after { box-shadow: inset 0 0 0 4px var(--color-primary); }
+  /* While one photo is hovered, the others step back */
+  .mem-grid:has(.mem-tile:hover) .mem-tile:not(:hover) { filter: saturate(.55) brightness(.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mem-tile, .mem-tile::before, .mem-tile::after { transition: none; }
+}

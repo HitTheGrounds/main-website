@@ -15,20 +15,20 @@
 <section class="relative overflow-hidden bg-base-100 min-h-[calc(100dvh-5rem)] flex items-center">
   <script>document.documentElement.classList.add('js')</script>
 
-  <x-PageContainer class="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-    <!-- Copy -->
-    <div class="lg:col-span-7">
+  <x-PageContainer class="grid gap-12 lg:grid-cols-[1.25fr_minmax(15rem,.5fr)_1.2fr] lg:gap-8 xl:gap-12 items-center lg:!py-8">
+    <!-- Column 1: copy and actions -->
+    <div class="text-center">
 
       <h1 class="reveal reveal-d1 mt-6 font-heading text-[clamp(3rem,9vw,6rem)] text-base-content">
         <span class="sr-only">CSE </span>Hit the<br>
         <span class="text-primary">Grounds.</span>
       </h1>
 
-      <p class="reveal reveal-d2 mt-6 max-w-[56ch] text-base sm:text-lg leading-relaxed text-base-content/75">
+      <p class="reveal reveal-d2 mx-auto mt-6 max-w-[56ch] text-base sm:text-lg leading-relaxed text-base-content/75">
         The annual cricket tournament of the Department of Computer Science and Engineering. Where the spirit from the university meets the drive from the industry, it's more than just a game, it's where passion and excellence collide.
       </p>
 
-      <div class="reveal reveal-d3 mt-9 flex flex-col sm:flex-row gap-3 sm:gap-4">
+      <div class="reveal reveal-d3 mt-9 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
         @if($user)
           <a href="{{ $isAdmin ? route('admin.dashboard') : route('company.dashboard') }}" class="btn-island btn-island-solid group justify-between sm:justify-start">
             {{ $isAdmin ? 'Admin Dashboard' : 'Dashboard' }}
@@ -45,25 +45,23 @@
           <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </a>
       </div>
-
-      <div class="hero-stats reveal reveal-d3 mt-10 flex gap-8 sm:gap-12 border-t border-base-300 pt-6 max-w-md">
-        <div>
-          <div class="font-heading text-3xl sm:text-4xl text-base-content" data-count="20">0+</div>
-          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</div>
-        </div>
-        <div>
-          <div class="font-heading text-3xl sm:text-4xl text-primary-ink" data-count="300">0+</div>
-          <div class="mt-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
-        </div>
-        <div>
-        </div>
-      </div>
     </div>
 
-    <!-- Interactive 3D canvas (falls back to the field diagram) -->
-    <div class="lg:col-span-5 reveal reveal-d2">
+    <!-- Column 2: stat card (numbers in one column, labels in the other) -->
+    <div class="hero-stats reveal reveal-d3 grid grid-cols-[auto_auto] items-baseline justify-center gap-x-3 rounded-3xl border border-base-300 bg-[#FBFAF6] p-6 xl:p-8">
+      <span class="inline-block min-w-[4.5ch] text-right font-heading text-3xl tabular-nums text-base-content xl:text-4xl" data-count="20">0+</span>
+      <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</span>
+
+      <div class="col-span-2 my-5 border-t border-base-300 xl:my-6"></div>
+
+      <span class="inline-block min-w-[4.5ch] text-right font-heading text-3xl tabular-nums text-primary-ink xl:text-4xl" data-count="300">0+</span>
+      <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</span>
+    </div>
+
+    <!-- Column 3: interactive 3D canvas (falls back to the field diagram) -->
+    <div class="reveal reveal-d2">
       <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
-        <div data-stage class="relative aspect-[4/5] w-full">
+        <div data-stage class="relative aspect-[4/5] w-full lg:aspect-auto lg:h-[calc(100dvh-9.5rem)] lg:min-h-[420px] lg:max-h-[760px]">
           <img src="/hero/field.webp" alt="" aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 w-[112%] max-w-none -translate-x-1/2 -translate-y-1/2 select-none">
           <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
             <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>

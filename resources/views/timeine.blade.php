@@ -5,19 +5,19 @@
       <x-PageContainer>
         <div class="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
 
-          <div class="border-t-2 border-base-content pt-6" data-aos="fade-up">
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
             <h3 class="text-lg font-semibold text-base-content">Tournament Duration</h3>
             <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">1 Day</p>
             <p class="mt-3 text-base-content/75">Full day of cricket action</p>
           </div>
 
-          <div class="border-t-2 border-base-content pt-6" data-aos="fade-up">
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
             <h3 class="text-lg font-semibold text-base-content">Registration Period</h3>
             <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">26 Days</p>
             <p class="mt-3 text-base-content/75">Oct 14 - Nov 8, 2026</p>
           </div>
 
-          <div class="border-t-2 border-base-content pt-6" data-aos="fade-up">
+          <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
             <h3 class="text-lg font-semibold text-base-content">Preparation Time</h3>
             <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">13 Days</p>
             <p class="mt-3 text-base-content/75">Nov 9 - Nov 21, 2026</p>

@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <div class="max-w-6xl mx-auto space-y-12">
+        <div class="space-y-12">
 
             <div class="relative">
                 <div class="flex items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8" data-aos="fade-in">

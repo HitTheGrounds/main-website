@@ -1,150 +1,98 @@
+@php
+    // Interleaved so neighbouring tiles come from different matches
+    $memories = [
+        [10, 'The champions trophy on its plinth'],
+        [1, 'A bowler in mid-delivery stride'],
+        [11, 'Players working on a wooden installation'],
+        [2, 'A batter swinging at the crease'],
+        [12, 'A match in progress on the ground'],
+        [3, 'Darts stuck in a dartboard'],
+        [13, 'Players in purple jerseys on the sidelines'],
+        [4, 'The maroon-jersey team posing together'],
+        [14, 'The blue-jersey team taking a selfie'],
+        [5, 'A blue-jersey team group photo'],
+        [15, 'The purple-jersey team after dark'],
+        [6, 'A fielder in blue smiling and clapping'],
+        [16, 'The teal-jersey team posing together'],
+        [7, 'Bamboo decoration beside a sponsor backdrop'],
+        [17, 'Players walking across the field'],
+        [8, 'Players gathered at the scoreboard'],
+        [18, 'The wicketkeeper and umpire at the stumps'],
+        [9, 'A batter playing a shot'],
+        [19, 'Players in orange watching from the bank'],
+        [20, 'A batter in a blue jersey driving through a big shot'],
+        [21, 'A blue-jersey team group photo at the backdrop'],
+        [22, 'Officials seated at a table under a tent'],
+        [23, 'A large group posing together under a blue tent'],
+        [24, 'A batter at the crease with spectators behind the stumps'],
+        [42, 'Players walking across the ground'],
+        [25, 'A wicketkeeper in a black jersey numbered 95'],
+        [43, 'Players in teal jerseys resting by the boundary'],
+        [26, 'A photographer in a bucket hat lining up a shot'],
+        [44, 'Three women in navy polo shirts and sun hats smiling'],
+        [27, 'A batter playing a shot in front of the sidelines'],
+        [45, 'A team in purple jerseys seated under a tent'],
+        [28, 'A photographer in a bucket hat with a camera strap'],
+        [46, 'A team in navy and orange jerseys posing together under a tent'],
+        [29, 'Two players in maroon University of Moratuwa shirts'],
+        [47, 'Volunteers in navy polos lined up in front of the sponsor backdrop'],
+        [30, 'Fielders and a batter at the stumps in low light'],
+        [48, 'Three men in navy polos posing under a blue tent'],
+        [31, 'A batter in a pink and navy kit playing a shot'],
+        [49, 'A large group in blue shirts posing in front of a banner'],
+        [32, 'A batter at the stumps with the keeper crouched behind'],
+        [50, 'Three men in blue polos seated in the shade'],
+        [33, 'A bowler in dark kit delivering the ball with an umpire behind'],
+        [51, 'A batter taking guard beside the stumps'],
+        [34, 'Three players in maroon and orange jerseys walking across the grass'],
+        [52, 'A large group in navy and blue shirts posing on the field'],
+        [35, 'A team in blue and purple jerseys posing in front of the sponsor backdrop'],
+        [53, 'A batter swinging at a delivery'],
+        [36, 'Players and a supporter in front of a pink food truck'],
+        [54, 'Players spread across the field'],
+        [37, 'A team in blue jerseys seated under a tent'],
+        [55, 'A team in blue gradient jerseys in front of the sponsor backdrop'],
+        [38, 'A group in white and navy shirts posing in front of the sponsor backdrop'],
+        [56, 'A team in blue jerseys with arms around each other in front of the backdrop'],
+        [39, 'Players relaxing in a green tent'],
+        [57, 'A fielder running in on the ground'],
+        [40, 'A batter waiting at the stumps on a dry pitch'],
+        [58, 'Two women in blue shirts smiling in front of the sponsor backdrop'],
+        [41, 'A man in a black shirt holding a bat in front of the sponsor backdrop'],
+    ];
+    $sizes = [7 => [800, 1200], 10 => [800, 1200], 18 => [800, 1200], 40 => [800, 1200], 41 => [800, 1200], 43 => [800, 1200], 51 => [800, 1200]];
+@endphp
+
 <x-layouts.public>
-    <section class="animated-3d-gallery-sec relative overflow-hidden">
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/hero/0_Background.avif'); z-index: 0;"></div>
-        <div class="backdrop-blur-md h-full w-full relative">
-          <x-PageContainer class="min-h-screen overflow-hidden">
-            <div class="anim-3d-gallery-wrapper">
-                @php
-                    $galleryPath = public_path('storage/gallery');
-                    $images = [];
+    <section class="bg-base-100">
+        <x-PageContainer>
+            <h1 class="mb-12 text-center font-heading text-[clamp(2.75rem,8vw,5.5rem)] md:mb-16" data-aos="fade-up">
+                <span class="text-base-content">Hit the Grounds </span><span class="text-primary">Memories</span>
+            </h1>
 
-                    if (is_dir($galleryPath)) {
-                        $files = glob($galleryPath . '/*.avif');
-                        sort($files, SORT_NATURAL);
-                        $images = array_map(function ($file) {
-                            return basename($file);
-                        }, $files);
-                    }
-
-                    $imageCount = count($images);
-                    // Duplicate images to create continuous scroll
-                    $imagesRepeated = array_merge($images, $images, $images);
-                @endphp
-
-                <div class="rotating-gallery-container">
-                    <div class="rotating-gallery-grid" style="--image-count: {{ $imageCount }}">
-                        @for ($row = 0; $row < 6; $row++)
-                            @php
-                                // Rotate the images array for each row to create variation
-                                $rowImages = array_merge(
-                                    array_slice($imagesRepeated, $row * 2),
-                                    array_slice($imagesRepeated, 0, $row * 2)
-                                );
-                            @endphp
-                            <div class="gallery-row">
-                                @foreach ($rowImages as $index => $image)
-                                    <div class="gallery-cell">
-                                        <img src="{{ asset('storage/gallery/' . $image) }}" alt="Memory from Hit the Grounds">
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endfor
+            <div class="mem-grid columns-2 gap-4 md:columns-3 xl:columns-4">
+                @foreach ($memories as $i => [$n, $alt])
+                    @php [$w, $h] = $sizes[$n] ?? [1200, 800]; @endphp
+                    <div class="mb-4 break-inside-avoid" data-aos="fade-up" data-aos-delay="{{ ($i % 4) * 80 }}">
+                        <figure class="mem-tile" style="aspect-ratio: {{ $w }} / {{ $h }}">
+                            <img src="/images/memories/memory-{{ sprintf('%02d', $n) }}.avif" alt="{{ $alt }}" width="{{ $w }}" height="{{ $h }}" loading="lazy" decoding="async">
+                        </figure>
                     </div>
-                </div>
+                @endforeach
             </div>
-
-            <div class="gallery-title-wrapper absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div class="gallery-title bg-secondary text-secondary-content px-8 py-4 rounded-lg inline-block">
-                    <h1 class="font-bold font-title">Hit the Grounds Memories</h1>
-                </div>
-            </div>
-          </x-PageContainer>
-        </div>
+        </x-PageContainer>
     </section>
 
-    <style>
-        .animated-3d-gallery-sec {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .gallery-title-wrapper {
-            text-align: center;
-        }
-
-        .gallery-title h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .rotating-gallery-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            min-height: calc(100vh - 10rem);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .rotating-gallery-grid {
-            transform: rotate(-45deg);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            position: absolute;
-        }
-
-        .gallery-row {
-            display: flex;
-            gap: 1rem;
-            animation: scrollLeft calc(var(--image-count) * 0.5s) linear infinite;
-        }
-
-        .gallery-row:nth-child(even) {
-            animation-delay: calc(var(--image-count) * -0.5s);
-        }
-
-        .gallery-cell {
-            flex-shrink: 0;
-            width: auto;
-            height: 330px;
-            overflow: hidden;
-            border-radius: 0.5rem;
-        }
-
-        .gallery-cell img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        @keyframes scrollLeft {
-            from {
-                transform: translateX(0);
-            }
-
-            to {
-                transform: translateX(calc(-100% / 3));
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .gallery-cell {
-                width: auto;
-                height: 250px;
-            }
-
-            .gallery-title h1 {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .gallery-cell {
-                width: auto;
-                height: 150px;
-            }
-
-            .gallery-title h1 {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
+    <script>
+        // Point the light at the cursor
+        document.querySelectorAll('.mem-tile').forEach((tile) => {
+            const follow = (e) => {
+                const r = tile.getBoundingClientRect();
+                tile.style.setProperty('--mem-x', (e.clientX - r.left) + 'px');
+                tile.style.setProperty('--mem-y', (e.clientY - r.top) + 'px');
+            };
+            tile.addEventListener('pointerenter', follow);
+            tile.addEventListener('pointermove', follow);
+        });
+    </script>
 </x-layouts.public>

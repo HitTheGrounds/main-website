@@ -2,7 +2,7 @@
     <div class="min-h-screen bg-base-100">
         <x-PageContainer>
 
-            <header class="mb-10 md:mb-14" data-aos="fade-up">
+            <header class="mb-10 text-center md:mb-14" data-aos="fade-up">
                 <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
                     <span class="text-primary">Rules </span>
                     <span class="text-base-content">& Regulations</span>

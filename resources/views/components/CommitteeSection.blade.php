@@ -3,22 +3,22 @@
         [
             'title' => 'Executive Committee',
             'members' => [
-                ['name' => 'Akindu Himan', 'role' => 'Chairperson', 'initials' => 'AH'],
-                ['name' => 'Devindi Wickramarathna', 'role' => 'Vice Chairperson', 'initials' => 'DW'],
-                ['name' => 'Sadil Ephraims', 'role' => 'Vice Chairperson', 'initials' => 'SE'],
+                ['name' => 'Akindu Himan', 'role' => 'Chairperson', 'photo' => '/people/akindu.avif'],
+                ['name' => 'Devindi Wickramarathna', 'role' => 'Vice Chairperson', 'photo' => '/people/devindi.avif'],
+                ['name' => 'Sadil Ephraims', 'role' => 'Vice Chairperson', 'photo' => '/people/sadil.avif'],
             ],
         ],
         [
             'title' => 'Partnership Development Committee',
             'members' => [
-                ['name' => 'Samadhi Talagala', 'role' => 'Partnership Development Committee Lead', 'initials' => 'ST'],
-                ['name' => 'Eshin Fernando', 'role' => 'Partnership Development Committee Lead', 'initials' => 'EF'],
+                ['name' => 'Samadhi Talagala', 'role' => 'Partnership Development Committee Lead', 'photo' => '/people/samadhi.avif'],
+                ['name' => 'Eshin Fernando', 'role' => 'Partnership Development Committee Lead', 'photo' => '/people/eshin.avif'],
             ],
         ],
         [
             'title' => 'Finance Committee',
             'members' => [
-                ['name' => 'Umen Samaranayake', 'role' => 'Finance Committee Lead', 'initials' => 'US'],
+                ['name' => 'Umen Samaranayake', 'role' => 'Finance Committee Lead', 'photo' => '/people/umen.avif'],
             ],
         ],
     ];
@@ -39,11 +39,9 @@
 
                 <div class="mx-auto grid grid-cols-1 gap-6 {{ count($group['members']) === 1 ? 'max-w-sm' : (count($group['members']) === 2 ? 'max-w-2xl sm:grid-cols-2' : 'max-w-5xl sm:grid-cols-2 lg:grid-cols-3') }}">
                     @foreach ($group['members'] as $member)
-                        <article class="card border border-base-300 bg-base-200 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md" data-aos="fade-up" data-aos-duration="1000">
+                        <article class="card border border-base-300 bg-base-200 shadow-sm" data-aos="fade-up" data-aos-duration="1000">
                             <div class="card-body items-center text-center">
-                                <div class="mb-3 grid size-28 place-items-center rounded-full bg-primary text-3xl font-bold text-primary-content ring ring-primary/30 ring-offset-4 ring-offset-base-200" aria-hidden="true">
-                                    {{ $member['initials'] }}
-                                </div>
+                                <img src="{{ $member['photo'] }}" alt="{{ $member['name'] }}" width="112" height="112" loading="lazy" class="mb-3 size-28 rounded-full object-cover ring ring-primary/30 ring-offset-4 ring-offset-base-200">
                                 <h4 class="card-title justify-center text-xl text-base-content">{{ $member['name'] }}</h4>
                                 <p class="text-sm leading-relaxed text-base-content/70">{{ $member['role'] }}</p>
                             </div>

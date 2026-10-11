@@ -1,6 +1,6 @@
 
 <footer class="bg-base-300 text-base-content border-t-2 border-secondary">
-  <div class="container mx-auto px-4 sm:px-8 py-16">
+  <div class="w-full px-4 sm:px-6 lg:px-12 py-16">
     <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
       <!-- HTG Logo -->
       <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="h-12 sm:h-14 md:h-16 w-auto">

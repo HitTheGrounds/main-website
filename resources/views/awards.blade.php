@@ -2,16 +2,16 @@
     <!-- Hero Section -->
     <section>
       <x-PageContainer>
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold font-heading uppercase mb-6" data-aos="fade-up" data-aos-duration="1000">
+        <header class="mb-14 md:mb-20" data-aos="fade-up">
+          <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
             <span class="text-base-content">Awards & </span>
-            <span class="text-primary-ink">Recognition</span>
+            <span class="text-primary">Recognition</span>
           </h1>
-          <p class="text-base-content/80 text-base sm:text-lg md:text-xl leading-relaxed" data-aos="fade-up" data-aos-duration="1500">
+          <p class="mt-4 max-w-2xl text-lg leading-relaxed text-base-content/75">
             More than just runs and wickets — it's about celebrating those standout moments.
             Here are the awards that will honor the best of the best!
           </p>
-        </div>
+        </header>
       </x-PageContainer>
     </section>
 

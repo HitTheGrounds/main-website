@@ -32,7 +32,7 @@
 
       <!-- Logo -->
       <a href="/" class="px-1 sm:px-4 flex items-center gap-2 cursor-pointer">
-        <img src="/nav_logo_orange.avif" alt="HIT THE GROUNDS" class="h-8 sm:h-10 md:h-12 block">
+        <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 object-contain block">
       </a>
     </div>
 

@@ -21,7 +21,7 @@
         <!-- Geometric accents -->
         <div class="pointer-events-none absolute inset-0" aria-hidden="true">
           <!-- Offset frames -->
-          <div class="card absolute left-0 top-0 h-4/5 w-4/5 border-4 border-accent/40"></div>
+          <div class="card absolute left-0 top-0 h-4/5 w-4/5 border-4 border-accent/50"></div>
           <div class="card absolute bottom-0 right-0 h-4/5 w-4/5 border-4 border-primary"></div>
           <div class="absolute bottom-6 left-6 h-24 w-24 border-b-4 border-l-4 border-[#24346c]"></div>
 
@@ -64,8 +64,8 @@
         </div>
 
         <!-- Main logo box -->
-        <div class="card z-10 w-4/5 h-4/5 absolute inset-0 m-auto overflow-hidden bg-base-100 bg-cover bg-center bg-no-repeat" data-aos="fade-up" data-aos-duration="1500" data-aos-easing="ease-in-out" data-aos-delay="300"
-        style="background-image: url('/logo.avif');">
+        <div class="card z-10 w-4/5 h-4/5 absolute inset-0 m-auto flex items-center justify-center overflow-hidden bg-[linear-gradient(135deg,#FFF8F0_0%,#FFE0C2_52%,#FFB270_100%)] p-6 sm:p-8" data-aos="fade-up" data-aos-duration="1500" data-aos-easing="ease-in-out" data-aos-delay="300">
+          <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="w-full h-auto object-contain drop-shadow-[0_10px_18px_rgba(130,45,0,0.18)]">
         </div>
       </div>
     </x-PageContainer>

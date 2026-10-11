@@ -60,7 +60,28 @@ class PublicPagesTest extends TestCase
     {
         $response = $this->get(route('timeline'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $response->assertSee([
+            'Hit the Grounds 2026',
+            'October 12th, 2026',
+            'Event Announcement',
+            'October 14th, 2026',
+            'Open Registration',
+            'November 8th, 2026',
+            'Close Registration',
+            'November 21st, 2026',
+            'Event Day',
+            '26 Days',
+            'Oct 14 - Nov 8, 2026',
+            '13 Days',
+            'Nov 9 - Nov 21, 2026',
+        ]);
+        $response->assertDontSee([
+            'October 11th, 2025',
+            'October 21st, 2025',
+            'November 12th, 2025',
+            'January 24th, 2026',
+        ]);
     }
 
     public function test_awards_page_can_be_rendered(): void

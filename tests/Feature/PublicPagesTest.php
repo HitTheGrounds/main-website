@@ -39,6 +39,16 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_public_navigation_shows_only_current_items(): void
+    {
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee(route('memories'), false);
+        $response->assertDontSee(route('partners'), false);
+        $response->assertDontSee(route('committee'), false);
+    }
+
     public function test_support_page_can_be_rendered(): void
     {
         $response = $this->get(route('support'));

@@ -3,7 +3,7 @@
   <div class="container mx-auto px-4 sm:px-8 py-16">
     <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
       <!-- HTG Logo -->
-      <img src="/nav_logo_orange.avif" alt="HIT THE GROUNDS" class="h-12 sm:h-14 md:h-16 w-auto">
+      <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="h-12 sm:h-14 md:h-16 w-auto">
 
       <!-- CSE Logo -->
       <img src="/cse.avif" alt="CSE" class="h-12 sm:h-14 md:h-16 w-auto">

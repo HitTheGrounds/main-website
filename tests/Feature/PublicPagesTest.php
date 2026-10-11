@@ -112,7 +112,29 @@ class PublicPagesTest extends TestCase
     {
         $response = $this->get(route('awards'));
 
-        $response->assertStatus(200);
+        $response->assertOk();
+        $response->assertSee([
+            'Champion',
+            '1st Runners-up',
+            'Most Valuable Player — Male',
+            'Most Valuable Player — Female',
+            'Orange Cap',
+            'Purple Cap',
+            'Super Striker of the Tournament',
+            '4s of the Tournament',
+            'Green Dot Ball Award',
+            'Player of the Match — Final',
+            'most sixes hit',
+            'most fours hit',
+            'most dot balls delivered',
+            'standout performer in the final',
+        ]);
+        $response->assertSee(route('register'), false);
+        $response->assertDontSee([
+            'Best Batsman',
+            'Best Bowler',
+            'Best Female Player',
+        ]);
     }
 
     public function test_teams_industry_page_can_be_rendered(): void

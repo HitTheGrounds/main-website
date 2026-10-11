@@ -1,129 +1,87 @@
+@php
+    $awards = [
+        ['name' => 'Champion', 'description' => 'Awarded to the tournament-winning team.'],
+        ['name' => '1st Runners-up', 'description' => 'Awarded to the tournament’s second-place team.'],
+        ['name' => 'Most Valuable Player — Male', 'description' => 'Best overall male player of the season.'],
+        ['name' => 'Most Valuable Player — Female', 'description' => 'Best overall female player of the season.'],
+        ['name' => 'Orange Cap', 'description' => 'Awarded to the tournament’s leading run-scorer.'],
+        ['name' => 'Purple Cap', 'description' => 'Awarded to the tournament’s leading wicket-taker.'],
+        ['name' => 'Super Striker of the Tournament', 'description' => 'Awarded to the player with the most sixes hit.'],
+        ['name' => '4s of the Tournament', 'description' => 'Awarded to the player with the most fours hit.'],
+        ['name' => 'Green Dot Ball Award', 'description' => 'Awarded to the bowler with the most dot balls delivered.'],
+        ['name' => 'Player of the Match — Final', 'description' => 'Awarded to the standout performer in the final.'],
+    ];
+@endphp
+
 <x-layouts.public>
-    <!-- Hero Section -->
-    <section>
-      <x-PageContainer>
-        <header class="mb-14 md:mb-20" data-aos="fade-up">
-          <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
-            <span class="text-base-content">Awards & </span>
-            <span class="text-primary">Recognition</span>
-          </h1>
-          <p class="mt-4 max-w-2xl text-lg leading-relaxed text-base-content/75">
-            More than just runs and wickets — it's about celebrating those standout moments.
-            Here are the awards that will honor the best of the best!
-          </p>
-        </header>
-      </x-PageContainer>
+    <section class="overflow-hidden bg-base-100">
+        <x-PageContainer>
+            <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
+                <header class="lg:col-span-7" data-aos="fade-up">
+                    <p class="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">Hit the Grounds 2026</p>
+                    <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]">
+                        <span class="text-base-content">Awards & </span>
+                        <span class="text-primary">Recognition</span>
+                    </h1>
+                    <p class="mt-5 max-w-2xl text-lg leading-relaxed text-base-content/75">
+                        Celebrating the teams, players, and unforgettable performances that define the tournament.
+                    </p>
+                </header>
+
+                <div class="relative mx-auto h-72 w-full max-w-md sm:h-80 lg:col-span-5" aria-hidden="true" data-aos="fade-up" data-aos-delay="120">
+                    <div class="absolute inset-x-8 bottom-3 h-24 rounded-[50%] bg-primary/20 blur-3xl"></div>
+                    <img src="/award/award_2.avif" alt="" class="absolute bottom-3 left-[6%] h-[72%] w-auto -rotate-6 object-contain drop-shadow-xl transition duration-500 hover:-translate-y-2 hover:-rotate-3">
+                    <img src="/award/award_3.avif" alt="" class="absolute bottom-3 right-[7%] h-[68%] w-auto rotate-6 object-contain drop-shadow-xl transition duration-500 hover:-translate-y-2 hover:rotate-3">
+                    <img src="/award/award_1.avif" alt="" class="absolute bottom-0 left-1/2 z-10 h-full w-auto -translate-x-1/2 object-contain drop-shadow-2xl transition duration-500 hover:-translate-x-1/2 hover:-translate-y-2">
+                </div>
+            </div>
+        </x-PageContainer>
     </section>
 
-    <!-- Awards Section -->
-    <section class="bg-base-100">
-      <x-PageContainer>
-        <div class="space-y-20">
-
-          <!-- Champions Section -->
-          <div data-aos="fade-up" data-aos-duration="1000">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold font-title text-center mb-8">
-              <span class="text-primary-ink">Tournament </span>
-              <span class="text-base-content">Champions</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div class="flex justify-center" data-aos="fade-up" data-aos-duration="1200">
-                <img src="/award/award_1.avif" alt="Champions Trophy" class="w-full max-w-md object-contain">
-              </div>
-              <div class="text-center md:text-left" data-aos="fade-left" data-aos-duration="1200">
-                <div class="badge badge-primary badge-lg mb-4">Team Award</div>
-                <h3 class="text-2xl sm:text-3xl font-title text-primary-ink mb-4">Champions Trophy</h3>
-                <p class="text-base-content/80 text-base md:text-lg leading-relaxed">
-                  The ultimate prize for the team that demonstrates exceptional skill, teamwork, and determination throughout the tournament. Only the best will lift this prestigious trophy.
-                </p>
-              </div>
+    <section class="bg-base-200">
+        <x-PageContainer>
+            <div class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between" data-aos="fade-up">
+                <div>
+                    <p class="text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">Official award list</p>
+                    <h2 class="mt-2 font-heading text-3xl text-base-content sm:text-4xl">Ten ways to make your mark</h2>
+                </div>
+                <p class="max-w-sm text-base-content/65 sm:text-right">Every run, wicket, boundary, and match-defining moment counts.</p>
             </div>
-          </div>
 
-          <div class="divider"></div>
-
-          <!-- Runner-up Section -->
-          <div data-aos="fade-up" data-aos-duration="1000">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold font-title text-center mb-8">
-              <span class="text-base-content">Tournament </span>
-              <span class="text-warning">Runner-up</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div class="text-center md:text-left order-2 md:order-1" data-aos="fade-right" data-aos-duration="1200">
-                <div class="badge badge-warning badge-lg mb-4">Team Award</div>
-                <h3 class="text-2xl sm:text-3xl font-title text-warning mb-4">Runner-up Trophy</h3>
-                <p class="text-base-content/80 text-base md:text-lg leading-relaxed">
-                  Recognition for the team with outstanding performance throughout the tournament. Awarded to the 2nd place finisher who demonstrated exceptional competitiveness and sportsmanship.
-                </p>
-              </div>
-              <div class="flex justify-center order-1 md:order-2" data-aos="fade-up" data-aos-duration="1200">
-                <img src="/award/award_2.avif" alt="Runner-up Trophy" class="w-full max-w-md object-contain">
-              </div>
+            <div data-aos="fade-up" data-aos-delay="100">
+                <table class="block w-full border-separate border-spacing-y-2 md:table" aria-label="Tournament awards">
+                    <thead class="hidden md:table-header-group">
+                        <tr class="text-left text-xs font-bold uppercase tracking-[0.18em] text-base-content/55">
+                            <th scope="col" class="w-16 px-4 pb-2">No.</th>
+                            <th scope="col" class="w-[38%] px-5 pb-2">Award</th>
+                            <th scope="col" class="px-5 pb-2">Recognition</th>
+                        </tr>
+                    </thead>
+                    <tbody class="block md:table-row-group">
+                        @foreach ($awards as $award)
+                            <tr class="group mb-3 block rounded-xl bg-base-100 transition-colors duration-200 hover:bg-primary/10 md:mb-0 md:table-row">
+                                <td class="hidden px-4 py-5 align-top font-mono text-sm font-bold text-primary-ink md:table-cell">
+                                    {{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}
+                                </td>
+                                <th scope="row" class="block px-5 pb-1 pt-5 text-left text-lg font-bold text-base-content md:table-cell md:py-5 md:align-top">
+                                    {{ $award['name'] }}
+                                </th>
+                                <td class="block px-5 pb-5 pt-1 leading-relaxed text-base-content/70 md:table-cell md:py-5 md:align-top">
+                                    {{ $award['description'] }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-          </div>
 
-          <div class="divider"></div>
-
-          <!-- Best Performing Players Section -->
-          <div data-aos="fade-up" data-aos-duration="1000">
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold font-title text-center mb-8">
-              <span class="text-base-content">Best Performing </span>
-              <span class="text-primary-ink">Players</span>
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-center">
-              <div class="flex justify-center" data-aos="fade-up" data-aos-duration="1200">
-                <img src="/award/award_3.avif" alt="Best Performing Players Trophy" class="w-full max-w-md object-contain">
-              </div>
-              <div class="text-center md:text-left" data-aos="fade-left" data-aos-duration="1200">
-                <div class="badge badge-lg mb-4 border-0 bg-secondary text-secondary-content">Individual Awards</div>
-                <h3 class="text-2xl sm:text-3xl font-title text-primary-ink mb-4">Excellence Recognition</h3>
-                <p class="text-base-content/80 text-base md:text-lg leading-relaxed mb-6">
-                  Celebrating individual excellence across various categories. These awards recognize players who shine in specific aspects of the game.
-                </p>
-                <ul class="grid grid-cols-3 gap-4 text-left">
-                  <li>
-                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M243.31,81.37,190.63,28.69a16,16,0,0,0-22.63,0L60.69,136a16,16,0,0,0,0,22.63l20.68,20.68-47,47a8,8,0,0,0,11.32,11.32l47-47,20.68,20.68a16,16,0,0,0,22.63,0L243.31,104a16,16,0,0,0,0-22.63ZM124.69,200,104,179.31l29.66-29.65a8,8,0,0,0-11.32-11.32L92.69,168,72,147.31,107.31,112H160v52.69ZM232,92.69l-56,56V104a8,8,0,0,0-8-8H123.31l56-56L232,92.68ZM60,88A28,28,0,1,0,32,60,28,28,0,0,0,60,88Zm0-40A12,12,0,1,1,48,60,12,12,0,0,1,60,48Z"></path></svg>
-                    </span>
-                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Batsman</p>
-                  </li>
-                  <li>
-                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM72.09,195.91c.82-1,1.64-1.93,2.42-2.91A8,8,0,1,0,62,183l-1.34,1.62a87.82,87.82,0,0,1,0-113.24L62,73A8,8,0,1,0,74.51,63c-.78-1-1.6-2-2.42-2.91a87.84,87.84,0,0,1,111.82,0c-.82,1-1.64,1.92-2.42,2.91A8,8,0,1,0,194,73l1.34-1.62a87.82,87.82,0,0,1,0,113.24L194,183a8,8,0,1,0-12.48,10c.78,1,1.6,1.95,2.42,2.91a87.84,87.84,0,0,1-111.82,0Zm23.8-50.59a104.5,104.5,0,0,1-4.48,17.35,8,8,0,0,1-15.09-5.34,87.1,87.1,0,0,0,3.79-14.65,8,8,0,1,1,15.78,2.64Zm0-34.64a8,8,0,0,1-6.57,9.21A8.52,8.52,0,0,1,88,120a8,8,0,0,1-7.88-6.68,87.1,87.1,0,0,0-3.79-14.65,8,8,0,0,1,15.09-5.34A104.5,104.5,0,0,1,95.89,110.68Zm78.91,56.86a8,8,0,0,1-10.21-4.87,104.5,104.5,0,0,1-4.48-17.35,8,8,0,1,1,15.78-2.64,87.1,87.1,0,0,0,3.79,14.65A8,8,0,0,1,174.8,167.54Zm-14.69-56.86a104.5,104.5,0,0,1,4.48-17.35,8,8,0,0,1,15.09,5.34,87.1,87.1,0,0,0-3.79,14.65A8,8,0,0,1,168,120a8.52,8.52,0,0,1-1.33-.11A8,8,0,0,1,160.11,110.68Z"></path></svg>
-                    </span>
-                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Bowler</p>
-                  </li>
-                  <li>
-                    <span class="grid size-14 place-items-center rounded-full bg-base-200 text-primary-ink">
-                      <svg class="size-8" aria-hidden="true" stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><path d="M208,96a80,80,0,1,0-88,79.6V200H88a8,8,0,0,0,0,16h32v24a8,8,0,0,0,16,0V216h32a8,8,0,0,0,0-16H136V175.6A80.11,80.11,0,0,0,208,96ZM64,96a64,64,0,1,1,64,64A64.07,64.07,0,0,1,64,96Z"></path></svg>
-                    </span>
-                    <p class="mt-3 text-base sm:text-lg font-semibold leading-snug text-base-content">Best Female Player</p>
-                  </li>
-                </ul>
-              </div>
+            <div class="mt-10 flex flex-col gap-5 rounded-2xl bg-secondary px-6 py-6 text-secondary-content sm:flex-row sm:items-center sm:justify-between sm:px-8" data-aos="fade-up">
+                <div>
+                    <h2 class="font-heading text-2xl sm:text-3xl">Ready to compete?</h2>
+                    <p class="mt-1 text-secondary-content/75">Register your team and take your shot at the honours.</p>
+                </div>
+                <x-mary-button link="{{ route('register') }}" label="Register Your Team" class="btn btn-primary shrink-0 rounded-full" />
             </div>
-          </div>
-
-        </div>
-      </x-PageContainer>
-    </section>
-
-    <!-- Call to Action Section -->
-    <section class="bg-base-200" data-aos="fade-up" data-aos-duration="1500">
-      <x-PageContainer>
-        <div class="card bg-base-100 shadow-xl border border-primary max-w-4xl mx-auto">
-          <div class="card-body text-center py-8 md:py-12">
-            <h2 class="card-title text-3xl sm:text-4xl md:text-5xl font-title text-primary-ink justify-center mb-4">
-              Ready to Compete?
-            </h2>
-            <p class="text-base-content/80 text-base md:text-lg mb-6">
-              Register your team now and compete for these prestigious awards!
-            </p>
-            <div class="card-actions justify-center">
-              <x-mary-button link="{{ route('register') }}" label="Register Your Team" class="btn btn-primary btn-lg" />
-            </div>
-          </div>
-        </div>
-      </x-PageContainer>
+        </x-PageContainer>
     </section>
 </x-layouts.public>

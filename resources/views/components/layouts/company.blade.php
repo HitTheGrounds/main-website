@@ -23,9 +23,9 @@
 
                     <div class="navbar-end">
                         <div class="dropdown dropdown-end">
-                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
-                                <div class="w-10 rounded-full bg-primary text-primary-content">
-                                    <span class="text-xl">{{ $authUser?->initials() }}</span>
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle p-0">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content">
+                                    <span class="text-xl leading-none">{{ $authUser?->initials() }}</span>
                                 </div>
                             </div>
                             <ul tabindex="0" class="overflow-hidden menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">

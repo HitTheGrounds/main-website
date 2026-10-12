@@ -2,6 +2,10 @@
 
 return [
 
+    'google_analytics' => [
+        'id' => env('GA_MEASUREMENT_ID', 'G-LWY179NW5C'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

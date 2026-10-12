@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Company Registration">
     <x-PageContainer class="min-h-screen flex items-center justify-center" data-aos="fade-up" data-aos-duration="1500">
         <div class="max-w-md w-full">
             <div class="text-center mb-8">

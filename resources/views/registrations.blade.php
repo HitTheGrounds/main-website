@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Registration Information" description="How to register your team for Hit the Grounds 2026.">
     <x-PageContainer class="min-h-screen">
         <div class="max-w-4xl mx-auto">
             <div class="text-center mb-12" data-aos="fade-up">

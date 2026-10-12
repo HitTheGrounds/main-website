@@ -63,7 +63,7 @@
     $sizes = [7 => [800, 1200], 10 => [800, 1200], 18 => [800, 1200], 40 => [800, 1200], 41 => [800, 1200], 43 => [800, 1200], 51 => [800, 1200]];
 @endphp
 
-<x-layouts.public>
+<x-layouts.public title="Memories" description="Photos from past Hit the Grounds tournaments.">
     <section class="bg-base-100">
         <x-PageContainer>
             <h1 class="mb-12 text-center font-heading text-[clamp(2.75rem,8vw,5.5rem)] md:mb-16" data-aos="fade-up">

@@ -5,7 +5,7 @@
     $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 20, 0, 0, 0, 'Asia/Colombo'), false);
 @endphp
 
-<x-layouts.public>
+<x-layouts.public title="Event Timeline" description="Key dates and a countdown for Hit the Grounds 2026.">
     <x-TimelineSection />
 
     <section class="bg-base-200">

@@ -23,12 +23,12 @@
 
                     <div class="navbar-end">
                         <div class="dropdown dropdown-end">
-                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
-                                <div class="w-10 rounded-full bg-primary text-primary-content">
-                                    <span class="text-xl">{{ $authUser?->initials() }}</span>
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle p-0">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content">
+                                    <span class="text-xl leading-none">{{ $authUser?->initials() }}</span>
                                 </div>
                             </div>
-                            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                            <ul tabindex="0" class="overflow-hidden menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                                 <li class="menu-title">
                                     <span>{{ $authUser?->name }}</span>
                                     <span class="text-xs">{{ $authUser?->email }}</span>
@@ -105,7 +105,7 @@
 
                     <!-- Desktop User Menu -->
                     <div class="p-4 border-t border-base-200 hidden lg:block">
-                        <div class="dropdown dropdown-top w-full">
+                        <div class="dropdown dropdown-top w-full overflow-hidden">
                             <div tabindex="0" role="button" class="flex items-center space-x-2 px-3 py-2 rounded-lg border border-base-300 hover:bg-base-200 transition-colors cursor-pointer w-full">
                                 <div class="flex items-center space-x-3 flex-1">
                                     <div class="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">

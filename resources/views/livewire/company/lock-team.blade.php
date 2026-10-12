@@ -2,10 +2,17 @@
 
 use App\Models\Team;
 use App\Helpers\CompanyAuth;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
     public Team $team;
+
+    #[On('team-members-updated.{team.id}')]
+    public function refreshTeam(): void
+    {
+        $this->team->refresh();
+    }
 
     public function lock(): void
     {

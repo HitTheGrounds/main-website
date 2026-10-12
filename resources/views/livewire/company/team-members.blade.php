@@ -2,7 +2,6 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
-use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -119,6 +118,7 @@ new class extends Component {
 
         $this->closeModal();
         $this->team->refresh();
+        $this->dispatch("team-members-updated.{$this->team->id}");
     }
 
     public function closeModal(): void
@@ -142,6 +142,7 @@ new class extends Component {
             }
             $member->delete();
             $this->team->refresh();
+            $this->dispatch("team-members-updated.{$this->team->id}");
         }
     }
 }; ?>

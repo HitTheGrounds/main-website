@@ -1,8 +1,8 @@
 @php
-    $ticker = ['Champion', 'Orange Cap', 'Purple Cap', 'Super Striker', 'Green Dot Ball', 'Player of the Match'];
+    $ticker = ['Champion', 'First Runner-up', 'Male MVP', 'Female MVP', 'Orange Cap', 'Purple Cap', 'Super Striker', 'Most Four Hits', 'Green Dot Ball', 'Player of the Match'];
 @endphp
 
-<x-layouts.public>
+<x-layouts.public title="Awards" description="Every award at Hit the Grounds 2026: the Champion and First Runner-up awards, Male and Female MVP, Orange Cap, Purple Cap, Super Striker, Most Four Hits, Green Dot Ball and Player of the Match.">
     {{-- Hero --}}
     <section class="overflow-hidden bg-base-100">
         <x-PageContainer class="!py-10 sm:!py-12 lg:!py-14">
@@ -55,10 +55,10 @@
                             <div class="aw-spin size-[460px] rounded-full border-2 border-dashed border-orange-400/40"></div>
                         </div>
                         <span class="absolute left-5 top-4 text-[78px] font-extrabold sm:left-7 sm:top-5 sm:text-[110px] leading-none tracking-tighter text-transparent [-webkit-text-stroke:1.5px_rgb(244_241_234_/_.25)]" aria-hidden="true">01</span>
-                        <img src="/award/award_1.avif" alt="Champion trophy" class="aw-tilt aw-float aw-gold relative h-[235px] w-auto sm:h-[360px]">
+                        <img src="/award/award_1.avif" alt="Champion Award trophy" class="aw-tilt aw-float aw-gold relative h-[235px] w-auto sm:h-[360px]">
                     </div>
                     <div class="px-6 pb-7 pt-1 text-center sm:px-9 sm:pb-10 sm:pt-2">
-                        <h3 class="font-heading text-3xl sm:text-4xl">Champion</h3>
+                        <h3 class="font-heading text-3xl sm:text-4xl">Champion Award</h3>
                         <p class="mt-2 text-base leading-relaxed text-base-100/70 sm:mt-2.5 sm:text-lg">Awarded to the tournament-winning team.</p>
                     </div>
                 </article>
@@ -67,10 +67,10 @@
                          style="background: radial-gradient(75% 42% at 50% 36%, rgb(255 106 19 / .22), transparent 75%), #EBE6DB">
                     <div class="relative flex h-[160px] w-[38%] shrink-0 items-center justify-center [perspective:900px] sm:h-[400px] sm:w-auto sm:shrink sm:items-end">
                         <span class="absolute left-7 top-5 hidden text-[110px] font-extrabold leading-none tracking-tighter text-transparent [-webkit-text-stroke:1.5px_rgb(31_27_22_/_.2)] sm:block" aria-hidden="true">02</span>
-                        <img src="/award/award_silver.avif" alt="Runners-up silver trophy" class="aw-tilt aw-float relative h-[125px] w-auto drop-shadow-[0_24px_24px_rgb(31_27_22_/_.4)] [animation-delay:-2s] sm:h-[340px]">
+                        <img src="/award/award_silver.avif" alt="First Runner-up Award trophy" class="aw-tilt aw-float relative h-[125px] w-auto drop-shadow-[0_24px_24px_rgb(31_27_22_/_.4)] [animation-delay:-2s] sm:h-[340px]">
                     </div>
                     <div class="flex-1 px-4 py-5 text-center sm:px-9 sm:pb-10 sm:pt-2">
-                        <h3 class="font-heading text-2xl text-base-content sm:text-4xl">1st Runners-up</h3>
+                        <h3 class="font-heading text-2xl text-base-content sm:text-4xl">First Runner-up Award</h3>
                         <p class="mt-2 text-sm leading-relaxed text-base-content/70 sm:mt-2.5 sm:text-lg">Awarded to the tournament’s second-place team.</p>
                     </div>
                 </article>
@@ -94,12 +94,12 @@
                     <article class="aw-card flex items-center rounded-[2rem] border border-base-300 bg-[#FBFAF6]" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                         <div class="flex h-[200px] w-[34%] shrink-0 items-end justify-center [perspective:800px] sm:h-[340px] sm:w-2/5"
                              style="background: radial-gradient(70% 70% at 50% 62%, {{ $glow }}, transparent 72%)">
-                            <img src="/award/mvp_{{ $file }}.avif" alt="Most Valuable Player ({{ $gender }}) trophy" width="437" height="848" loading="lazy"
+                            <img src="/award/mvp_{{ $file }}.avif" alt="{{ $gender }} MVP trophy" width="437" height="848" loading="lazy"
                                  class="aw-tilt aw-float mb-3 h-[170px] w-auto drop-shadow-[0_20px_22px_rgb(31_27_22_/_.4)] {{ $delay }} sm:mb-5 sm:h-[300px]">
                         </div>
                         <div class="w-full p-4 text-center sm:p-8">
                             <span class="inline-block rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-secondary-content">MVP</span>
-                            <h3 class="mt-2 font-heading text-xl leading-tight text-base-content sm:mt-4 sm:text-3xl">Most Valuable Player ({{ $gender }})</h3>
+                            <h3 class="mt-2 font-heading text-xl leading-tight text-base-content sm:mt-4 sm:text-3xl">{{ $gender }} MVP Award</h3>
                             <p class="mt-2 text-sm leading-relaxed text-base-content/70 sm:mt-3 sm:text-lg">{{ $text }}</p>
                         </div>
                     </article>
@@ -119,7 +119,7 @@
             </div>
             <div class="relative text-center">
                 <span class="inline-block rounded-full bg-secondary px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#FF9248]">Leading run-scorer</span>
-                <h3 class="mt-4 font-heading text-[clamp(2.4rem,5vw,3.4rem)] leading-[.95]">Orange Cap</h3>
+                <h3 class="mt-4 font-heading text-[clamp(2.4rem,5vw,3.4rem)] leading-[.95]">Orange Cap Award</h3>
                 <p class="mx-auto mt-2.5 max-w-md text-[17px] leading-relaxed max-sm:text-balance text-secondary/80">Awarded to the tournament’s leading run-scorer.</p>
             </div>
         </article>
@@ -133,7 +133,7 @@
             </div>
             <div class="relative text-center">
                 <span class="inline-block rounded-full bg-base-100 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#4B1DA0]">Leading wicket-taker</span>
-                <h3 class="mt-4 font-heading text-[clamp(2.4rem,5vw,3.4rem)] leading-[.95]">Purple Cap</h3>
+                <h3 class="mt-4 font-heading text-[clamp(2.4rem,5vw,3.4rem)] leading-[.95]">Purple Cap Award</h3>
                 <p class="mx-auto mt-2.5 max-w-md text-[17px] leading-relaxed max-sm:text-balance text-base-100/85">Awarded to the tournament’s leading wicket-taker.</p>
             </div>
         </article>
@@ -149,27 +149,28 @@
 
             <div class="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
                 <article class="aw-card flex min-h-[250px] sm:min-h-[340px] flex-col items-center justify-between text-center rounded-[1.75rem] border border-base-300 bg-[#FBFAF6] p-4 sm:p-7" data-aos="fade-up">
-                    <div class="text-[92px] font-extrabold leading-[.85] sm:text-[160px] tracking-tighter text-primary" aria-hidden="true">6</div>
+                    <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]">
+                        <img src="/award/super_striker.avif" alt="Super Striker trophy" width="675" height="1299" loading="lazy" class="aw-tilt aw-float relative h-full w-auto drop-shadow-[0_18px_18px_rgb(31_27_22_/_.4)]">
+                    </div>
                     <div>
-                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl text-base-content">Super Striker of the Tournament</h3>
+                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl text-base-content">Super Striker Award</h3>
                         <p class="mt-2 text-[13px] leading-snug sm:mt-2.5 sm:text-base sm:leading-relaxed text-base-content/70">Awarded to the player with the most sixes hit.</p>
                     </div>
                 </article>
 
                 <article class="aw-card flex min-h-[250px] sm:min-h-[340px] flex-col items-center justify-between text-center rounded-[1.75rem] bg-secondary p-4 sm:p-7 text-secondary-content" data-aos="fade-up" data-aos-delay="80">
-                    <div class="text-[92px] font-extrabold leading-[.85] sm:text-[160px] tracking-tighter text-transparent [-webkit-text-stroke:3px_var(--color-primary)]" aria-hidden="true">4</div>
+                    <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]">
+                        <img src="/award/most_fours.avif" alt="Most Four Hits trophy" width="675" height="1299" loading="lazy" class="aw-tilt aw-float relative h-full w-auto [animation-delay:-2s] drop-shadow-[0_18px_18px_rgb(0_0_0_/_.55)]">
+                    </div>
                     <div>
-                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">4s of the Tournament</h3>
+                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">Most Four Hits Award</h3>
                         <p class="mt-2 text-[13px] leading-snug sm:mt-2.5 sm:text-base sm:leading-relaxed text-secondary-content/72">Awarded to the player with the most fours hit.</p>
                     </div>
                 </article>
 
                 <article class="aw-card flex min-h-[250px] sm:min-h-[340px] flex-col items-center justify-between text-center rounded-[1.75rem] border border-[#BFD8C6] bg-[#E3EFE6] p-4 sm:p-7" data-aos="fade-up" data-aos-delay="160">
-                    <div class="relative mt-1 size-[80px] sm:mt-4 sm:size-[120px]" aria-hidden="true">
-                        <span class="aw-pulse"></span>
-                        <span class="aw-pulse [animation-delay:1.3s]"></span>
-                        <span class="absolute inset-[22px] rounded-full shadow-[0_14px_24px_-8px_rgb(30_75_46_/_.6)]"
-                              style="background: radial-gradient(circle at 32% 28%, #5FC184, #2E7D4F 60%, #1B4B2E)"></span>
+                    <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]">
+                        <img src="/award/green_dot.avif" alt="Green Dot Ball trophy" width="675" height="1299" loading="lazy" class="aw-tilt aw-float relative h-full w-auto [animation-delay:-4s] drop-shadow-[0_18px_18px_rgb(30_75_46_/_.45)]">
                     </div>
                     <div>
                         <h3 class="font-heading text-[17px] leading-tight sm:text-2xl text-base-content">Green Dot Ball Award</h3>
@@ -188,7 +189,7 @@
                         <img src="/award/award_2.avif" alt="" class="aw-tilt aw-final h-[105px] w-auto sm:h-[150px]">
                     </div>
                     <div class="relative text-center">
-                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">Player of the Match</h3>
+                        <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">Player of the Match Award</h3>
                         <p class="mt-2 text-[13px] leading-snug sm:mt-2.5 sm:text-base sm:leading-relaxed text-base-100/78">Awarded to the standout performer in the final.</p>
                     </div>
                 </article>

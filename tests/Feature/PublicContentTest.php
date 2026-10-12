@@ -20,7 +20,7 @@ class PublicContentTest extends TestCase
 
     public function test_awards_page_trophy_images_exist(): void
     {
-        foreach (['award_1', 'award_2', 'award_gold', 'award_silver', 'mvp_male', 'mvp_female', 'super_striker', 'most_fours', 'green_dot'] as $file) {
+        foreach (['champions', '1st-runners-up', 'most-valuble-player-men', 'most-valuble-player-women', 'orange-cap', 'purple-cap', 'super-striker-of-the-tournament', '4s-of-the-tournament', 'green-dot-ball', 'player-of-the-match-final'] as $file) {
             $this->assertFileExists(public_path("award/{$file}.avif"));
         }
     }
@@ -113,8 +113,11 @@ class PublicContentTest extends TestCase
 
     public function test_timeline_countdown_follows_the_calendar(): void
     {
-        $this->travelTo(\Carbon\Carbon::create(2026, 11, 20, 9, 0, 0, 'Asia/Colombo'));
-        $this->get(route('timeline'))->assertSee('Last Day')->assertSee('1 Day');
+        $this->travelTo(\Carbon\Carbon::create(2026, 11, 8, 9, 0, 0, 'Asia/Colombo'));
+        $this->get(route('timeline'))->assertSee('Last Day')->assertSee('13 Days');
+
+        $this->travelTo(\Carbon\Carbon::create(2026, 11, 9, 9, 0, 0, 'Asia/Colombo'));
+        $this->get(route('timeline'))->assertSee('Closed')->assertSee('12 Days');
 
         $this->travelTo(\Carbon\Carbon::create(2026, 11, 21, 9, 0, 0, 'Asia/Colombo'));
         $this->get(route('timeline'))->assertSee('The Tournament')->assertSee('Today')->assertSee('Closed');

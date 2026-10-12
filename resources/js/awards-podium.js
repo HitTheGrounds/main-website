@@ -7,9 +7,9 @@ const mount = document.getElementById('awards-podium');
 // Podium blocks: x position, height, label. The trophy images are pre-rendered, so each one is a
 // camera-facing card that stands on its block while the blocks turn underneath.
 const BLOCKS = [
-    { x: 0, h: 1.5, w: 1.3, num: '1', label: 'CHAMPION AWARD', img: '/award/award_gold.avif', visible: 1.75, pad: [0.036, 0.118], glow: 0xffb347 },
-    { x: -1.5, h: 1.0, w: 1.3, num: '2', label: 'FIRST RUNNER-UP', img: '/award/award_silver.avif', visible: 1.4, pad: [0.036, 0.118], glow: 0xcfd8e3 },
-    { x: 1.5, h: 0.62, w: 1.3, num: 'MVP', label: 'MVP AWARD', img: '/award/mvp_male.avif', visible: 1.4, pad: [0.005, 0.005], glow: 0xd9824a },
+    { x: 0, h: 1.5, w: 1.3, num: '1', label: 'CHAMPION AWARD', img: '/award/stage/champions.avif', visible: 1.75, pad: [0, 0], glow: 0xffb347 },
+    { x: -1.5, h: 1.0, w: 1.3, num: '2', label: 'FIRST RUNNER-UP', img: '/award/stage/1st-runners-up.avif', visible: 1.25, pad: [0, 0], glow: 0xcfd8e3 },
+    { x: 1.5, h: 0.62, w: 1.3, num: 'MVP', label: 'MVP AWARD', img: '/award/stage/most-valuble-player-men.avif', visible: 1.25, pad: [0, 0], glow: 0xd9824a },
 ];
 
 const STONE = 0x17120f;

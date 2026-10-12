@@ -62,7 +62,7 @@ class Team extends Model
         $femaleCount = $this->getFemaleCount();
         $totalCount = $this->members()->count();
 
-        // Minimum: 8 players (6 male, 2 female)
+        // A full squad: 12 players, 9 male and 3 female
         return $totalCount === 12 && $maleCount === 9 && $femaleCount === 3;
     }
 
@@ -77,8 +77,6 @@ class Team extends Model
             return false;
         }
 
-        // Maximum: 12 players (9 male, 3 female)
-        // Starting from minimum (6M, 2F), can add up to 3 male and 1 female
         return $totalCount === 12 && $maleCount === 9 && $femaleCount === 3;
     }
 }

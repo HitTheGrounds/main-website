@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\VerificationCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Volt\Volt;
@@ -142,8 +143,11 @@ class VerificationCodeSecurityTest extends TestCase
             RateLimiter::hit('register:spam@example.com', 300);
         }
 
+        Http::fake(['challenges.cloudflare.com/*' => Http::response(['success' => true])]);
+
         // Next registration attempt with same email should be rate limited
         $component = Volt::test('company-registration-form')
+            ->set('turnstile_token', 'test-token')
             ->set('company_name', 'Test Company')
             ->set('contact_person_name', 'Test Person')
             ->set('contact_email', 'spam@example.com')

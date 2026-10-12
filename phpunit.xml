@@ -19,8 +19,15 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:dGVzdGluZy1rZXktdGVzdGluZy1rZXktdGVzdGluZyE="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="JWT_SECRET" value="eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eA=="/>
+        <env name="JWT_TTL" value="720"/>
+        <env name="TURNSTILE_SITE_KEY" value="test-site-key"/>
+        <env name="TURNSTILE_SECRET_KEY" value="test-secret-key"/>
+        <env name="REGISTRATION_ENABLED" value="true"/>
+        <env name="TEAM_REGISTRATION_ENABLED" value="true"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>

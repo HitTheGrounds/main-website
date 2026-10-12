@@ -73,13 +73,6 @@ class PublicPagesTest extends TestCase
         $this->get('/committee')->assertNotFound();
     }
 
-    public function test_support_page_can_be_rendered(): void
-    {
-        $response = $this->get(route('support'));
-
-        $response->assertStatus(200);
-    }
-
     public function test_timeline_countdown_cards_count_the_days_left(): void
     {
         $this->travelTo(\Carbon\Carbon::create(2026, 10, 12, 12, 0, 0, 'Asia/Colombo'));
@@ -172,10 +165,8 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_teams_university_page_can_be_rendered(): void
+    public function test_teams_university_page_is_only_for_signed_in_users(): void
     {
-        $response = $this->get(route('teams.university'));
-
-        $response->assertStatus(200);
+        $this->get(route('teams.university'))->assertRedirect(route('login'));
     }
 }

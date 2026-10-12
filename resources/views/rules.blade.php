@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Rules and Regulations" description="Match structure, bowling and fielding rules, special situations and umpire authority for Hit the Grounds 2026.">
     <div class="min-h-screen bg-base-100">
         <x-PageContainer>
 
@@ -251,7 +251,7 @@
         <section id="umpire" class="scroll-mt-36 lg:scroll-mt-28 rounded-2xl bg-secondary text-secondary-content p-8 sm:p-12 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5">
             <h2 class="font-heading text-3xl sm:text-4xl">Umpire Authority</h2>
-            <img src="/images/rulebook_illustrations/orange/header_umpire_authority.avif" alt="Umpire Authority" class="mt-6 w-full max-w-md h-auto">
+            <img src="/images/rulebook_illustrations/orange/header_umpire_authority.avif" alt="An illustrated umpire in a white hat, shirt and red tie raising a finger to signal out" width="1197" height="1197" class="mt-6 h-auto w-full max-w-md rounded-2xl" loading="lazy">
           </div>
           <div class="lg:col-span-7">
             <ul class="space-y-3 text-lg">

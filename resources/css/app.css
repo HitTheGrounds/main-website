@@ -551,3 +551,24 @@ h1, h2, h3 { text-wrap: balance; }
   }
   .btn-island:hover .btn-dot { transform: translate(2px, -1px) scale(1.06); }
 }
+
+/* Past seasons: leaderboard tally marks */
+.ps-row { transition: background-color .3s; }
+.ps-row:hover { background-color: rgb(255 255 255 / .05); }
+.ps-tally { color: #F4F1EA; }
+.ps-board.is-armed .ps-mark { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.ps-slash { color: #FF6A13; stroke: #FF6A13; }
+.ps-board.is-in .ps-mark {
+  animation: ps-draw .45s cubic-bezier(.3,.7,.2,1) forwards;
+  animation-delay: calc(var(--i, 0) * .18s + .25s + var(--m) * .3s);
+}
+.ps-board.is-in .ps-row .ps-mark { animation-delay: calc(var(--i) * .18s + .25s + var(--m) * .3s); }
+@keyframes ps-draw { to { stroke-dashoffset: 0; } }
+.ps-board.is-armed .ps-row { opacity: 0; transform: translateY(14px); }
+.ps-board.is-in .ps-row { animation: ps-row-in .6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(var(--i) * .18s); }
+@keyframes ps-row-in { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ps-board.is-armed .ps-mark { stroke-dashoffset: 0; }
+  .ps-board.is-armed .ps-row { opacity: 1; transform: none; }
+  .ps-board.is-in .ps-mark, .ps-board.is-in .ps-row { animation: none; }
+}

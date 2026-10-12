@@ -61,8 +61,8 @@
     <!-- Column 2: interactive 3D canvas (falls back to the field diagram) -->
     <div class="reveal reveal-d2">
       <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
-        <div data-stage class="relative aspect-[4/5] w-full lg:aspect-auto lg:h-[calc(100dvh-9.5rem)] lg:min-h-[420px] lg:max-h-[760px]">
-          <img src="/hero/field.webp" alt="" aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 w-[112%] max-w-none -translate-x-1/2 -translate-y-1/2 select-none">
+        <div data-stage class="relative aspect-[4/5] w-full lg:aspect-auto lg:h-[calc(100dvh-13rem)] lg:min-h-[380px] lg:max-h-[680px] lg:[--stage-h:calc(100dvh-13rem)]">
+          <img src="/hero/field.webp" alt="" aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 w-[104%] lg:w-[min(112%,calc(min(var(--stage-h),680px)*0.98))] max-w-none -translate-x-1/2 -translate-y-1/2 select-none">
           <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
             <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>
             <circle cx="200" cy="150" r="88" stroke="currentColor" stroke-opacity=".55" stroke-width="1.5"/>

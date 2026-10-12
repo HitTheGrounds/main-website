@@ -533,3 +533,21 @@ h1, h2, h3 { text-wrap: balance; }
 @media (max-width: 639px) { .ps-stage.wants-3d .ps-hint { display: none; } }
 .ps-stage.is-3d .ps-nav { display: grid; }
 .ps-stage.is-3d .ps-progress { display: block; }
+
+/* Full-width mobile buttons: centre the label, keep the arrow dot pinned right */
+@media (max-width: 639px) {
+  .btn-island {
+    position: relative;
+    justify-content: center;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+    width: 100%;
+  }
+  .btn-island .btn-dot {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    margin-top: -1.125rem;
+  }
+  .btn-island:hover .btn-dot { transform: translate(2px, -1px) scale(1.06); }
+}

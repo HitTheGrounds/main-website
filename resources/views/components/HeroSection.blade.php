@@ -15,7 +15,7 @@
 <section class="relative overflow-hidden bg-base-100 min-h-[calc(100dvh-5rem)] flex items-center">
   <script>document.documentElement.classList.add('js')</script>
 
-  <x-PageContainer class="grid gap-12 lg:grid-cols-[1.25fr_minmax(15rem,.5fr)_1.2fr] lg:gap-8 xl:gap-12 items-center lg:!py-8">
+  <x-PageContainer class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10 xl:gap-16 items-center lg:!py-8">
     <!-- Column 1: copy and actions -->
     <div class="text-center">
 
@@ -45,20 +45,20 @@
           <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </a>
       </div>
+
+      <div class="hero-stats reveal reveal-d3 mx-auto mt-10 flex max-w-sm justify-center gap-12 border-t border-base-300 pt-6 sm:gap-16">
+        <div>
+          <div class="font-heading text-4xl tabular-nums text-base-content sm:text-5xl" data-count="20">0+</div>
+          <div class="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</div>
+        </div>
+        <div>
+          <div class="font-heading text-4xl tabular-nums text-primary-ink sm:text-5xl" data-count="300">0+</div>
+          <div class="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
+        </div>
+      </div>
     </div>
 
-    <!-- Column 2: stat card (numbers in one column, labels in the other) -->
-    <div class="hero-stats reveal reveal-d3 grid grid-cols-[auto_auto] items-baseline justify-center gap-x-3 rounded-3xl border border-base-300 bg-[#FBFAF6] p-6 xl:p-8">
-      <span class="inline-block min-w-[4.5ch] text-right font-heading text-3xl tabular-nums text-base-content xl:text-4xl" data-count="20">0+</span>
-      <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Teams</span>
-
-      <div class="col-span-2 my-5 border-t border-base-300 xl:my-6"></div>
-
-      <span class="inline-block min-w-[4.5ch] text-right font-heading text-3xl tabular-nums text-primary-ink xl:text-4xl" data-count="300">0+</span>
-      <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</span>
-    </div>
-
-    <!-- Column 3: interactive 3D canvas (falls back to the field diagram) -->
+    <!-- Column 2: interactive 3D canvas (falls back to the field diagram) -->
     <div class="reveal reveal-d2">
       <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
         <div data-stage class="relative aspect-[4/5] w-full lg:aspect-auto lg:h-[calc(100dvh-9.5rem)] lg:min-h-[420px] lg:max-h-[760px]">

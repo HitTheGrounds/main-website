@@ -5,7 +5,7 @@
 
     <x-PageContainer class="hero-content max-w-none flex-col lg:flex-row gap-8 sm:gap-12 md:gap-16 lg:gap-20 xl:gap-32 2xl:gap-56 z-10">
       <!-- Text Content -->
-      <div class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12 text-center" data-aos="fade-up" data-aos-duration="1000">
+      <div id="about-text" class="w-full lg:flex-1 flex flex-col gap-6 sm:gap-8 md:gap-10 lg:gap-12 text-center" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="0">
       <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white font-title">
         Bridging Excellence in Technology and Sport
       </h2>
@@ -64,7 +64,7 @@
         </div>
 
         <!-- Main logo box: frosted glass -->
-        <div class="card z-10 absolute inset-0 m-auto flex h-4/5 w-4/5 items-center justify-center overflow-hidden border border-white/30 bg-white/10 p-6 shadow-[0_30px_60px_-20px_rgb(0_0_0_/_.55),inset_0_1px_0_rgb(255_255_255_/_.45)] backdrop-blur-xl backdrop-saturate-150 sm:p-8" data-aos="fade-up" data-aos-duration="1500" data-aos-easing="ease-in-out" data-aos-delay="300">
+        <div class="card z-10 absolute inset-0 m-auto flex h-4/5 w-4/5 items-center justify-center overflow-hidden border border-white/30 bg-white/10 p-6 shadow-[0_30px_60px_-20px_rgb(0_0_0_/_.55),inset_0_1px_0_rgb(255_255_255_/_.45)] backdrop-blur-xl backdrop-saturate-150 sm:p-8" data-aos="fade-up" data-aos-anchor="#about-text" data-aos-duration="1000" data-aos-delay="0">
           <div class="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgb(255_255_255_/_.28)_0%,rgb(255_255_255_/_.06)_38%,transparent_60%)]" aria-hidden="true"></div>
           <div class="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-primary/25 blur-3xl" aria-hidden="true"></div>
           <img src="/images/htg-logo-orange.avif" alt="HIT THE GROUNDS 2026" width="1500" height="710" class="relative w-full h-auto object-contain drop-shadow-[0_8px_20px_rgba(255,106,19,0.35)]">

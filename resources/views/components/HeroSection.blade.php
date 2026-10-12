@@ -46,6 +46,7 @@
         </a>
       </div>
 
+      {{-- Stat card, hidden for now:
       <div class="hero-stats reveal reveal-d3 mx-auto mt-10 flex max-w-sm justify-center gap-12 border-t border-base-300 pt-6 sm:gap-16">
         <div>
           <div class="font-heading text-4xl tabular-nums text-base-content sm:text-5xl" data-count="20">0+</div>
@@ -56,6 +57,7 @@
           <div class="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-base-content/70">Participants</div>
         </div>
       </div>
+      --}}
     </div>
 
     <!-- Column 2: interactive 3D canvas (falls back to the field diagram) -->

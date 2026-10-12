@@ -2,7 +2,7 @@
     // Whole days left, counted in Sri Lanka time so the number changes at local midnight.
     $today = now('Asia/Colombo')->startOfDay();
     $eventDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 21, 0, 0, 0, 'Asia/Colombo'), false);
-    $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 20, 0, 0, 0, 'Asia/Colombo'), false);
+    $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 8, 0, 0, 0, 'Asia/Colombo'), false);
 @endphp
 
 <x-layouts.public title="Event Timeline" description="Key dates and a countdown for Hit the Grounds 2026.">
@@ -31,7 +31,7 @@
             <p class="mt-3 font-heading text-5xl sm:text-6xl text-primary">
               {{ $regDays > 1 ? $regDays . ' Days' : ($regDays === 1 ? '1 Day' : ($regDays === 0 ? 'Last Day' : 'Closed')) }}
             </p>
-            <p class="mt-3 text-base-content/75">Open Oct 14 - Nov 20, 2026</p>
+            <p class="mt-3 text-base-content/75">Open Oct 14 - Nov 8, 2026</p>
           </div>
 
         </div>

@@ -35,7 +35,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-base-content/70">Registered At</p>
-                                <p class="font-medium">{{ $user->created_at->format('F d, Y h:i A') }}</p>
+                                <p class="font-medium">{{ $user->created_at?->timezone('Asia/Colombo')->format('F d, Y h:i A') ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>

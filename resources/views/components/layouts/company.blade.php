@@ -33,10 +33,10 @@
                                     <span>{{ $authUser?->name }}</span>
                                     <span class="text-xs">{{ $authUser?->email }}</span>
                                 </li>
-                                <li>
-                                    <form method="POST" action="{{ route('company.logout') }}">
+                                <li class="w-full">
+                                    <form method="POST" action="{{ route('company.logout') }}" class="!block w-full !p-0">
                                         @csrf
-                                        <button type="submit" class="w-full text-left">Logout</button>
+                                        <button type="submit" class="flex w-full cursor-pointer items-center rounded-lg px-3 py-1 text-left hover:bg-base-200">Logout</button>
                                     </form>
                                 </li>
                             </ul>

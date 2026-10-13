@@ -24,14 +24,6 @@ new class extends Component {
         $this->dispatch('user-promoted');
     }
 
-    public function demoteFromAdmin(int $userId): void
-    {
-        $user = User::findOrFail($userId);
-        $user->update(['is_admin' => false]);
-
-        $this->dispatch('user-demoted');
-    }
-
     public function with(): array
     {
         $query = User::with('company');
@@ -90,13 +82,7 @@ new class extends Component {
                                 <td>
                                     @if(!$user->company_id)
                                         @if($user->is_admin)
-                                            <button
-                                                wire:click="demoteFromAdmin({{ $user->id }})"
-                                                wire:confirm="Are you sure you want to demote this user from admin?"
-                                                class="btn btn-warning btn-xs"
-                                            >
-                                                Demote
-                                            </button>
+                                            <span class="text-xs text-base-content/50">—</span>
                                         @else
                                             <button
                                                 wire:click="promoteToAdmin({{ $user->id }})"

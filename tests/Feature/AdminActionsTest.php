@@ -121,13 +121,18 @@ class AdminActionsTest extends TestCase
         $this->assertFalse($user->fresh()->is_admin);
     }
 
-    public function test_admin_can_demote_an_admin(): void
+    public function test_admin_demotion_is_not_available(): void
     {
         $user = User::factory()->create(['is_admin' => true]);
 
-        Volt::test('admin.users-list')->call('demoteFromAdmin', $user->id);
+        $component = Volt::test('admin.users-list')->assertDontSee('Demote');
 
-        $this->assertFalse($user->fresh()->is_admin);
+        try {
+            $component->call('demoteFromAdmin', $user->id);
+            $this->fail('The removed demotion action should not be callable.');
+        } catch (\Livewire\Exceptions\MethodNotFoundException $exception) {
+            $this->assertTrue($user->fresh()->is_admin);
+        }
     }
 
     public function test_users_list_can_show_only_admins(): void

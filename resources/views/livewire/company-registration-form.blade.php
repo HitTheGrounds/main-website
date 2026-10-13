@@ -231,7 +231,7 @@ new class extends Component {
                 autocomplete="tel"
                 inputmode="tel"
                 
-                placeholder="0771234567 or +94771234567"
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
             />
 
             @error('turnstile_token')

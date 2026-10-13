@@ -74,7 +74,7 @@ new class extends Component {
                 label="Team Captain Phone"
                 wire:model="captain_phone"
                 type="tel"
-                placeholder="+1 (555) 123-4567"
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
                 required
             />
 

@@ -208,9 +208,14 @@ h1, h2, h3 { text-wrap: balance; }
   }
   .input:focus, .select:focus, .textarea:focus,
   .input:focus-within {
+<<<<<<< HEAD
+    border-color: var(--color-base-content);
+    outline: 3px solid var(--color-base-content);
+=======
     --input-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
     outline: 3px solid color-mix(in oklab, var(--color-primary) 35%, transparent) !important;
+>>>>>>> 659f6cafa18a9bda2645b99a6ba1bcacdb58129a
     outline-offset: 2px;
   }
   .input input:focus,

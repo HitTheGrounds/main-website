@@ -169,8 +169,8 @@ html, body{
 h1, h2, h3 { text-wrap: balance; }
 
 /* Visible focus for keyboard users */
-:focus-visible {
-    outline: 3px solid var(--color-accent);
+:focus-visible:not(input, select, textarea) {
+    outline: 2px solid var(--color-base-content);
     outline-offset: 2px;
 }
 
@@ -209,8 +209,12 @@ h1, h2, h3 { text-wrap: balance; }
   .input:focus, .select:focus, .textarea:focus,
   .input:focus-within {
     border-color: var(--color-base-content);
-    outline: 3px solid var(--color-accent);
+    outline: 3px solid var(--color-base-content);
     outline-offset: 2px;
+  }
+  .input input:focus,
+  .input input:focus-visible {
+    outline: none;
   }
 
   .table thead th {

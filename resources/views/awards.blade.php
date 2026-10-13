@@ -160,7 +160,7 @@
 
                 <article class="aw-card flex min-h-[250px] sm:min-h-[340px] flex-col items-center justify-between text-center rounded-[1.75rem] bg-secondary p-4 sm:p-7 text-secondary-content" data-aos="fade-up" data-aos-delay="80">
                     <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]">
-                        <img src="/award/most_fours.avif" alt="4s of the Tournament recognition medal" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float relative h-full w-auto max-w-full object-contain [animation-delay:-2s] drop-shadow-[0_18px_18px_rgb(0_0_0_/_.55)]">
+                        <img src="/award/most_fours.avif" alt="4s of the Tournament recognition medal" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float relative h-full w-auto max-w-full object-contain drop-shadow-[0_18px_18px_rgb(0_0_0_/_.55)]">
                     </div>
                     <div>
                         <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">4s of the Tournament</h3>
@@ -170,7 +170,7 @@
 
                 <article class="aw-card flex min-h-[250px] sm:min-h-[340px] flex-col items-center justify-between text-center rounded-[1.75rem] border border-base-300 bg-[#EBE6DB] p-4 sm:p-7" data-aos="fade-up" data-aos-delay="160">
                     <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]">
-                        <img src="/award/dot_ball.avif" alt="The Dot Ball Dominator recognition medal" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float relative h-full w-auto max-w-full object-contain [animation-delay:-4s] drop-shadow-[0_18px_18px_rgb(31_27_22_/_.35)]">
+                        <img src="/award/dot_ball.avif" alt="The Dot Ball Dominator recognition medal" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float relative h-full w-auto max-w-full object-contain drop-shadow-[0_18px_18px_rgb(31_27_22_/_.35)]">
                     </div>
                     <div>
                         <h3 class="font-heading text-[17px] leading-tight sm:text-2xl text-base-content">The Dot Ball Dominator</h3>
@@ -182,11 +182,11 @@
                          style="background: linear-gradient(160deg, #3A2A14 0%, #1F1710 55%, #120D08 100%)" data-aos="fade-up" data-aos-delay="240">
                     <div class="aw-glow pointer-events-none absolute left-1/2 top-4 size-[170px] -translate-x-1/2 sm:top-7 sm:size-[260px] rounded-full" aria-hidden="true"
                          style="background: radial-gradient(closest-side, rgb(255 196 64 / .6), rgb(255 106 19 / .18) 65%, transparent)"></div>
-                    <div class="pointer-events-none absolute left-1/2 top-[52px] hidden -translate-x-1/2 sm:block" aria-hidden="true">
+                    <div class="pointer-events-none absolute left-1/2 top-7 hidden -translate-x-1/2 sm:block" aria-hidden="true">
                         <div class="aw-spin size-[210px] rounded-full border-2 border-dashed border-amber-300/55"></div>
                     </div>
-                    <div class="relative mt-3 flex h-[105px] items-end sm:mt-8 sm:h-[150px] justify-center [perspective:700px]" aria-hidden="true">
-                        <img src="/award/player_match.avif" alt="" width="1254" height="1254" loading="lazy" class="aw-tilt aw-final h-[105px] w-auto max-w-full object-contain sm:h-[150px]">
+                    <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]" aria-hidden="true">
+                        <img src="/award/player_match.avif" alt="" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float aw-final relative h-full w-auto max-w-full object-contain">
                     </div>
                     <div class="relative text-center">
                         <h3 class="font-heading text-[17px] leading-tight sm:text-2xl">Player of the Match Award</h3>

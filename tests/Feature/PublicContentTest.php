@@ -20,7 +20,7 @@ class PublicContentTest extends TestCase
 
     public function test_awards_page_trophy_images_exist(): void
     {
-        foreach (['champions', '1st-runners-up', 'most-valuble-player-men', 'most-valuble-player-women', 'orange-cap', 'purple-cap', 'super-striker-of-the-tournament', '4s-of-the-tournament', 'green-dot-ball', 'player-of-the-match-final'] as $file) {
+        foreach (['champion', '1st-runners-up', 'award_gold', 'award_silver', 'mvp_male', 'mvp_female', 'super_striker', 'most_fours', 'green_dot'] as $file) {
             $this->assertFileExists(public_path("award/{$file}.avif"));
         }
     }

@@ -15,8 +15,8 @@ class Team extends Model
         'user_id',
         'company_id',
         'team_name',
-        'captain_email',  // written only by member management logic
-        'captain_phone',  // written only by member management logic
+        'captain_email',
+        'captain_phone',
         'locked',
         'approved',
     ];
@@ -46,11 +46,6 @@ class Team extends Model
         return $this->members()->where('is_captain', true)->first();
     }
 
-    public function hasCaptain(): bool
-    {
-        return $this->members()->where('is_captain', true)->exists();
-    }
-
     public function getMaleCount(): int
     {
         return $this->members()->where('gender', 'Male')->count();
@@ -73,17 +68,12 @@ class Team extends Model
 
     public function isValidConfiguration(): bool
     {
-        $maleCount   = $this->getMaleCount();
+        $maleCount = $this->getMaleCount();
         $femaleCount = $this->getFemaleCount();
-        $totalCount  = $this->members()->count();
+        $totalCount = $this->members()->count();
 
         // Must meet minimum requirements
         if (!$this->meetsMinimumRequirements()) {
-            return false;
-        }
-
-        // Must have a captain assigned
-        if (!$this->hasCaptain()) {
             return false;
         }
 

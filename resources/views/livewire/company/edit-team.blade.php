@@ -11,9 +11,17 @@ new class extends Component {
     #[Validate('required|string|max:255')]
     public string $team_name = '';
 
+    #[Validate('required|email|max:255')]
+    public string $captain_email = '';
+
+    #[Validate('required|string|max:20')]
+    public string $captain_phone = '';
+
     public function mount(): void
     {
         $this->team_name = $this->team->team_name;
+        $this->captain_email = $this->team->captain_email;
+        $this->captain_phone = $this->team->captain_phone;
     }
 
     public function update(): void
@@ -61,7 +69,43 @@ new class extends Component {
             @enderror
         </div>
 
-        {{-- Captain email and phone are managed through member management --}}
+        <!-- Captain Email -->
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text font-medium">Team Captain Email</span>
+            </label>
+            <input
+                type="email"
+                wire:model="captain_email"
+                class="input input-bordered w-full @error('captain_email') input-error @enderror"
+                placeholder="captain@example.com"
+                required
+            />
+            @error('captain_email')
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ $message }}</span>
+                </label>
+            @enderror
+        </div>
+
+        <!-- Captain Phone -->
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text font-medium">Team Captain Phone</span>
+            </label>
+            <input
+                type="tel"
+                wire:model="captain_phone"
+                class="input input-bordered w-full @error('captain_phone') input-error @enderror"
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
+                required
+            />
+            @error('captain_phone')
+                <label class="label">
+                    <span class="label-text-alt text-error">{{ $message }}</span>
+                </label>
+            @enderror
+        </div>
 
         <!-- Submit Buttons -->
         <div class="flex gap-2 justify-end mt-6">

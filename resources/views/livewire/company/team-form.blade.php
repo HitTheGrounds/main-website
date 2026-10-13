@@ -6,6 +6,8 @@ use Livewire\Volt\Component;
 
 new class extends Component {
     public string $team_name = '';
+    public string $captain_email = '';
+    public string $captain_phone = '';
 
     public function save(): void
     {
@@ -34,12 +36,16 @@ new class extends Component {
 
         $validated = $this->validate([
             'team_name' => ['required', 'string', 'max:255'],
+            'captain_email' => ['required', 'email', 'max:255'],
+            'captain_phone' => ['required', 'string', 'max:20'],
         ]);
 
         Team::create([
-            'user_id'    => $user->id,
+            'user_id' => $user->id,
             'company_id' => $user->company_id,
-            'team_name'  => $validated['team_name'],
+            'team_name' => $validated['team_name'],
+            'captain_email' => $validated['captain_email'],
+            'captain_phone' => $validated['captain_phone'],
         ]);
 
         $this->redirect(route('company.teams'), navigate: true);
@@ -56,7 +62,21 @@ new class extends Component {
                 required
             />
 
-            {{-- Captain email and phone are collected when a member is assigned as captain --}}
+            <x-mary-input
+                label="Team Captain Email"
+                wire:model="captain_email"
+                type="email"
+                placeholder="captain@example.com"
+                required
+            />
+
+            <x-mary-input
+                label="Team Captain Phone"
+                wire:model="captain_phone"
+                type="tel"
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
+                required
+            />
 
             <x-slot:actions>
                 <x-mary-button label="Cancel" link="{{ route('company.teams') }}" />

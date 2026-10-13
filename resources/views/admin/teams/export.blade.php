@@ -203,10 +203,10 @@
                     <div class="info-value">{{ $team->captain()?->name ?? 'N/A' }}</div>
 
                     <div class="info-label">Captain Email:</div>
-                    <div class="info-value">{{ $team->captain_email }}</div>
+                    <div class="info-value">{{ $team->captain_email ?: 'N/A' }}</div>
 
                     <div class="info-label">Phone Number:</div>
-                    <div class="info-value">{{ $team->captain_phone }}</div>
+                    <div class="info-value">{{ $team->captain_phone ?: 'N/A' }}</div>
 
                     <div class="info-label">Team Status:</div>
                     <div class="info-value">

@@ -29,7 +29,7 @@ new class extends Component {
 
         // Check if team meets requirements
         if (!$this->team->isValidConfiguration()) {
-            $this->dispatch('error', message: 'Team does not meet the required composition (Min: 6 male, 2 female)');
+            $this->dispatch('error', message: 'Team must have 12 players (9M, 3F) and an assigned captain before locking.');
             return;
         }
 
@@ -59,7 +59,7 @@ new class extends Component {
 
     @if(!$canLock)
     <p class="text-xs text-warning mt-2 text-center">
-        Team must meet composition requirements before locking
+        Team must have 12 players (9M, 3F) and an assigned captain before locking
     </p>
     @endif
 </div>

@@ -39,15 +39,15 @@
                             <div class="space-y-2 text-sm">
                                 <div>
                                     <span class="font-semibold">Captain:</span>
-                                    <span>{{ $team->captain()?->name ?? 'Not assigned' }}</span>
+                                    <span>{{ $team->captain()?->name ?? '-' }}</span>
                                 </div>
                                 <div>
                                     <span class="font-semibold">Email:</span>
-                                    <span>{{ $team->captain_email }}</span>
+                                    <span>{{ $team->captain_email ?: '-' }}</span>
                                 </div>
                                 <div>
                                     <span class="font-semibold">Phone:</span>
-                                    <span>{{ $team->captain_phone }}</span>
+                                    <span>{{ $team->captain_phone ?: '-' }}</span>
                                 </div>
                                 <div>
                                     <span class="font-semibold">Team Members:</span>

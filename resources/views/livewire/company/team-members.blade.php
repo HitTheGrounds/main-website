@@ -2,6 +2,7 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -14,6 +15,8 @@ new class extends Component {
     public $photo = null;
     public ?string $existingPicture = null;
     public bool $is_captain = false;
+    public string $captain_email = '';
+    public string $captain_phone = '';
     public ?int $editingId = null;
     public bool $showModal = false;
 
@@ -35,7 +38,8 @@ new class extends Component {
         if ($this->team->locked) {
             return;
         }
-        $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'editingId');
+        $this->resetErrorBag();
+        $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'captain_email', 'captain_phone', 'editingId');
         $this->showModal = true;
     }
 
@@ -47,13 +51,16 @@ new class extends Component {
 
         $member = TeamMember::find($id);
         if ($member && $member->team_id === $this->team->id) {
-            $this->editingId = $id;
-            $this->member_name = $member->name;
-            $this->gender = $member->gender;
-            $this->is_captain = $member->is_captain;
-            $this->photo = null;
+            $this->resetErrorBag();
+            $this->editingId       = $id;
+            $this->member_name     = $member->name;
+            $this->gender          = $member->gender;
+            $this->is_captain      = (bool) $member->is_captain;
+            $this->captain_email   = $member->email ?? '';
+            $this->captain_phone   = $member->phone ?? '';
+            $this->photo           = null;
             $this->existingPicture = $member->picture;
-            $this->showModal = true;
+            $this->showModal       = true;
         }
     }
 
@@ -65,13 +72,51 @@ new class extends Component {
             return;
         }
 
-        // Check member limit
+        // Check member limit (add only)
         if (!$this->editingId && $this->team->members()->count() >= 12) {
             $this->addError('member_name', 'Team can only have up to 12 members.');
             return;
         }
 
-        // Check if trying to add another captain
+        // Duplicate name check: case-insensitive, scoped to this team, excludes self on edit
+        if (trim($this->member_name) !== '') {
+            $duplicateQuery = $this->team->members()
+                ->whereRaw('LOWER(name) = ?', [strtolower(trim($this->member_name))]);
+            if ($this->editingId) {
+                $duplicateQuery->where('id', '!=', $this->editingId);
+            }
+            if ($duplicateQuery->exists()) {
+                $this->addError('member_name', 'A member with this name already exists in this team.');
+                return;
+            }
+        }
+
+        // Gender slot check
+        // ADD: always check. EDIT: only check if gender is actually being changed.
+        if (!$this->editingId) {
+            if ($this->gender === 'Male' && $this->team->getMaleCount() >= 9) {
+                $this->addError('gender', 'Male player slots are full (9/9).');
+                return;
+            }
+            if ($this->gender === 'Female' && $this->team->getFemaleCount() >= 3) {
+                $this->addError('gender', 'Female player slots are full (3/3).');
+                return;
+            }
+        } else {
+            $existingMember = TeamMember::find($this->editingId);
+            if ($existingMember && $existingMember->gender !== $this->gender) {
+                if ($this->gender === 'Male' && $this->team->getMaleCount() >= 9) {
+                    $this->addError('gender', 'Male player slots are full (9/9). Cannot change gender.');
+                    return;
+                }
+                if ($this->gender === 'Female' && $this->team->getFemaleCount() >= 3) {
+                    $this->addError('gender', 'Female player slots are full (3/3). Cannot change gender.');
+                    return;
+                }
+            }
+        }
+
+        // One captain only: check no other member has is_captain = true
         if ($this->is_captain) {
             $captainQuery = $this->team->members()->where('is_captain', true);
             if ($this->editingId) {
@@ -83,17 +128,22 @@ new class extends Component {
             }
         }
 
+        // Dynamic validation: captain email and phone are required only when marking as captain
         $validated = $this->validate([
-            'member_name' => ['required', 'string', 'max:255'],
-            'gender' => ['required', 'string', 'in:Male,Female,Other'],
-            'photo' => ['nullable', 'image', 'max:2048'],
-            'is_captain' => ['boolean'],
+            'member_name'   => ['required', 'string', 'max:255'],
+            'gender'        => ['required', 'string', 'in:Male,Female,Other'],
+            'photo'         => ['nullable', 'image', 'max:2048'],
+            'is_captain'    => ['boolean'],
+            'captain_email' => $this->is_captain ? ['required', 'email', 'max:255'] : ['nullable'],
+            'captain_phone' => $this->is_captain ? ['required', 'string', 'max:20'] : ['nullable'],
         ]);
 
         $data = [
-            'name' => $validated['member_name'],
-            'gender' => $validated['gender'],
+            'name'       => trim($validated['member_name']),
+            'gender'     => $validated['gender'],
             'is_captain' => $this->is_captain,
+            'email'      => $this->is_captain ? strtolower(trim($validated['captain_email'])) : null,
+            'phone'      => $this->is_captain ? trim($validated['captain_phone']) : null,
         ];
 
         if ($this->photo) {
@@ -103,7 +153,7 @@ new class extends Component {
         if ($this->editingId) {
             $member = TeamMember::find($this->editingId);
             if ($member && $member->team_id === $this->team->id) {
-                // Delete old picture if new one is uploaded
+                // Delete old picture if a new one is uploaded
                 if ($this->photo && $member->picture) {
                     Storage::disk('public')->delete($member->picture);
                 }
@@ -116,6 +166,14 @@ new class extends Component {
             ]);
         }
 
+        // Sync captain contact info to the teams table.
+        // If is_captain was removed, captain() returns null and fields are cleared.
+        $captain = $this->team->fresh()->captain();
+        $this->team->forceFill([
+            'captain_email' => $captain?->email,
+            'captain_phone' => $captain?->phone,
+        ])->save();
+
         $this->closeModal();
         $this->team->refresh();
         $this->dispatch("team-members-updated.{$this->team->id}");
@@ -124,7 +182,8 @@ new class extends Component {
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'editingId');
+        $this->resetErrorBag();
+        $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'captain_email', 'captain_phone', 'editingId');
     }
 
     public function deleteMember(int $id): void
@@ -141,6 +200,14 @@ new class extends Component {
                 Storage::disk('public')->delete($member->picture);
             }
             $member->delete();
+
+            // Sync captain contact to team (clears if the deleted member was the captain)
+            $captain = $this->team->fresh()->captain();
+            $this->team->forceFill([
+                'captain_email' => $captain?->email,
+                'captain_phone' => $captain?->phone,
+            ])->save();
+
             $this->team->refresh();
             $this->dispatch("team-members-updated.{$this->team->id}");
         }
@@ -209,6 +276,7 @@ new class extends Component {
                                 <li>On field: 8 players</li>
                                 <li>Reserved: 4 players</li>
                                 <li>Total: 12 players (9 male, 3 female)</li>
+                                <li>Must have an assigned captain</li>
                             </ul>
                         </div>
                     </div>
@@ -229,7 +297,7 @@ new class extends Component {
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                             </svg>
-                            <span>Team meets minimum requirements. You can add {{ 12 - $team->members->count() }} more player(s).</span>
+                            <span>Team meets player requirements. {{ $team->hasCaptain() ? 'Ready to lock!' : 'Assign a captain to lock.' }}</span>
                         </div>
                     @else
                         <div class="alert alert-warning">
@@ -240,6 +308,7 @@ new class extends Component {
                                 Team doesn't meet requirements. Need:
                                 @if($team->getMaleCount() < 9) {{ 9 - $team->getMaleCount() }} more male player(s) @endif
                                 @if($team->getFemaleCount() < 3) {{ 3 - $team->getFemaleCount() }} more female player(s) @endif
+                                @if(!$team->hasCaptain()) · Assign a captain @endif
                             </span>
                         </div>
                     @endif
@@ -365,6 +434,7 @@ new class extends Component {
                 @enderror
             </div> --}}
 
+            <!-- Captain Flag -->
             <div class="form-control">
                 <label class="label cursor-pointer justify-start gap-2">
                     <input
@@ -379,6 +449,47 @@ new class extends Component {
                         <span class="label-text-alt text-error">{{ $message }}</span>
                     </label>
                 @enderror
+            </div>
+
+            <!-- Captain Contact Fields: visible only when is_captain is checked -->
+            <div x-show="$wire.is_captain" x-transition class="space-y-3 pl-1">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">
+                            Captain Email <span class="text-error">*</span>
+                        </span>
+                    </label>
+                    <input
+                        type="email"
+                        wire:model="captain_email"
+                        class="input input-bordered w-full @error('captain_email') input-error @enderror"
+                        placeholder="captain@example.com"
+                    />
+                    @error('captain_email')
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ $message }}</span>
+                        </label>
+                    @enderror
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text font-medium">
+                            Captain Phone <span class="text-error">*</span>
+                        </span>
+                    </label>
+                    <input
+                        type="tel"
+                        wire:model="captain_phone"
+                        class="input input-bordered w-full @error('captain_phone') input-error @enderror"
+                        placeholder="07XXXXXXXX or +947XXXXXXXX"
+                    />
+                    @error('captain_phone')
+                        <label class="label">
+                            <span class="label-text-alt text-error">{{ $message }}</span>
+                        </label>
+                    @enderror
+                </div>
             </div>
 
             <div class="modal-action">

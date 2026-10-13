@@ -74,7 +74,7 @@ new class extends Component {
                                     </a>
                                 </td>
                                 <td>{{ $team->company?->name ?? 'N/A' }}</td>
-                                <td>{{ $team->captain_email }}</td>
+                                <td>{{ $team->captain_email ?: '-' }}</td>
                                 <td>{{ $team->members->count() }}</td>
                                 <td>
                                     <div class="flex gap-2">

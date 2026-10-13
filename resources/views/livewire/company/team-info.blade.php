@@ -50,20 +50,20 @@ new class extends Component {
                     <p class="text-base-content/70">{{ $team->team_name }}</p>
                 </div>
                 <div>
+                    <p class="font-semibold">Captain</p>
+                    <p class="text-base-content/70">{{ $team->captain()?->name ?? '-' }}</p>
+                </div>
+                <div>
                     <p class="font-semibold">Captain Email</p>
-                    <p class="text-base-content/70">{{ $team->captain_email }}</p>
+                    <p class="text-base-content/70">{{ $team->captain_email ?: '-' }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Captain Phone</p>
-                    <p class="text-base-content/70">{{ $team->captain_phone }}</p>
+                    <p class="text-base-content/70">{{ $team->captain_phone ?: '-' }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Total Members</p>
                     <p class="text-base-content/70">{{ $team->members->count() }}/12</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Captain</p>
-                    <p class="text-base-content/70">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
                 </div>
                 <div>
                     <p class="font-semibold">Status</p>

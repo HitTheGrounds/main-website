@@ -182,6 +182,87 @@ class CompanyTeamsTest extends TestCase
         $this->assertSame(12, $team->members()->count());
     }
 
+    public function test_player_names_must_be_unique_within_the_team_on_add_and_edit(): void
+    {
+        $user = $this->companyUser();
+        $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id]);
+        $first = TeamMember::factory()->create(['team_id' => $team->id, 'name' => 'Alex Silva']);
+        $second = TeamMember::factory()->create(['team_id' => $team->id, 'name' => 'Sam Silva']);
+        $this->as($user);
+
+        Volt::test('company.team-members', ['team' => $team])
+            ->call('openAddModal')->set('member_name', ' alex silva ')->set('gender', 'Male')
+            ->call('saveMember')->assertHasErrors(['member_name']);
+
+        Volt::test('company.team-members', ['team' => $team])
+            ->call('openEditModal', $second->id)->set('member_name', 'ALEX SILVA')
+            ->call('saveMember')->assertHasErrors(['member_name']);
+
+        $this->assertSame('Sam Silva', $second->fresh()->name);
+        $this->assertSame(2, $team->members()->count());
+
+        Volt::test('company.team-members', ['team' => $team])
+            ->call('openEditModal', $first->id)->call('saveMember')->assertHasNoErrors();
+    }
+
+    public function test_players_with_the_same_name_can_belong_to_different_teams(): void
+    {
+        TeamMember::factory()->create(['name' => 'Alex Silva']);
+        $user = $this->companyUser();
+        $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id]);
+        $this->as($user);
+
+        Volt::test('company.team-members', ['team' => $team])
+            ->set('member_name', ' Alex Silva ')->set('gender', 'Male')
+            ->call('saveMember')->assertHasNoErrors();
+
+        $this->assertSame('Alex Silva', $team->members()->firstOrFail()->name);
+    }
+
+    public function test_gender_limits_are_enforced_when_adding_and_changing_players(): void
+    {
+        $user = $this->companyUser();
+        $this->as($user);
+
+        foreach (['Male' => 9, 'Female' => 3] as $gender => $limit) {
+            $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id]);
+            TeamMember::factory()->count($limit - 1)->create(['team_id' => $team->id, 'gender' => $gender]);
+
+            Volt::test('company.team-members', ['team' => $team])
+                ->set('member_name', 'Last Slot')->set('gender', $gender)
+                ->call('saveMember')->assertHasNoErrors();
+
+            Volt::test('company.team-members', ['team' => $team->fresh()])
+                ->set('member_name', 'Extra Player')->set('gender', $gender)
+                ->call('saveMember')->assertHasErrors(['gender']);
+
+            $opposite = $gender === 'Male' ? 'Female' : 'Male';
+            $member = TeamMember::factory()->create(['team_id' => $team->id, 'gender' => $opposite]);
+            Volt::test('company.team-members', ['team' => $team->fresh()])
+                ->call('openEditModal', $member->id)->set('gender', $gender)
+                ->call('saveMember')->assertHasErrors(['gender']);
+            $this->assertSame($opposite, $member->fresh()->gender);
+
+            $existing = $team->members()->where('gender', $gender)->firstOrFail();
+            Volt::test('company.team-members', ['team' => $team->fresh()])
+                ->call('openEditModal', $existing->id)->set('member_name', 'Updated Player')
+                ->call('saveMember')->assertHasNoErrors();
+            $this->assertSame($limit, $team->members()->where('gender', $gender)->count());
+        }
+    }
+
+    public function test_full_team_explains_why_members_cannot_be_added(): void
+    {
+        $user = $this->companyUser();
+        $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id]);
+        $this->fullSquad($team);
+        $this->as($user);
+
+        Volt::test('company.team-members', ['team' => $team])
+            ->assertSee('Add Member')
+            ->assertSee('All 12 player slots are filled.');
+    }
+
     public function test_member_gender_must_be_valid(): void
     {
         $user = $this->companyUser();

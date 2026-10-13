@@ -54,6 +54,80 @@ class CompanyTeamsTest extends TestCase
         $this->assertFalse($team->locked);
     }
 
+    public function test_company_cannot_create_a_team_with_a_duplicate_name(): void
+    {
+        $user = $this->companyUser(maxTeams: 5);
+        Team::factory()->create(['company_id' => $user->company_id, 'team_name' => 'Code Crushers']);
+        $this->as($user);
+
+        foreach (['Code Crushers', ' code crushers '] as $name) {
+            Volt::test('company.team-form')
+                ->set('team_name', $name)
+                ->set('captain_email', 'cap@acme.test')
+                ->set('captain_phone', '0771234567')
+                ->call('save')
+                ->assertHasErrors(['team_name']);
+        }
+
+        $this->assertDatabaseCount('teams', 1);
+    }
+
+    public function test_company_cannot_rename_a_team_to_another_team_name(): void
+    {
+        $user = $this->companyUser();
+        Team::factory()->create(['company_id' => $user->company_id, 'team_name' => 'Code Crushers']);
+        $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id, 'team_name' => 'Original Name']);
+        $this->as($user);
+
+        foreach (['Code Crushers', ' code crushers '] as $name) {
+            Volt::test('company.edit-team', ['team' => $team])
+                ->set('team_name', $name)
+                ->call('update')
+                ->assertHasErrors(['team_name']);
+        }
+
+        $this->assertSame('Original Name', $team->fresh()->team_name);
+    }
+
+    public function test_company_can_keep_its_team_name_when_editing(): void
+    {
+        $user = $this->companyUser();
+        $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id, 'team_name' => 'Code Crushers']);
+        $this->as($user);
+
+        Volt::test('company.edit-team', ['team' => $team])
+            ->set('captain_phone', '0770000000')
+            ->call('update')
+            ->assertHasNoErrors();
+
+        $this->assertSame('0770000000', $team->fresh()->captain_phone);
+    }
+
+    public function test_different_companies_can_use_the_same_team_name_when_creating_and_editing(): void
+    {
+        Team::factory()->create(['team_name' => 'Shared Name']);
+        $user = $this->companyUser();
+        $this->as($user);
+
+        Volt::test('company.team-form')
+            ->set('team_name', ' Shared Name ')
+            ->set('captain_email', 'cap@acme.test')
+            ->set('captain_phone', '0771234567')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $team = Team::where('company_id', $user->company_id)->firstOrFail();
+        $this->assertSame('Shared Name', $team->team_name);
+        Team::factory()->create(['team_name' => 'Other Shared Name']);
+
+        Volt::test('company.edit-team', ['team' => $team])
+            ->set('team_name', ' Other Shared Name ')
+            ->call('update')
+            ->assertHasNoErrors();
+
+        $this->assertSame('Other Shared Name', $team->fresh()->team_name);
+    }
+
     public function test_team_form_validates_its_fields(): void
     {
         $this->as($this->companyUser());

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Team;
+use App\Rules\UniqueCompanyTeamName;
 use App\Helpers\CompanyAuth;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
@@ -39,7 +40,13 @@ new class extends Component {
             return;
         }
 
-        $validated = $this->validate();
+        $this->team_name = trim($this->team_name);
+
+        $validated = $this->validate([
+            'team_name' => ['required', 'string', 'max:255', new UniqueCompanyTeamName($this->team->company_id, $this->team->id)],
+            'captain_email' => ['required', 'email', 'max:255'],
+            'captain_phone' => ['required', 'string', 'max:20'],
+        ]);
 
         $this->team->update($validated);
 

@@ -6,6 +6,11 @@ use App\Helpers\CompanyAuth;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    protected $validationAttributes = [
+        'captain_email' => 'team contact person email',
+        'captain_phone' => 'team contact person phone',
+    ];
+
     public string $team_name = '';
     public string $captain_email = '';
     public string $captain_phone = '';
@@ -58,28 +63,15 @@ new class extends Component {
 <div>
     <x-mary-card>
         <x-mary-form wire:submit="save">
-            <x-mary-input
-                label="Team Name"
-                wire:model="team_name"
-                placeholder="Enter team name"
-                required
-            />
+            <x-mary-input label="Team Name" wire:model="team_name" placeholder="Enter team name" required />
 
-            <x-mary-input
-                label="Team Captain Email"
-                wire:model="captain_email"
-                type="email"
-                placeholder="captain@example.com"
-                required
-            />
+           
 
-            <x-mary-input
-                label="Team Captain Phone"
-                wire:model="captain_phone"
-                type="tel"
-                placeholder="07XXXXXXXX or +947XXXXXXXX"
-                required
-            />
+            <x-mary-input label="Contact Person Email" wire:model="captain_email" type="email"
+                placeholder="contact@example.com" required />
+
+            <x-mary-input label="Contact Person Phone" wire:model="captain_phone" type="tel"
+                placeholder="07XXXXXXXX or +947XXXXXXXX" required />
 
             <x-slot:actions>
                 <x-mary-button label="Cancel" link="{{ route('company.teams') }}" />

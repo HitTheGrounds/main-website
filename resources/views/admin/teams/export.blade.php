@@ -46,7 +46,7 @@
 
         .team-info {
             display: grid;
-            grid-template-columns: 150px 1fr;
+            grid-template-columns: 200px 1fr;
             gap: 8px;
             margin-top: 15px;
         }
@@ -199,13 +199,13 @@
                     <div class="info-label">Company:</div>
                     <div class="info-value">{{ $team->company?->name ?? 'N/A' }}</div>
 
-                    <div class="info-label">Captain Name:</div>
+                    <div class="info-label">Team Captain:</div>
                     <div class="info-value">{{ $team->captain()?->name ?? 'N/A' }}</div>
 
-                    <div class="info-label">Captain Email:</div>
+                    <div class="info-label">Contact Person Email:</div>
                     <div class="info-value">{{ $team->captain_email }}</div>
 
-                    <div class="info-label">Phone Number:</div>
+                    <div class="info-label">Contact Person Phone:</div>
                     <div class="info-value">{{ $team->captain_phone }}</div>
 
                     <div class="info-label">Team Status:</div>

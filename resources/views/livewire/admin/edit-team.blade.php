@@ -5,6 +5,11 @@ use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    protected $validationAttributes = [
+        'captain_email' => 'team contact person email',
+        'captain_phone' => 'team contact person phone',
+    ];
+
     public Team $team;
 
     #[Validate('required|string|max:255')]
@@ -41,13 +46,9 @@ new class extends Component {
             <label class="label">
                 <span class="label-text font-medium">Team Name</span>
             </label>
-            <input
-                type="text"
-                wire:model="team_name"
+            <input type="text" wire:model="team_name"
                 class="input input-bordered w-full @error('team_name') input-error @enderror"
-                placeholder="Enter team name"
-                required
-            />
+                placeholder="Enter team name" required />
             @error('team_name')
                 <label class="label">
                     <span class="label-text-alt text-error">{{ $message }}</span>
@@ -55,18 +56,14 @@ new class extends Component {
             @enderror
         </div>
 
-        <!-- Captain Email -->
+        <!-- Contact Person Email -->
         <div class="form-control">
             <label class="label">
-                <span class="label-text font-medium">Team Captain Email</span>
+                <span class="label-text font-medium">Contact Person Email</span>
             </label>
-            <input
-                type="email"
-                wire:model="captain_email"
+            <input type="email" wire:model="captain_email"
                 class="input input-bordered w-full @error('captain_email') input-error @enderror"
-                placeholder="captain@example.com"
-                required
-            />
+                placeholder="contact@example.com" required />
             @error('captain_email')
                 <label class="label">
                     <span class="label-text-alt text-error">{{ $message }}</span>
@@ -74,18 +71,14 @@ new class extends Component {
             @enderror
         </div>
 
-        <!-- Captain Phone -->
+        <!-- Contact Person Phone -->
         <div class="form-control">
             <label class="label">
-                <span class="label-text font-medium">Team Captain Phone</span>
+                <span class="label-text font-medium">Contact Person Phone</span>
             </label>
-            <input
-                type="tel"
-                wire:model="captain_phone"
+            <input type="tel" wire:model="captain_phone"
                 class="input input-bordered w-full @error('captain_phone') input-error @enderror"
-                placeholder="07XXXXXXXX or +947XXXXXXXX"
-                required
-            />
+                placeholder="07XXXXXXXX or +947XXXXXXXX" required />
             @error('captain_phone')
                 <label class="label">
                     <span class="label-text-alt text-error">{{ $message }}</span>

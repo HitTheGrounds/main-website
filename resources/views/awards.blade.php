@@ -51,9 +51,6 @@
                 <article class="aw-card rounded-[2rem] text-base-100 shadow-[0_30px_60px_-30px_rgb(31_27_22_/_.55)]" data-aos="fade-up"
                          style="background: radial-gradient(75% 42% at 50% 36%, rgb(255 138 61 / .5), transparent 75%), #17120E">
                     <div class="relative flex h-[270px] items-end justify-center [perspective:900px] sm:h-[400px]">
-                        <div class="absolute bottom-[-170px] left-1/2 -ml-[230px]">
-                            <div class="aw-spin size-[460px] rounded-full border-2 border-dashed border-orange-400/40"></div>
-                        </div>
                         <span class="absolute left-5 top-4 text-[78px] font-extrabold sm:left-7 sm:top-5 sm:text-[110px] leading-none tracking-tighter text-transparent [-webkit-text-stroke:1.5px_rgb(244_241_234_/_.25)]" aria-hidden="true">01</span>
                         <img src="/award/champion.avif" alt="Champion Award trophy" class="aw-tilt aw-float aw-gold relative h-[235px] w-auto sm:h-[360px]">
                     </div>
@@ -182,9 +179,6 @@
                          style="background: linear-gradient(160deg, #3A2A14 0%, #1F1710 55%, #120D08 100%)" data-aos="fade-up" data-aos-delay="240">
                     <div class="aw-glow pointer-events-none absolute left-1/2 top-4 size-[170px] -translate-x-1/2 sm:top-7 sm:size-[260px] rounded-full" aria-hidden="true"
                          style="background: radial-gradient(closest-side, rgb(255 196 64 / .6), rgb(255 106 19 / .18) 65%, transparent)"></div>
-                    <div class="pointer-events-none absolute left-1/2 top-7 hidden -translate-x-1/2 sm:block" aria-hidden="true">
-                        <div class="aw-spin size-[210px] rounded-full border-2 border-dashed border-amber-300/55"></div>
-                    </div>
                     <div class="relative flex h-[130px] w-full items-end justify-center sm:h-[210px]" aria-hidden="true">
                         <img src="/award/player_match.avif" alt="" width="1254" height="1254" loading="lazy" class="aw-tilt aw-float aw-final relative h-full w-auto max-w-full object-contain">
                     </div>

@@ -12,10 +12,10 @@ class PublicContentTest extends TestCase
     public function test_awards_page_uses_the_agreed_award_names(): void
     {
         $this->get(route('awards'))->assertOk()->assertSeeInOrder([
-            'Champion Award', 'First Runner-up Award', 'Male MVP Award', 'Female MVP Award',
-            'Orange Cap Award', 'Purple Cap Award', 'Super Striker Award', '4s of the Tournament',
-            'The Dot Ball Dominator', 'Player of the Match Award',
-        ])->assertDontSee('Super Striker of the Tournament')->assertDontSee('Most Four Hits Award')->assertDontSee('Green Dot Ball Award')->assertDontSee('Match winner');
+            'Champion', '1st Runners-up', 'Most Valuable Player (Male)', 'Most Valuable Player (Female)',
+            'Orange Cap', 'Purple Cap', 'Super Striker Award', '4s of the Tournament',
+            'The Dot Ball Dominator', 'Player of the Match',
+        ])->assertDontSee('Super Striker of the Tournament')->assertDontSee('Most Four Hits Award')->assertDontSee('Player of the Match Award')->assertDontSee('Match winner');
     }
 
     public function test_awards_page_artwork_images_exist(): void

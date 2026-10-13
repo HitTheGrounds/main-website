@@ -135,16 +135,16 @@ class PublicPagesTest extends TestCase
 
         $response->assertOk();
         $response->assertSee([
-            'Champion Award',
-            'First Runner-up Award',
-            'Male MVP Award',
-            'Female MVP Award',
-            'Orange Cap Award',
-            'Purple Cap Award',
+            'Champion',
+            '1st Runners-up',
+            'Most Valuable Player (Male)',
+            'Most Valuable Player (Female)',
+            'Orange Cap',
+            'Purple Cap',
             'Super Striker Award',
             '4s of the Tournament',
             'The Dot Ball Dominator',
-            'Player of the Match Award',
+            'Player of the Match',
             'most sixes hit',
             'most fours hit',
             'most dot balls delivered',

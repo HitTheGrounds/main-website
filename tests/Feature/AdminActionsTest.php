@@ -77,19 +77,17 @@ class AdminActionsTest extends TestCase
 
         Volt::test('admin.edit-team', ['team' => $team])
             ->set('team_name', 'Renamed XI')
-            ->set('captain_email', 'new@captain.test')
-            ->set('captain_phone', '0770000000')
             ->call('update')
             ->assertHasNoErrors();
 
         $this->assertSame('Renamed XI', $team->fresh()->team_name);
     }
 
-    public function test_editing_a_team_validates_the_captain_email(): void
+    public function test_editing_a_team_validates_the_team_name(): void
     {
         $team = Team::factory()->create();
 
-        Volt::test('admin.edit-team', ['team' => $team])->set('captain_email', 'nope')->call('update')->assertHasErrors(['captain_email']);
+        Volt::test('admin.edit-team', ['team' => $team])->set('team_name', '')->call('update')->assertHasErrors(['team_name']);
     }
 
     public function test_admin_can_delete_a_team_and_its_members(): void

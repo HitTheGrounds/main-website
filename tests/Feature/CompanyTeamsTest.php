@@ -30,8 +30,9 @@ class CompanyTeamsTest extends TestCase
 
     private function fullSquad(Team $team): void
     {
-        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(8)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
+        TeamMember::factory()->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => true, 'email' => 'cap@acme.test', 'phone' => '0771234567']);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female', 'is_captain' => false]);
     }
 
     public function test_company_can_register_a_team(): void
@@ -41,8 +42,6 @@ class CompanyTeamsTest extends TestCase
 
         Volt::test('company.team-form')
             ->set('team_name', 'Code Crushers')
-            ->set('captain_email', 'cap@acme.test')
-            ->set('captain_phone', '0771234567')
             ->call('save')
             ->assertHasNoErrors()
             ->assertRedirect(route('company.teams'));
@@ -59,9 +58,9 @@ class CompanyTeamsTest extends TestCase
         $this->as($this->companyUser());
 
         Volt::test('company.team-form')
-            ->set('team_name', '')->set('captain_email', 'bad')->set('captain_phone', str_repeat('7', 30))
+            ->set('team_name', '')
             ->call('save')
-            ->assertHasErrors(['team_name', 'captain_email', 'captain_phone']);
+            ->assertHasErrors(['team_name']);
 
         $this->assertDatabaseCount('teams', 0);
     }
@@ -73,7 +72,7 @@ class CompanyTeamsTest extends TestCase
         $this->as($user);
 
         Volt::test('company.team-form')
-            ->set('team_name', 'One Too Many')->set('captain_email', 'cap@acme.test')->set('captain_phone', '0771234567')
+            ->set('team_name', 'One Too Many')
             ->call('save')
             ->assertHasErrors(['team_name']);
 
@@ -86,7 +85,7 @@ class CompanyTeamsTest extends TestCase
         $this->as($this->companyUser());
 
         Volt::test('company.team-form')
-            ->set('team_name', 'Late Team')->set('captain_email', 'cap@acme.test')->set('captain_phone', '0771234567')
+            ->set('team_name', 'Late Team')
             ->call('save')
             ->assertHasErrors(['team_name']);
 
@@ -137,14 +136,15 @@ class CompanyTeamsTest extends TestCase
     {
         $user = $this->companyUser();
         $team = Team::factory()->create(['user_id' => $user->id, 'company_id' => $user->company_id]);
-        TeamMember::factory()->count(5)->create(['team_id' => $team->id, 'gender' => 'Male']);
+        TeamMember::factory()->count(5)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
         $this->as($user);
 
         Volt::test('company.lock-team', ['team' => $team])->call('lock');
         $this->assertFalse($team->fresh()->locked);
 
-        TeamMember::factory()->count(4)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
+        TeamMember::factory()->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => true, 'email' => 'c@a.test', 'phone' => '0771234567']);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female', 'is_captain' => false]);
 
         Volt::test('company.lock-team', ['team' => $team->fresh()])->call('lock');
         $this->assertTrue($team->fresh()->locked);

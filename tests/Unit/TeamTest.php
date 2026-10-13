@@ -107,8 +107,9 @@ class TeamTest extends TestCase
     public function test_team_is_valid_with_a_full_squad(): void
     {
         $team = Team::factory()->create();
-        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(8)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
+        TeamMember::factory()->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => true]);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female', 'is_captain' => false]);
 
         $this->assertTrue($team->isValidConfiguration());
     }
@@ -116,10 +117,20 @@ class TeamTest extends TestCase
     public function test_team_is_valid_with_maximum_configuration(): void
     {
         $team = Team::factory()->create();
-        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(8)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
+        TeamMember::factory()->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => true]);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female', 'is_captain' => false]);
 
         $this->assertTrue($team->isValidConfiguration());
+    }
+
+    public function test_team_is_invalid_without_a_captain(): void
+    {
+        $team = Team::factory()->create();
+        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male', 'is_captain' => false]);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female', 'is_captain' => false]);
+
+        $this->assertFalse($team->isValidConfiguration());
     }
 
     public function test_team_is_invalid_with_too_many_males(): void

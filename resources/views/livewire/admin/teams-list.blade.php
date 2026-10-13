@@ -58,7 +58,7 @@ new class extends Component {
                             <th>ID</th>
                             <th>Team Name</th>
                             <th>Company</th>
-                            <th>Captain</th>
+                            <th>Contact Person Email</th>
                             <th>Members</th>
                             <th>Status</th>
                             <th>Actions</th>

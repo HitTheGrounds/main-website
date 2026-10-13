@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Rules and Regulations" description="Match structure, bowling and fielding rules, special situations and umpire authority for Hit the Grounds 2026.">
     <div class="min-h-screen bg-base-100">
         <x-PageContainer>
 

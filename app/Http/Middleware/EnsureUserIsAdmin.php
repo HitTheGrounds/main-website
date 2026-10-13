@@ -18,6 +18,10 @@ class EnsureUserIsAdmin
         $user = $request->attributes->get('user');
 
         if (!$user || !$user->is_admin) {
+            if ($user && $user->company_id === null && $request->routeIs('admin.dashboard') && !$request->expectsJson()) {
+                return response()->view('admin.awaiting-approval', ['user' => $user], 403);
+            }
+
             abort(403, 'Unauthorized');
         }
 

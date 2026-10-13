@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Company Login">
     <x-PageContainer class="min-h-screen flex items-center justify-center">
         <div class="max-w-md w-full">
             <div class="text-center mb-8">

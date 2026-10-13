@@ -23,12 +23,12 @@
 
                     <div class="navbar-end">
                         <div class="dropdown dropdown-end">
-                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
-                                <div class="w-10 rounded-full bg-primary text-primary-content">
-                                    <span class="text-xl">{{ $authUser?->initials() }}</span>
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle p-0">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-content">
+                                    <span class="text-xl leading-none">{{ $authUser?->initials() }}</span>
                                 </div>
                             </div>
-                            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                            <ul tabindex="0" class="overflow-hidden menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
                                 <li class="menu-title">
                                     <span>{{ $authUser?->name }}</span>
                                     <span class="text-xs">{{ $authUser?->email }}</span>
@@ -107,24 +107,24 @@
                     <div class="p-4 border-t border-base-200 hidden lg:block">
                         <div class="dropdown dropdown-top w-full">
                             <div tabindex="0" role="button" class="flex items-center space-x-2 px-3 py-2 rounded-lg border border-base-300 hover:bg-base-200 transition-colors cursor-pointer w-full">
-                                <div class="flex items-center space-x-3 flex-1">
-                                    <div class="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">
+                                <div class="flex min-w-0 flex-1 items-center space-x-3">
+                                    <div class="w-10 h-10 shrink-0 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">
                                         {{ $authUser?->initials() }}
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <div class="font-semibold text-sm truncate">{{ $authUser?->name }}</div>
-                                        <div class="text-xs opacity-70 truncate">{{ $authUser?->email }}</div>
+                                        <div class="truncate text-xs opacity-70" title="{{ $authUser?->email }}">{{ $authUser?->email }}</div>
                                     </div>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 opacity-60">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 shrink-0 opacity-60">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                                 </svg>
                             </div>
                             <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-full mb-2">
-                                <li>
-                                    <form method="POST" action="{{ route('company.logout') }}" class="w-full">
+                                <li class="w-full">
+                                    <form method="POST" action="{{ route('company.logout') }}" class="!block w-full !p-0">
                                         @csrf
-                                        <button type="submit" class="flex items-center w-full text-left text-error">
+                                        <button type="submit" class="flex w-full cursor-pointer items-center rounded-lg px-4 py-2 text-left text-error hover:bg-base-200">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                                             </svg>

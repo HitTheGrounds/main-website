@@ -35,7 +35,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-base-content/70">Registered At</p>
-                                <p class="font-medium">{{ $user->created_at->format('F d, Y h:i A') }}</p>
+                                <p class="font-medium">{{ $user->created_at?->timezone('Asia/Colombo')->format('F d, Y h:i A') ?? 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
@@ -89,9 +89,9 @@
                                 <div class="card-body">
                                     <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
                                     <div class="text-sm space-y-1">
-                                        <p><span class="opacity-70">Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
-                                        <p><span class="opacity-70">Email:</span> {{ $team->captain_email }}</p>
-                                        <p><span class="opacity-70">Phone:</span> {{ $team->captain_phone }}</p>
+                                        <p><span class="opacity-70">Team Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
+                                        <p><span class="opacity-70">Contact Person Email:</span> {{ $team->captain_email }}</p>
+                                        <p><span class="opacity-70">Contact Person Phone:</span> {{ $team->captain_phone }}</p>
                                         <p><span class="opacity-70">Members:</span> {{ $team->members->count() }}/12</p>
                                     </div>
                                 </div>

@@ -7,9 +7,9 @@ const mount = document.getElementById('awards-podium');
 // Podium blocks: x position, height, label. The trophy images are pre-rendered, so each one is a
 // camera-facing card that stands on its block while the blocks turn underneath.
 const BLOCKS = [
-    { x: 0, h: 1.5, w: 1.3, num: '1', label: 'CHAMPION', img: '/award/award_gold.avif', visible: 1.75, pad: [0.036, 0.118], glow: 0xffb347 },
-    { x: -1.5, h: 1.0, w: 1.3, num: '2', label: '1ST RUNNER UP', img: '/award/award_silver.avif', visible: 1.4, pad: [0.036, 0.118], glow: 0xcfd8e3 },
-    { x: 1.5, h: 0.62, w: 1.3, num: 'MVP', label: 'MOST VALUABLE PLAYER', img: '/award/mvp_male.avif', visible: 1.4, pad: [0.005, 0.005], glow: 0xd9824a },
+    { x: 0, h: 1.5, w: 1.3, num: '1', label: 'CHAMPION', img: '/award/champion.avif', visible: 1.75, pad: [0.063, 0.012], glow: 0xffb347 },
+    { x: -1.5, h: 1.0, w: 1.3, num: '2', label: '1ST RUNNERS-UP', img: '/award/1st-runners-up.avif', visible: 1.4, pad: [0.060, 0.030], glow: 0xcfd8e3 },
+    { x: 1.5, h: 0.62, w: 1.3, num: 'MVP', label: 'MOST VALUABLE PLAYER', img: '/award/mvp_male.avif', visible: 1.4, pad: [0.034, 0.014], glow: 0xd9824a },
 ];
 
 const STONE = 0x17120f;
@@ -54,8 +54,7 @@ function labelTexture(num, text) {
     g.font = '700 34px "Plus Jakarta Sans", system-ui, sans-serif';
     g.letterSpacing = '6px';
     g.fillStyle = 'rgba(244, 241, 234, 0.82)';
-    g.fillText(text.length > 14 ? 'MOST VALUABLE' : text, 256, 380);
-    if (text.length > 14) g.fillText('PLAYER', 256, 424);
+    g.fillText(text, 256, 380);
     const t = new THREE.CanvasTexture(c);
     t.colorSpace = THREE.SRGBColorSpace;
     t.anisotropy = 8;

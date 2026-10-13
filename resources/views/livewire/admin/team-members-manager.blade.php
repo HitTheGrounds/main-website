@@ -169,8 +169,8 @@ new class extends Component {
 
     <!-- Add/Edit Member Modal -->
     <x-mary-modal wire:model="showModal" title="{{ $editingId ? 'Edit' : 'Add' }} Team Member" class="backdrop-blur">
-        <form wire:submit="saveMember" class="space-y-4">
-            <div class="form-control">
+        <form wire:submit="saveMember" class="min-w-0 space-y-4">
+            <div class="flex min-w-0 flex-col">
                 <label class="label">
                     <span class="label-text font-medium">Name</span>
                 </label>
@@ -181,13 +181,11 @@ new class extends Component {
                     placeholder="Enter member name"
                 />
                 @error('member_name')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-control">
+            <div class="flex min-w-0 flex-col">
                 <label class="label">
                     <span class="label-text font-medium">Gender</span>
                 </label>
@@ -197,29 +195,25 @@ new class extends Component {
                     <option value="Female">Female</option>
                 </select>
                 @error('gender')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-control">
-                <label class="label cursor-pointer justify-start gap-2">
+            <div class="flex min-w-0 flex-col">
+                <label class="flex items-center gap-2 cursor-pointer py-2">
                     <input
                         type="checkbox"
                         wire:model="is_captain"
-                        class="checkbox"
+                        class="checkbox shrink-0"
                     />
-                    <span class="label-text">Mark as Team Captain</span>
+                    <span class="min-w-0 whitespace-normal">Mark as Team Captain</span>
                 </label>
                 @error('is_captain')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="modal-action">
+            <div class="modal-action flex-wrap gap-2">
                 <button type="button" wire:click="closeModal" class="btn btn-ghost">
                     Cancel
                 </button>

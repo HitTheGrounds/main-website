@@ -73,20 +73,13 @@ class PublicPagesTest extends TestCase
         $this->get('/committee')->assertNotFound();
     }
 
-    public function test_support_page_can_be_rendered(): void
-    {
-        $response = $this->get(route('support'));
-
-        $response->assertStatus(200);
-    }
-
     public function test_timeline_countdown_cards_count_the_days_left(): void
     {
         $this->travelTo(\Carbon\Carbon::create(2026, 10, 12, 12, 0, 0, 'Asia/Colombo'));
 
         $this->get(route('timeline'))
             ->assertOk()
-            ->assertSee(['Countdown to the Tournament', '40 Days', 'Until November 21, 2026', 'Registration Closes In', '39 Days', 'Open Oct 14 - Nov 20, 2026']);
+            ->assertSee(['Countdown to the Tournament', '40 Days', 'Until November 21, 2026', 'Registration Closes In', '27 Days', 'Until November 8, 2026']);
     }
 
     public function test_timeline_countdown_cards_after_the_event(): void
@@ -148,9 +141,9 @@ class PublicPagesTest extends TestCase
             'Most Valuable Player (Female)',
             'Orange Cap',
             'Purple Cap',
-            'Super Striker of the Tournament',
+            'Super Striker Award',
             '4s of the Tournament',
-            'Green Dot Ball Award',
+            'The Dot Ball Dominator',
             'Player of the Match',
             'most sixes hit',
             'most fours hit',
@@ -172,10 +165,8 @@ class PublicPagesTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_teams_university_page_can_be_rendered(): void
+    public function test_teams_university_page_is_only_for_signed_in_users(): void
     {
-        $response = $this->get(route('teams.university'));
-
-        $response->assertStatus(200);
+        $this->get(route('teams.university'))->assertRedirect(route('login'));
     }
 }

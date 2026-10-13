@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\CompanyAuth;
 use App\Models\Team;
 use Livewire\Volt\Component;
 
@@ -8,7 +9,7 @@ new class extends Component {
 
     public function approve(): void
     {
-        $user = request()->attributes->get('user');
+        $user = CompanyAuth::user();
 
         if (!$user || !$user->is_admin) {
             abort(403, 'Unauthorized action.');

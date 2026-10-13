@@ -169,8 +169,8 @@ html, body{
 h1, h2, h3 { text-wrap: balance; }
 
 /* Visible focus for keyboard users */
-:focus-visible {
-    outline: 3px solid var(--color-accent);
+:focus-visible:not(input, select, textarea) {
+    outline: 2px solid var(--color-base-content);
     outline-offset: 2px;
 }
 
@@ -208,9 +208,14 @@ h1, h2, h3 { text-wrap: balance; }
   }
   .input:focus, .select:focus, .textarea:focus,
   .input:focus-within {
-    border-color: var(--color-base-content);
-    outline: 3px solid var(--color-accent);
+    --input-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    outline: 3px solid color-mix(in oklab, var(--color-primary) 35%, transparent) !important;
     outline-offset: 2px;
+  }
+  .input input:focus,
+  .input input:focus-visible {
+    outline: none;
   }
 
   .table thead th {
@@ -333,10 +338,9 @@ h1, h2, h3 { text-wrap: balance; }
 .aw-card:hover .aw-tilt { transform: translateY(-10px) rotateY(-12deg) scale(1.05); }
 .aw-card.aw-still:hover .aw-tilt { transform: none; }
 
-/* The trophy renders are green; recolour them to the brand palette */
-.aw-gold { filter: hue-rotate(-70deg) saturate(1.35) brightness(1.1) drop-shadow(0 24px 30px rgb(31 27 22 / .4)); }
-.aw-orange { filter: hue-rotate(-92deg) saturate(1.25) brightness(1.08) drop-shadow(0 24px 30px rgb(31 27 22 / .35)); }
-.aw-final { filter: hue-rotate(-62deg) saturate(1.5) brightness(1.15) drop-shadow(0 16px 18px rgb(0 0 0 / .55)); }
+/* Preserve the approved artwork colours; only add soft contact shadows. */
+.aw-gold { filter: drop-shadow(0 20px 24px rgb(31 27 22 / .3)); }
+.aw-final { filter: drop-shadow(0 12px 16px rgb(0 0 0 / .4)); }
 
 @media (prefers-reduced-motion: reduce) {
   .aw-float, .aw-sway, .aw-spin, .aw-spin-r, .aw-glow, .aw-marquee, .aw-pulse { animation: none; }
@@ -533,3 +537,42 @@ h1, h2, h3 { text-wrap: balance; }
 @media (max-width: 639px) { .ps-stage.wants-3d .ps-hint { display: none; } }
 .ps-stage.is-3d .ps-nav { display: grid; }
 .ps-stage.is-3d .ps-progress { display: block; }
+
+/* Full-width mobile buttons: centre the label, keep the arrow dot pinned right */
+@media (max-width: 639px) {
+  .btn-island {
+    position: relative;
+    justify-content: center;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+    width: 100%;
+  }
+  .btn-island .btn-dot {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    margin-top: -1.125rem;
+  }
+  .btn-island:hover .btn-dot { transform: translate(2px, -1px) scale(1.06); }
+}
+
+/* Past seasons: leaderboard tally marks */
+.ps-row { transition: background-color .3s; }
+.ps-row:hover { background-color: rgb(255 255 255 / .05); }
+.ps-tally { color: #F4F1EA; }
+.ps-board.is-armed .ps-mark { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.ps-slash { color: #FF6A13; stroke: #FF6A13; }
+.ps-board.is-in .ps-mark {
+  animation: ps-draw .45s cubic-bezier(.3,.7,.2,1) forwards;
+  animation-delay: calc(var(--i, 0) * .18s + .25s + var(--m) * .3s);
+}
+.ps-board.is-in .ps-row .ps-mark { animation-delay: calc(var(--i) * .18s + .25s + var(--m) * .3s); }
+@keyframes ps-draw { to { stroke-dashoffset: 0; } }
+.ps-board.is-armed .ps-row { opacity: 0; transform: translateY(14px); }
+.ps-board.is-in .ps-row { animation: ps-row-in .6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(var(--i) * .18s); }
+@keyframes ps-row-in { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ps-board.is-armed .ps-mark { stroke-dashoffset: 0; }
+  .ps-board.is-armed .ps-row { opacity: 1; transform: none; }
+  .ps-board.is-in .ps-mark, .ps-board.is-in .ps-row { animation: none; }
+}

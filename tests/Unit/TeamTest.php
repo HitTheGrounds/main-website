@@ -68,11 +68,11 @@ class TeamTest extends TestCase
         $this->assertEquals(2, $team->getFemaleCount());
     }
 
-    public function test_team_meets_minimum_requirements(): void
+    public function test_team_meets_the_required_squad(): void
     {
         $team = Team::factory()->create();
-        TeamMember::factory()->count(6)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(2)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male']);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
 
         $this->assertTrue($team->meetsMinimumRequirements());
     }
@@ -104,11 +104,11 @@ class TeamTest extends TestCase
         $this->assertFalse($team->meetsMinimumRequirements());
     }
 
-    public function test_team_is_valid_with_minimum_configuration(): void
+    public function test_team_is_valid_with_a_full_squad(): void
     {
         $team = Team::factory()->create();
-        TeamMember::factory()->count(6)->create(['team_id' => $team->id, 'gender' => 'Male']);
-        TeamMember::factory()->count(2)->create(['team_id' => $team->id, 'gender' => 'Female']);
+        TeamMember::factory()->count(9)->create(['team_id' => $team->id, 'gender' => 'Male']);
+        TeamMember::factory()->count(3)->create(['team_id' => $team->id, 'gender' => 'Female']);
 
         $this->assertTrue($team->isValidConfiguration());
     }

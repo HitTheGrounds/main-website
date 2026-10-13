@@ -21,6 +21,19 @@
     ];
 
     $champions = collect($seasons)->map(fn ($pair) => $pair[0])->all();
+    $board = collect($seasons)->flatMap(fn ($pair, $year) => [
+        ['team' => $pair[0], 'year' => $year, 'role' => 'champion'],
+        ['team' => $pair[1], 'year' => $year, 'role' => 'runner'],
+    ])->groupBy('team')->map(fn ($rows, $team) => [
+        'team' => $team,
+        'logo' => $logos[$team][0],
+        'dark' => $logos[$team][1] ?? false,
+        'total' => $rows->count(),
+        'champion' => $rows->where('role', 'champion')->count(),
+        'runner' => $rows->where('role', 'runner')->count(),
+        'latest' => $rows->max('year'),
+    ])->sort(fn ($a, $b) => [$b['total'], $b['champion'], $b['latest']] <=> [$a['total'], $a['champion'], $a['latest']])->values();
+
     $scene = collect($seasons)->map(function ($pair, $year) use ($logos) {
         [$champion, $runner] = $pair;
         return [
@@ -31,7 +44,7 @@
     })->values();
 @endphp
 
-<x-layouts.public>
+<x-layouts.public title="Past Seasons" description="Champions and runners-up from every past season of Hit the Grounds, from 2015 to 2025, with an all-time leaderboard.">
     {{-- Title --}}
     <section class="bg-base-100">
         <x-PageContainer class="!pb-6">
@@ -141,35 +154,53 @@
         </x-PageContainer>
     </section>
 
-    {{-- Full circle --}}
+    {{-- Leaderboard: appearances on the podium, as tally marks and numbers --}}
     <section class="bg-base-200">
         <x-PageContainer>
             <div class="mb-10 text-center" data-aos="fade-up">
-                <p class="text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">Full circle</p>
-                <h2 class="mt-3 font-heading text-[clamp(2.2rem,5vw,3.6rem)] text-base-content">From runner-up to champion and back</h2>
+                <p class="text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">All time</p>
+                <h2 class="mt-3 font-heading text-[clamp(2.2rem,5vw,3.6rem)] text-base-content">Who keeps making the podium</h2>
+                <p class="mx-auto mt-3 max-w-xl text-base-content/70">Every time a company finishes as champion or runner-up, it earns a mark.</p>
             </div>
 
-            <div class="grid gap-5 md:grid-cols-2 md:gap-7">
-                @foreach ([
-                    ['Virtusa', 2015, 'Runners-up', 2019, 'Champions'],
-                    ['Synopsys', 2024, 'Champions', 2025, 'Runners-up'],
-                ] as [$team, $y1, $r1, $y2, $r2])
-                    @php [$src] = $logos[$team]; @endphp
-                    <div class="aw-card rounded-[1.75rem] border border-base-300 bg-[#FBFAF6] p-6 text-center sm:p-8" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                        <div class="mx-auto grid h-20 max-w-xs place-items-center">
-                            <img src="{{ $src }}" alt="{{ $team }} logo" class="max-h-14 w-auto max-w-full object-contain" loading="lazy">
+            <div class="ps-board mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-[#17120E] text-base-100 shadow-[0_30px_60px_-30px_rgb(31_27_22_/_.55)]" data-board data-aos="fade-up">
+                <div class="hidden grid-cols-[3.5rem_minmax(0,1.3fr)_minmax(0,1.5fr)_5.5rem] items-center gap-4 border-b border-white/10 px-6 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-base-100/50 md:grid">
+                    <span>#</span><span>Company</span><span>Tally</span><span class="text-center">Total</span>
+                </div>
+
+                @foreach ($board as $i => $row)
+                    <div class="ps-row grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 border-b border-white/[.07] px-4 py-5 last:border-b-0 sm:px-6 md:grid-cols-[3.5rem_minmax(0,1.3fr)_minmax(0,1.5fr)_5.5rem]" style="--i: {{ $i }}">
+                        <span class="font-heading text-2xl text-primary sm:text-3xl">{{ $i + 1 }}</span>
+
+                        <div class="flex min-w-0 items-center gap-3">
+                            <span class="grid h-11 w-20 shrink-0 place-items-center rounded-xl px-2 sm:h-12 sm:w-24 {{ $row['dark'] ? 'bg-[#1F2A44]' : 'bg-[#FBFAF6]' }}">
+                                <img src="{{ $row['logo'] }}" alt="" class="max-h-8 w-auto max-w-full object-contain sm:max-h-9" loading="lazy">
+                            </span>
+                            <span class="min-w-0 font-heading text-lg leading-tight sm:text-xl">{{ $row['team'] }}</span>
                         </div>
-                        <div class="mt-6 flex items-center justify-center gap-3 sm:gap-5">
-                            @foreach ([[$y1, $r1], [$y2, $r2]] as $k => [$y, $r])
-                                <div class="rounded-2xl px-4 py-3 {{ $r === 'Champions' ? 'bg-[#17120E] text-base-100' : 'bg-base-200 text-base-content' }}">
-                                    <div class="font-heading text-3xl leading-none sm:text-4xl">{{ $y }}</div>
-                                    <div class="mt-1 text-[11px] font-bold uppercase tracking-[0.12em] {{ $r === 'Champions' ? 'text-[#FFC440]' : 'text-base-content/70' }}">{{ $r }}</div>
-                                </div>
-                                @if ($k === 0)
-                                    <svg class="size-6 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                                @endif
-                            @endforeach
-                        </div>
+
+                        <span class="order-last col-span-3 flex items-center md:order-none md:col-span-1" aria-hidden="true">
+                            @php
+                                $groups = intdiv($row['total'], 5);
+                                $rest = $row['total'] % 5;
+                                $n = 0;
+                            @endphp
+                            <svg class="ps-tally h-12 w-full max-w-[17rem]" preserveAspectRatio="xMinYMid meet" viewBox="0 0 {{ max(1, $groups) * 66 + ($rest ? $rest * 13 + 8 : 0) + 4 }} 56" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round">
+                                @for ($g = 0; $g < $groups; $g++)
+                                    @foreach ([8, 21, 34, 47] as $x)
+                                        <path pathLength="1" class="ps-mark" style="--m: {{ $n++ }}" d="M{{ $g * 66 + $x }} 6 V50"/>
+                                    @endforeach
+                                    <path pathLength="1" class="ps-mark ps-slash" style="--m: {{ $n++ }}" d="M{{ $g * 66 + 1 }} 42 L{{ $g * 66 + 56 }} 14"/>
+                                @endfor
+                                @for ($r = 0; $r < $rest; $r++)
+                                    <path pathLength="1" class="ps-mark" style="--m: {{ $n++ }}" d="M{{ $groups * 66 + 8 + $r * 13 }} 6 V50"/>
+                                @endfor
+                            </svg>
+                        </span>
+
+                        <span class="text-center font-heading text-4xl leading-none sm:text-5xl md:text-center">
+                            <span data-count="{{ $row['total'] }}">{{ $row['total'] }}</span>
+                        </span>
                     </div>
                 @endforeach
             </div>
@@ -193,6 +224,33 @@
             </div>
         </x-PageContainer>
     </section>
+
+    <script>
+        (() => {
+            const board = document.querySelector('[data-board]');
+            if (!board) return;
+            board.classList.add('is-armed');
+            const play = () => {
+                board.classList.add('is-in');
+                if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                board.querySelectorAll('[data-count]').forEach((el, k) => {
+                    const end = +el.dataset.count;
+                    el.textContent = '0';
+                    const row = el.closest('.ps-row');
+                    const start = performance.now() + (+row.style.getPropertyValue('--i') * 180) + 250;
+                    const tick = (now) => {
+                        const t = Math.min(1, Math.max(0, (now - start) / (end * 330)));
+                        el.textContent = String(Math.round(end * t));
+                        if (t < 1) requestAnimationFrame(tick);
+                    };
+                    requestAnimationFrame(tick);
+                });
+            };
+            new IntersectionObserver((entries, io) => {
+                if (entries.some((e) => e.isIntersecting)) { play(); io.disconnect(); }
+            }, { threshold: 0.25 }).observe(board);
+        })();
+    </script>
 
     <script>
         (() => {

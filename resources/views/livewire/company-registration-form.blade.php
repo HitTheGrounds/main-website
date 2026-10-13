@@ -40,12 +40,17 @@ new class extends Component {
             ]);
         }
 
+        $this->contact_person_phone = str_replace([' ', '-', '(', ')'], '', trim($this->contact_person_phone));
+
         $validated = $this->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'contact_person_name' => ['required', 'string', 'max:255'],
             'contact_email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
-            'contact_person_phone' => ['required', 'string', 'max:20'],
+            'contact_person_phone' => ['required', 'string', 'regex:/\A(?:0[1-9][0-9]{8}|\+?[1-9][0-9]{9,14})\z/'],
             'turnstile_token' => ['required', 'string'],
+        ], [
+            'contact_person_phone.required' => 'Please enter a contact phone number.',
+            'contact_person_phone.regex' => 'Enter a valid phone number, such as 0771234567 or +94771234567.',
         ]);
 
         // Verify Turnstile token
@@ -223,7 +228,10 @@ new class extends Component {
                 label="{{ __('Contact Person Phone') }}"
                 type="tel"
                 required
-                placeholder="+1 (555) 123-4567"
+                autocomplete="tel"
+                inputmode="tel"
+                
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
             />
 
             @error('turnstile_token')

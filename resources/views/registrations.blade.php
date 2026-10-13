@@ -1,4 +1,4 @@
-<x-layouts.public>
+<x-layouts.public title="Registration Information" description="How to register your team for Hit the Grounds 2026.">
     <x-PageContainer class="min-h-screen">
         <div class="max-w-4xl mx-auto">
             <div class="text-center mb-12" data-aos="fade-up">
@@ -94,7 +94,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-xl mb-2">Complete the Registration</h3>
-                                    <p class="text-base-content/80">Fill out all the required information in the registration page accurately. This includes team name, company details, team captain name, contact information, and other requested details.</p>
+                                    <p class="text-base-content/80">Fill out all the required information in the registration page accurately. This includes team name, company details, team contact person email and phone, and other requested details.</p>
                                     <p class="text-sm text-base-content/60 mt-2 italic">(Filling in the team players' details is optional)</p>
                                 </div>
                             </div>

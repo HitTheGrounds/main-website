@@ -338,10 +338,9 @@ h1, h2, h3 { text-wrap: balance; }
 .aw-card:hover .aw-tilt { transform: translateY(-10px) rotateY(-12deg) scale(1.05); }
 .aw-card.aw-still:hover .aw-tilt { transform: none; }
 
-/* The trophy renders are green; recolour them to the brand palette */
-.aw-gold { filter: hue-rotate(-70deg) saturate(1.35) brightness(1.1) drop-shadow(0 24px 30px rgb(31 27 22 / .4)); }
-.aw-orange { filter: hue-rotate(-92deg) saturate(1.25) brightness(1.08) drop-shadow(0 24px 30px rgb(31 27 22 / .35)); }
-.aw-final { filter: hue-rotate(-62deg) saturate(1.5) brightness(1.15) drop-shadow(0 16px 18px rgb(0 0 0 / .55)); }
+/* Preserve the approved artwork colours; only add soft contact shadows. */
+.aw-gold { filter: drop-shadow(0 20px 24px rgb(31 27 22 / .3)); }
+.aw-final { filter: drop-shadow(0 12px 16px rgb(0 0 0 / .4)); }
 
 @media (prefers-reduced-motion: reduce) {
   .aw-float, .aw-sway, .aw-spin, .aw-spin-r, .aw-glow, .aw-marquee, .aw-pulse { animation: none; }

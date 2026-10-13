@@ -83,7 +83,7 @@ new class extends Component {
                 type="tel"
                 wire:model="captain_phone"
                 class="input input-bordered w-full @error('captain_phone') input-error @enderror"
-                placeholder="+1 (555) 123-4567"
+                placeholder="07XXXXXXXX or +947XXXXXXXX"
                 required
             />
             @error('captain_phone')

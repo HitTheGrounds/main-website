@@ -13,15 +13,18 @@ class PublicContentTest extends TestCase
     {
         $this->get(route('awards'))->assertOk()->assertSeeInOrder([
             'Champion Award', 'First Runner-up Award', 'Male MVP Award', 'Female MVP Award',
-            'Orange Cap Award', 'Purple Cap Award', 'Super Striker Award', 'Most Four Hits Award',
-            'Green Dot Ball Award', 'Player of the Match Award',
-        ])->assertDontSee('Super Striker of the Tournament')->assertDontSee('4s of the Tournament')->assertDontSee('Match winner');
+            'Orange Cap Award', 'Purple Cap Award', 'Super Striker Award', '4s of the Tournament',
+            'The Dot Ball Dominator', 'Player of the Match Award',
+        ])->assertDontSee('Super Striker of the Tournament')->assertDontSee('Most Four Hits Award')->assertDontSee('Green Dot Ball Award')->assertDontSee('Match winner');
     }
 
-    public function test_awards_page_trophy_images_exist(): void
+    public function test_awards_page_artwork_images_exist(): void
     {
-        foreach (['champion', '1st-runners-up', 'award_gold', 'award_silver', 'mvp_male', 'mvp_female', 'super_striker', 'most_fours', 'green_dot'] as $file) {
+        $response = $this->get(route('awards'))->assertOk();
+
+        foreach (['champion', '1st-runners-up', 'mvp_male', 'mvp_female', 'orange_cap', 'purple_cap', 'super_striker', 'most_fours', 'dot_ball', 'player_match'] as $file) {
             $this->assertFileExists(public_path("award/{$file}.avif"));
+            $response->assertSee("/award/{$file}.avif", false);
         }
     }
 

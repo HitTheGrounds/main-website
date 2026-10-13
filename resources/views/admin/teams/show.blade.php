@@ -58,11 +58,11 @@
                                 <p class="text-base-content/70">{{ $team->company?->name ?? 'N/A' }}</p>
                             </div>
                             <div>
-                                <p class="font-semibold">Captain Email</p>
+                                <p class="font-semibold">Contact Person Email</p>
                                 <p class="text-base-content/70">{{ $team->captain_email }}</p>
                             </div>
                             <div>
-                                <p class="font-semibold">Captain Phone</p>
+                                <p class="font-semibold">Contact Person Phone</p>
                                 <p class="text-base-content/70">{{ $team->captain_phone }}</p>
                             </div>
                             <div>
@@ -70,7 +70,7 @@
                                 <p class="text-base-content/70">{{ $team->members->count() }}/12</p>
                             </div>
                             <div>
-                                <p class="font-semibold">Captain</p>
+                                <p class="font-semibold">Team Captain</p>
                                 <p class="text-base-content/70">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
                             </div>
                             <div>

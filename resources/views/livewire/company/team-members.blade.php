@@ -2,6 +2,7 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -35,6 +36,7 @@ new class extends Component {
         if ($this->team->locked) {
             return;
         }
+        $this->resetErrorBag();
         $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'editingId');
         $this->showModal = true;
     }
@@ -47,6 +49,7 @@ new class extends Component {
 
         $member = TeamMember::find($id);
         if ($member && $member->team_id === $this->team->id) {
+            $this->resetErrorBag();
             $this->editingId = $id;
             $this->member_name = $member->name;
             $this->gender = $member->gender;
@@ -83,12 +86,42 @@ new class extends Component {
             }
         }
 
+        $this->member_name = trim($this->member_name);
+
         $validated = $this->validate([
             'member_name' => ['required', 'string', 'max:255'],
             'gender' => ['required', 'string', 'in:Male,Female,Other'],
             'photo' => ['nullable', 'image', 'max:2048'],
             'is_captain' => ['boolean'],
         ]);
+
+        $otherMembers = $this->team->members();
+        if ($this->editingId) {
+            $member = $this->team->members()->find($this->editingId);
+            if (!$member) {
+                $this->addError('member_name', 'This member no longer belongs to this team.');
+                return;
+            }
+            $otherMembers->where('id', '!=', $this->editingId);
+        }
+
+        if ((clone $otherMembers)->whereRaw('LOWER(TRIM(name)) = ?', [strtolower($validated['member_name'])])->exists()) {
+            $this->addError('member_name', 'A player with this name already exists in this team.');
+            return;
+        }
+
+        $genderLimit = match ($validated['gender']) {
+            'Male' => 9,
+            'Female' => 3,
+            default => null,
+        };
+        // Allow existing players to be edited without changing their gender,
+        // including teams that exceeded the limits before this validation existed.
+        if ($genderLimit !== null && (!$this->editingId || $member->gender !== $validated['gender'])
+            && (clone $otherMembers)->where('gender', $validated['gender'])->count() >= $genderLimit) {
+            $this->addError('gender', "Team can only have up to {$genderLimit} ".strtolower($validated['gender']).' players. Edit or remove an existing player first.');
+            return;
+        }
 
         $data = [
             'name' => $validated['member_name'],
@@ -124,6 +157,7 @@ new class extends Component {
     public function closeModal(): void
     {
         $this->showModal = false;
+        $this->resetErrorBag();
         $this->reset('member_name', 'gender', 'photo', 'existingPicture', 'is_captain', 'editingId');
     }
 
@@ -161,6 +195,10 @@ new class extends Component {
                 </button>
                 @endif
             </div>
+
+            @if(!$team->locked && $team->members->count() >= 12)
+                <p class="text-sm text-base-content/70 mb-4">All 12 player slots are filled. Edit or remove an existing member to change the team. The team must have 9 male and 3 female players.</p>
+            @endif
 
             <!-- Team Composition Progress -->
             <div class="mb-4 p-4 bg-base-200 rounded-lg">
@@ -317,8 +355,8 @@ new class extends Component {
 
     <!-- Add/Edit Modal -->
     <x-mary-modal wire:model="showModal" title="{{ $editingId ? 'Edit' : 'Add' }} Team Member" class="backdrop-blur">
-        <form wire:submit="saveMember" class="space-y-4">
-            <div class="form-control">
+        <form wire:submit="saveMember" class="min-w-0 space-y-4">
+            <div class="flex min-w-0 flex-col">
                 <label class="label">
                     <span class="label-text font-medium">Name</span>
                 </label>
@@ -329,13 +367,11 @@ new class extends Component {
                     placeholder="Enter member name"
                 />
                 @error('member_name')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-control">
+            <div class="flex min-w-0 flex-col">
                 <label class="label">
                     <span class="label-text font-medium">Gender</span>
                 </label>
@@ -345,13 +381,11 @@ new class extends Component {
                     <option value="Female">Female</option>
                 </select>
                 @error('gender')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            {{-- <div class="form-control">
+            {{-- <div class="flex min-w-0 flex-col">
                 <label class="label">
                     <span class="label-text font-medium">Photo (Optional)</span>
                 </label>
@@ -359,29 +393,25 @@ new class extends Component {
                         <img src="{{ $photo ? $photo->temporaryUrl() : ($existingPicture ? Storage::url( $existingPicture) : '/placeholder/male.avif') }}" class="h-40 rounded-lg" />
                 </x-mary-file>
                 @error('photo')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div> --}}
 
-            <div class="form-control">
-                <label class="label cursor-pointer justify-start gap-2">
+            <div class="flex min-w-0 flex-col">
+                <label class="flex items-center gap-2 cursor-pointer py-2">
                     <input
                         type="checkbox"
                         wire:model="is_captain"
-                        class="checkbox"
+                        class="checkbox shrink-0"
                     />
-                    <span class="label-text">Mark as Team Captain</span>
+                    <span class="min-w-0 whitespace-normal">Mark as Team Captain</span>
                 </label>
                 @error('is_captain')
-                    <label class="label">
-                        <span class="label-text-alt text-error">{{ $message }}</span>
-                    </label>
+                    <p role="alert" class="mt-1 w-full whitespace-normal break-words text-sm leading-5 text-error">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="modal-action">
+            <div class="modal-action flex-wrap gap-2">
                 <button type="button" wire:click="closeModal" class="btn btn-ghost">
                     Cancel
                 </button>

@@ -122,7 +122,7 @@ function yearTexture(year) {
 }
 
 async function init() {
-    if (!root || !mount || !webglAvailable()) return;
+    if (!root || !mount || !webglAvailable() || (mount.closest('[data-mobile-only]') && matchMedia('(min-width: 1024px)').matches)) return;
     const seasons = JSON.parse(root.dataset.seasons || '[]');
     if (!seasons.length) return;
 

@@ -6,7 +6,7 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-base-100 text-base-content antialiased overflow-x-clip">
+<body class="min-h-screen bg-base-100 text-base-content antialiased pb-24 lg:pb-0 overflow-x-clip">
     <!-- Navigation Header -->
     <x-Navbar />
 

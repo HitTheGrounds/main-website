@@ -62,7 +62,7 @@ function labelTexture(num, text) {
 }
 
 async function init() {
-    if (!mount || !webglAvailable()) return;
+    if (!mount || !webglAvailable() || (mount.closest('[data-mobile-only]') && matchMedia('(min-width: 1024px)').matches)) return;
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     try { await document.fonts.load('800 200px "Plus Jakarta Sans"'); } catch (e) { /* fall back to system font */ }

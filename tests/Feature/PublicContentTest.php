@@ -117,13 +117,13 @@ class PublicContentTest extends TestCase
     public function test_timeline_countdown_follows_the_calendar(): void
     {
         $this->travelTo(\Carbon\Carbon::create(2026, 11, 8, 9, 0, 0, 'Asia/Colombo'));
-        $this->get(route('timeline'))->assertSee('Last Day')->assertSee('13 Days');
+        $this->get(route('timeline'))->assertSee('Last Day');
 
         $this->travelTo(\Carbon\Carbon::create(2026, 11, 9, 9, 0, 0, 'Asia/Colombo'));
-        $this->get(route('timeline'))->assertSee('Closed')->assertSee('12 Days');
+        $this->get(route('timeline'))->assertSee('Closed');
 
         $this->travelTo(\Carbon\Carbon::create(2026, 11, 21, 9, 0, 0, 'Asia/Colombo'));
-        $this->get(route('timeline'))->assertSee('The Tournament')->assertSee('Today')->assertSee('Closed');
+        $this->get(route('timeline'))->assertSee('Tournament Date')->assertSee('Closed');
     }
 
     public function test_unknown_pages_return_404(): void

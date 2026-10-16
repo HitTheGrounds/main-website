@@ -79,7 +79,7 @@ class PublicPagesTest extends TestCase
 
         $this->get(route('timeline'))
             ->assertOk()
-            ->assertSee(['Countdown to the Tournament', '40 Days', 'Until November 21, 2026', 'Registration Closes In', '27 Days', 'Until November 8, 2026']);
+            ->assertSee(['Registration Closes In', '27 Days', 'Until November 8, 2026', 'Tournament Date', 'November 21, 2026']);
     }
 
     public function test_timeline_countdown_cards_after_the_event(): void
@@ -88,8 +88,8 @@ class PublicPagesTest extends TestCase
 
         $this->get(route('timeline'))
             ->assertOk()
-            ->assertSee(['Done', 'Closed'])
-            ->assertDontSee(['Countdown to the Tournament', 'Registration Closes In']);
+            ->assertSee(['Tournament Date', 'Closed'])
+            ->assertDontSee('Registration Closes In');
     }
 
     public function test_timeline_page_can_be_rendered(): void

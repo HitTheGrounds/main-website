@@ -44,11 +44,13 @@
             <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </a>
         @endif
-        <a href="#timeline" class="btn-island btn-island-line group justify-between sm:justify-start lg:hidden">
-          View Timeline
-          <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        </a>
-        <a href="{{ route('timeline') }}" class="btn-island btn-island-line group hidden lg:flex justify-between sm:justify-start">
+        {{-- Mobile only: these sections sit on this page, so link straight to them. --}}
+        <div class="grid w-full grid-cols-2 gap-3 sm:w-auto lg:hidden">
+          @foreach (['awards' => 'Awards', 'past-seasons' => 'Past Seasons', 'timeline' => 'Timeline', 'committee' => 'Committee'] as $id => $label)
+            <a href="#{{ $id }}" class="btn-island-line rounded-full px-4 py-3 text-center text-sm font-bold transition hover:bg-base-200">{{ $label }}</a>
+          @endforeach
+        </div>
+        <a href="{{ route('timeline') }}" class="btn-island btn-island-line group max-lg:!hidden justify-between sm:justify-start">
           View Timeline
           <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </a>

@@ -1,6 +1,6 @@
 {{-- Back to top: a round button whose ring fills as you scroll down the page. --}}
 <button type="button" id="back-to-top" aria-label="Back to top" tabindex="-1"
-        class="group fixed bottom-24 right-4 z-40 grid size-14 translate-y-4 place-items-center rounded-full bg-secondary text-primary opacity-0 pointer-events-none shadow-[0_14px_30px_-10px_rgba(31,27,22,0.55)] transition duration-300 ease-out data-[show]:translate-y-0 data-[show]:opacity-100 data-[show]:pointer-events-auto hover:-translate-y-0.5 active:scale-95 lg:bottom-8 lg:right-8">
+        class="group fixed bottom-6 right-4 z-40 grid size-14 translate-y-4 place-items-center rounded-full bg-secondary text-primary opacity-0 pointer-events-none shadow-[0_14px_30px_-10px_rgba(31,27,22,0.55)] transition duration-300 ease-out data-[show]:translate-y-0 data-[show]:opacity-100 data-[show]:pointer-events-auto hover:-translate-y-0.5 active:scale-95 lg:bottom-8 lg:right-8">
     <svg class="absolute inset-0 -rotate-90" viewBox="0 0 56 56" fill="none" aria-hidden="true">
         <circle cx="28" cy="28" r="25" stroke="currentColor" stroke-opacity=".2" stroke-width="3"/>
         <circle id="back-to-top-ring" cx="28" cy="28" r="25" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="157.08" stroke-dashoffset="157.08"/>

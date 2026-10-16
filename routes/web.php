@@ -20,6 +20,10 @@ Route::get('/robots.txt', function () {
     return response($body)->header('Content-Type', 'text/plain');
 })->name('robots');
 
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 Route::get('/awards', function () {
     return view('awards');
 })->name('awards');

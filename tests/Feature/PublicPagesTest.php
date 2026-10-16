@@ -48,15 +48,16 @@ class PublicPagesTest extends TestCase
         $response->assertDontSee(route('partners'), false);
     }
 
-    public function test_committee_content_is_on_home_page_and_standalone_page_is_removed(): void
+    public function test_committee_content_is_on_the_home_and_about_pages_and_standalone_page_is_removed(): void
     {
-        $committeeUrl = route('home').'#committee';
+        $committeeUrl = route('about').'#committee';
 
-        $homeResponse = $this->get(route('home'));
+        $aboutResponse = $this->get(route('about'));
 
-        $homeResponse->assertOk();
-        $homeResponse->assertSee('id="committee"', false);
-        $homeResponse->assertSeeText('Committee Leads');
+        $aboutResponse->assertOk();
+        $aboutResponse->assertSee('id="committee"', false);
+        $aboutResponse->assertSeeText('Committee Leads');
+        $this->get(route('home'))->assertSee('id="committee"', false)->assertSeeText('Committee Leads');
 
         $this->get(route('rules'))
             ->assertOk()

@@ -94,7 +94,7 @@ class PublicContentTest extends TestCase
 
     public function test_committee_cards_show_contact_details_as_links(): void
     {
-        $this->get('/')
+        $this->get('/about')
             ->assertSee('mailto:akindu.22@cse.mrt.ac.lk', false)
             ->assertSee('tel:+94701663373', false)
             ->assertSee('Partnership Committee')

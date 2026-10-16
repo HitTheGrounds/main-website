@@ -1,10 +1,16 @@
 <x-layouts.public>
     <x-HeroSection />
-    <x-MoreThanGameSection />
-    <x-AboutSection />
+    <div class="hidden lg:block">
+        <x-MoreThanGameSection />
+        <x-AboutSection />
+    </div>
     <x-MobileHighlights />
     {{-- <x-ContendersSection /> --}}
-    <x-CommitteeSection />
+    {{-- On phones the committee (and the two sections above) live on the About page --}}
+    <div class="hidden lg:block">
+        <x-CommitteeSection />
+    </div>
+    <x-RegisterCta />
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',

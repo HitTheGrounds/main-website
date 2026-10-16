@@ -1,7 +1,7 @@
-/* Enhance public desktop pages only after the scroll control has initialized. */
+/* Enhance public pages only after the scroll control has initialized. */
 .page-scrollbar { display: none; }
 
-@media (min-width: 1024px) and (forced-colors: none) {
+@media (forced-colors: none) {
     html.has-page-scrollbar {
         scrollbar-width: none;
     }
@@ -88,6 +88,14 @@
     .page-scrollbar.is-out .page-scrollbar__bail--left { transform: translateY(-5px) rotate(-35deg); }
     .page-scrollbar.is-out .page-scrollbar__bail--right { transform: translateY(-7px) rotate(40deg); }
     .page-scrollbar.is-out .page-scrollbar__impact { opacity: 1; }
+}
+
+/* Keep the wicket above the floating mobile navigation and device safe area. */
+@media (max-width: 1023px) and (forced-colors: none) {
+    .page-scrollbar:not([hidden]) {
+        top: 80px;
+        bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

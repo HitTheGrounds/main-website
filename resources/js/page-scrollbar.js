@@ -9,7 +9,6 @@ function initPageScrollbar() {
     const root = document.documentElement;
     const thumb = rail.querySelector('[data-scroll-thumb]');
     const progressLine = rail.querySelector('[data-scroll-progress]');
-    const desktop = matchMedia('(min-width: 1024px)');
     const contrast = matchMedia('(forced-colors: active)');
     const events = new AbortController();
     let frame = 0;
@@ -20,7 +19,7 @@ function initPageScrollbar() {
     function update() {
         frame = 0;
         range = Math.max(0, root.scrollHeight - root.clientHeight);
-        const enabled = range > 1 && desktop.matches && !contrast.matches;
+        const enabled = range > 1 && !contrast.matches;
         rail.hidden = !enabled;
         root.classList.toggle('has-page-scrollbar', enabled);
         if (!enabled) return;
@@ -87,7 +86,6 @@ function initPageScrollbar() {
     window.addEventListener('resize', schedule, { passive: true, signal: events.signal });
     document.addEventListener('load', schedule, { capture: true, signal: events.signal });
     contrast.addEventListener('change', schedule, { signal: events.signal });
-    desktop.addEventListener('change', schedule, { signal: events.signal });
     const resize = new ResizeObserver(schedule);
     resize.observe(document.body);
     resize.observe(root);

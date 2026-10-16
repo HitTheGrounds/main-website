@@ -1,4 +1,4 @@
-{{-- Native page scrolling remains in charge; this is its desktop control. --}}
+{{-- Native page scrolling remains in charge; this is its visual control. --}}
 <div class="page-scrollbar" data-page-scrollbar hidden tabindex="0" role="scrollbar"
     aria-label="Page scroll progress" aria-controls="public-page-content" aria-orientation="vertical"
     aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">

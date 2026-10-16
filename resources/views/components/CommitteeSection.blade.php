@@ -27,7 +27,7 @@
     ];
 @endphp
 
-<section id="committee" class="scroll-mt-24 bg-base-100">
+<section id="committee" class="bg-base-100">
     <x-PageContainer>
         <div class="mb-12 text-center" data-aos="fade-up">
             <p class="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-primary-ink">The team behind the tournament</p>

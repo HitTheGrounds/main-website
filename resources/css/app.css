@@ -576,3 +576,7 @@ h1, h2, h3 { text-wrap: balance; }
   .ps-board.is-armed .ps-row { opacity: 1; transform: none; }
   .ps-board.is-in .ps-mark, .ps-board.is-in .ps-row { animation: none; }
 }
+
+/* In-page links land below the sticky header */
+html { scroll-padding-top: 5.5rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }

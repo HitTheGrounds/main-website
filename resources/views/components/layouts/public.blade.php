@@ -17,6 +17,7 @@
 
     <!-- Footer -->
     <x-FooterSection />
+    <x-BackToTop />
     @livewireScripts
 </body>
 

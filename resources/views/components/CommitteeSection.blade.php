@@ -35,12 +35,12 @@
         </div>
 
         @foreach ($committeeGroups as $group)
-            <div class="mb-16">
-                <h3 class="mb-8 text-center font-title text-2xl font-bold text-base-content sm:text-3xl" data-aos="fade-up">
+            <div class="mb-10 sm:mb-16">
+                <h3 class="mb-5 text-center font-title text-lg font-bold leading-tight text-base-content sm:mb-8 sm:text-3xl" data-aos="fade-up">
                     {{ $group['title'] }}
                 </h3>
 
-                <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="mx-auto grid max-w-5xl grid-cols-3 gap-2 sm:gap-6">
                     @foreach ($group['members'] as $member)
                         <x-committee-card :member="$member" />
                     @endforeach
@@ -49,14 +49,14 @@
         @endforeach
 
         {{-- Two committees in one row: two cards, a divider, then one --}}
-        <div class="mx-auto grid max-w-5xl grid-cols-1 gap-12 lg:grid-cols-[2fr_1fr] lg:gap-0">
+        <div class="mx-auto grid max-w-5xl grid-cols-[2fr_1fr]">
             @foreach ($leadGroups as $group)
-                <div class="flex flex-col {{ $loop->last ? 'border-t border-base-300 pt-12 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0' : 'lg:pr-6' }}">
-                    <h3 class="mb-8 text-center font-title text-2xl font-bold text-base-content sm:text-3xl" data-aos="fade-up">
+                <div class="flex flex-col {{ $loop->last ? 'border-l border-base-300 pl-1.5 sm:pl-6' : 'pr-1.5 sm:pr-6' }}">
+                    <h3 class="mb-5 flex min-h-[3.25rem] items-center justify-center text-center sm:block sm:min-h-0 font-title text-lg font-bold leading-tight text-base-content sm:mb-8 sm:text-3xl" data-aos="fade-up">
                         {{ $group['title'] }}
                     </h3>
 
-                    <div class="grid flex-1 grid-cols-1 gap-6 {{ count($group['members']) > 1 ? 'sm:grid-cols-2' : '' }}">
+                    <div class="grid flex-1 grid-rows-[1fr] gap-2 sm:gap-6 {{ count($group['members']) > 1 ? 'grid-cols-2' : 'grid-cols-1' }}">
                         @foreach ($group['members'] as $member)
                             <x-committee-card :member="$member" />
                         @endforeach

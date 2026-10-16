@@ -49,7 +49,7 @@
         </x-PageContainer>
     </section>
 
-    <section id="timeline">
+    <section id="timeline" class="scroll-mt-24">
         <x-TimelineFull />
     </section>
 </div>

@@ -15,16 +15,16 @@
 <section class="relative overflow-hidden bg-base-100 min-h-[calc(100dvh-5rem)] flex items-center">
   <script>document.documentElement.classList.add('js')</script>
 
-  <x-PageContainer class="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-10 xl:gap-16 items-center lg:!py-8">
+  <x-PageContainer class="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:gap-10 xl:gap-16 items-center lg:!py-8">
     <!-- Column 1: copy and actions -->
-    <div class="text-center">
+    <div class="order-2 flex flex-col text-center lg:order-1">
 
       <h1 class="reveal reveal-d1 mt-6 font-heading text-[clamp(3rem,9vw,6rem)] text-base-content">
         <span class="sr-only">CSE </span>Hit the<br>
         <span class="text-primary">Grounds.</span>
       </h1>
 
-      <p class="reveal reveal-d2 mx-auto mt-6 max-w-[56ch] text-base sm:text-lg leading-relaxed text-base-content/75">
+      <p class="order-3 lg:order-none reveal reveal-d2 mx-auto mt-6 max-w-[56ch] text-base sm:text-lg leading-relaxed text-base-content/75">
         The annual cricket tournament of the Department of Computer Science and Engineering. Where the spirit from the university meets the drive from the industry, it's more than just a game, it's where passion and excellence collide.
       </p>
 
@@ -35,12 +35,20 @@
             <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </a>
         @else
+          <a href="{{ route('login') }}" class="btn-island btn-island-line group justify-between sm:justify-start lg:hidden">
+            Login
+            <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+          </a>
           <a href="{{ route('register') }}" class="btn-island btn-island-solid group justify-between sm:justify-start">
             Register
             <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </a>
         @endif
-        <a href="{{ route('timeline') }}" class="btn-island btn-island-line group justify-between sm:justify-start">
+        <a href="#timeline" class="btn-island btn-island-line group justify-between sm:justify-start lg:hidden">
+          View Timeline
+          <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+        <a href="{{ route('timeline') }}" class="btn-island btn-island-line group hidden lg:flex justify-between sm:justify-start">
           View Timeline
           <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </a>
@@ -61,9 +69,10 @@
     </div>
 
     <!-- Column 2: interactive 3D canvas (falls back to the field diagram) -->
-    <div class="reveal reveal-d2">
-      <div id="hero-3d" class="relative" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
-        <div data-stage class="relative aspect-[4/5] w-full lg:aspect-auto lg:h-[calc(100dvh-9.5rem)] lg:min-h-[400px] lg:max-h-[780px] lg:[--stage-h:calc(100dvh-9.5rem)]">
+    {{-- Crop only the bottom of the mobile field; retain the full stage size for the 3D camera. --}}
+    <div class="relative aspect-[16/17] overflow-hidden order-1 reveal reveal-d2 lg:aspect-auto lg:overflow-visible lg:order-2">
+      <div id="hero-3d" class="absolute inset-x-0 top-0 aspect-[4/5] lg:relative lg:aspect-auto" style="background: radial-gradient(60% 50% at 50% 60%, rgb(255 106 19 / 0.10), transparent 70%);">
+        <div data-stage class="absolute inset-x-0 top-0 aspect-[4/5] w-full lg:relative lg:aspect-auto lg:h-[calc(100dvh-9.5rem)] lg:min-h-[400px] lg:max-h-[780px] lg:[--stage-h:calc(100dvh-9.5rem)]">
           <img src="/hero/field.webp" alt="" aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 lg:top-[48.73%] w-[104%] lg:w-[calc(min(max(var(--stage-h),400px),780px)*1.058)] max-w-none -translate-x-1/2 -translate-y-1/2 select-none">
           <svg data-fallback viewBox="0 0 400 300" class="absolute inset-0 m-auto w-4/5 h-auto text-base-content transition-opacity duration-700" fill="none" role="img" aria-label="Cricket field diagram">
             <circle cx="200" cy="150" r="140" stroke="currentColor" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7" stroke-linecap="round"/>

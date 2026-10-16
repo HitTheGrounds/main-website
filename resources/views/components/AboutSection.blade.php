@@ -1,5 +1,5 @@
 <div
-    class="hero min-h-screen relative overflow-hidden bg-base-100 bg-cover bg-center bg-no-repeat text-base-content"
+    class="hero lg:min-h-screen relative overflow-hidden bg-base-100 bg-cover bg-center bg-no-repeat text-base-content"
     style="background-image: url('/images/about.jpeg');">
     <div class="absolute inset-0 bg-black/60" aria-hidden="true"></div>
 

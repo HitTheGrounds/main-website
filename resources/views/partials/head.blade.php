@@ -39,8 +39,9 @@
 <meta name="twitter:image:alt" content="{{ $pageImageAlt }}">
 
 <!-- Additional SEO -->
-<meta name="robots" content="index, follow">
-<meta name="googlebot" content="index, follow">
+@php $robots = request()->routeIs(config('seo.indexable')) ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'; @endphp
+<meta name="robots" content="{{ $robots }}">
+<meta name="googlebot" content="{{ $robots }}">
 <meta name="theme-color" content="#F4F1EA">
 
 <link rel="icon" href="/favicon.ico" sizes="any">

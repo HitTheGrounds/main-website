@@ -69,18 +69,5 @@
           </div>
         </li>
       </ol>
-
-      <!-- CTA -->
-      <div class="mt-16 md:mt-24 rounded-2xl bg-secondary p-8 sm:p-12 text-secondary-content grid gap-8 md:grid-cols-12 md:items-center" data-aos="fade-up">
-        <div class="md:col-span-8">
-          <h3 class="font-heading text-3xl sm:text-4xl">Don't Miss Out!</h3>
-          <p class="mt-3 max-w-[52ch] text-lg text-secondary-content/85">
-            Register your team before November 8th to be part of the most exciting cricket tournament of the year!
-          </p>
-        </div>
-        <div class="md:col-span-4 md:text-right">
-          <x-mary-button label="Register Now" link="{{ route('register') }}" class="btn btn-primary btn-lg rounded-full" />
-        </div>
-      </div>
     </x-PageContainer>
   </section>

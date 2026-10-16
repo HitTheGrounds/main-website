@@ -48,15 +48,16 @@ class PublicPagesTest extends TestCase
         $response->assertDontSee(route('partners'), false);
     }
 
-    public function test_committee_content_is_on_home_page_and_standalone_page_is_removed(): void
+    public function test_committee_content_is_on_the_home_and_about_pages_and_standalone_page_is_removed(): void
     {
-        $committeeUrl = route('home').'#committee';
+        $committeeUrl = route('about').'#committee';
 
-        $homeResponse = $this->get(route('home'));
+        $aboutResponse = $this->get(route('about'));
 
-        $homeResponse->assertOk();
-        $homeResponse->assertSee('id="committee"', false);
-        $homeResponse->assertSeeText('Committee Leads');
+        $aboutResponse->assertOk();
+        $aboutResponse->assertSee('id="committee"', false);
+        $aboutResponse->assertSeeText('Committee Leads');
+        $this->get(route('home'))->assertSee('id="committee"', false)->assertSeeText('Committee Leads');
 
         $this->get(route('rules'))
             ->assertOk()
@@ -79,7 +80,7 @@ class PublicPagesTest extends TestCase
 
         $this->get(route('timeline'))
             ->assertOk()
-            ->assertSee(['Countdown to the Tournament', '40 Days', 'Until November 21, 2026', 'Registration Closes In', '27 Days', 'Until November 8, 2026']);
+            ->assertSee(['Registration Closes In', '27 Days', 'Until November 8, 2026', 'Tournament Date', 'November 21, 2026']);
     }
 
     public function test_timeline_countdown_cards_after_the_event(): void
@@ -88,8 +89,8 @@ class PublicPagesTest extends TestCase
 
         $this->get(route('timeline'))
             ->assertOk()
-            ->assertSee(['Done', 'Closed'])
-            ->assertDontSee(['Countdown to the Tournament', 'Registration Closes In']);
+            ->assertSee(['Tournament Date', 'Closed'])
+            ->assertDontSee('Registration Closes In');
     }
 
     public function test_timeline_page_can_be_rendered(): void

@@ -11,5 +11,9 @@
       <!-- CSESS Logo -->
       <img src="/csess.avif" alt="CSESS" class="h-12 sm:h-14 md:h-16 w-auto">
     </div>
+
+    <p class="mt-10 text-center text-sm text-base-content/70">
+      &copy; {{ now()->year }} Department of Computer Science and Engineering, University of Moratuwa. All Rights Reserved.
+    </p>
   </div>
 </footer>

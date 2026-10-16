@@ -16,6 +16,10 @@
 
 {{-- Mobile only: on larger screens these live on their own pages. --}}
 <div class="lg:hidden" data-mobile-only>
+    <section id="timeline" class="scroll-mt-24">
+        <x-TimelineFull />
+    </section>
+
     <section id="awards" class="bg-base-100">
         <x-PageContainer class="!pb-6">
             <div class="mb-6 text-center" data-aos="fade-up">
@@ -42,14 +46,9 @@
                 <h2 class="mt-2 font-heading text-[clamp(2.2rem,9vw,3rem)] text-base-content">Champions <span class="text-primary">so far</span></h2>
             </div>
             <x-SeasonsStage />
-            <div class="mt-6 flex flex-wrap justify-center gap-3 text-sm font-bold">
-                <a href="{{ route('awards') }}" class="rounded-full border border-base-content/20 px-5 py-2">All awards</a>
-                <a href="{{ route('seasons') }}" class="rounded-full border border-base-content/20 px-5 py-2">Past Seasons leaderboard</a>
+            <div class="mt-6 flex justify-center">
+                <a href="{{ route('memories') }}" class="rounded-full border border-base-content/20 px-6 py-2.5 text-sm font-bold">See the memories</a>
             </div>
         </x-PageContainer>
-    </section>
-
-    <section id="timeline" class="scroll-mt-24">
-        <x-TimelineFull />
     </section>
 </div>

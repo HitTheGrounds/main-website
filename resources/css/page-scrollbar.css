@@ -12,6 +12,7 @@
     }
 
     .page-scrollbar:not([hidden]) {
+        --scroll-ball-rim: #142D4E;
         position: fixed;
         z-index: 60;
         inset: 88px 0 20px auto;
@@ -48,8 +49,8 @@
         height: 16px;
         z-index: 1;
         border-radius: 50%;
-        background: var(--color-base-100);
-        box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-base-content) 12%, transparent);
+        background: var(--scroll-ball-rim);
+        box-shadow: inset 0 0 0 1px var(--scroll-ball-rim);
         cursor: grab;
         will-change: transform;
     }
@@ -58,7 +59,7 @@
     .page-scrollbar.is-dragging, .page-scrollbar.is-dragging .page-scrollbar__ball { cursor: grabbing; }
     .page-scrollbar:hover .page-scrollbar__ball,
     .page-scrollbar:focus-visible .page-scrollbar__ball {
-        box-shadow: 0 0 0 2px var(--color-base-100), 0 0 0 3px var(--color-primary);
+        box-shadow: 0 0 0 2px var(--scroll-ball-rim), 0 0 0 3px var(--color-primary);
     }
 
     .page-scrollbar:focus-visible { outline-offset: -2px; border-radius: 8px; }

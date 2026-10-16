@@ -12,8 +12,8 @@
         </div>
 
             <!-- Company Details Card -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="card bg-base-100 border-base-300 border-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+                <div class="card bg-base-100 border-base-300 border-2 md:col-span-2">
                     <div class="card-body">
                         <h2 class="card-title">Company Information</h2>
                         <div class="space-y-3">
@@ -26,7 +26,16 @@
                                 <p class="font-medium">{{ $user->name }}</p>
                             </div>
                             <div>
-                                <p class="text-sm text-base-content/70">Email</p>
+                                
+                                <div class="inline-flex items-baseline gap-2">
+                                    <p class="text-sm text-base-content/70">Email</p>
+                                    <!-- <p class="text-sm text-base-content/70">Email Verification</p> -->
+                                    @if($user->email_verified_at)
+                                    <div class="badge badge-sm badge-soft badge-success">Verified</div>
+                                    @else
+                                    <div class="badge badge-sm badge-outline badge-warning">Not Verified</div>
+                                    @endif
+                                </div>
                                 <p class="font-medium">{{ $user->email }}</p>
                             </div>
                             <div>
@@ -37,11 +46,12 @@
                                 <p class="text-sm text-base-content/70">Registered At</p>
                                 <p class="font-medium">{{ $user->created_at?->timezone('Asia/Colombo')->format('F d, Y h:i A') ?? 'N/A' }}</p>
                             </div>
+
                         </div>
                     </div>
                 </div>
 
-                <div class="card bg-base-100 border-base-300 border-2">
+                <!-- <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <h2 class="card-title">Status</h2>
                         <div class="space-y-3">
@@ -55,59 +65,61 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div> -->
+            <!-- </div> -->
 
-        <!-- Teams Section -->
-        <div class="card bg-base-100 border-base-300 border-2">
-            <div class="card-body">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="card-title">My Teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</h2>
-                    @if($user->teams->count() < $maxTeamCount)
-                        @if(config('registration.team_enabled'))
-                            <a href="{{ route('company.teams.create') }}" class="btn btn-primary btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                Add Team
-                            </a>
-                        @else
-                            <button onclick="dashboard_team_closed_modal.showModal()" class="btn btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                Team Registration Closed
-                            </button>
+            <!-- Teams Section -->
+            <div class="card bg-base-100 border-base-300 border-2 md:col-span-3">
+                <div class="card-body">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="card-title">My Teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</h2>
+                        @if($user->teams->count() < $maxTeamCount)
+                            @if(config('registration.team_enabled'))
+                                <a href="{{ route('company.teams.create') }}" class="btn btn-primary btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Add Team
+                                </a>
+                            @else
+                                <button onclick="dashboard_team_closed_modal.showModal()" class="btn btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Team Registration Closed
+                                </button>
+                            @endif
                         @endif
+                    </div>
+
+                    @if($user->teams->count() > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            @foreach($user->teams as $team)
+                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-300 transition-colors cursor-pointer" style="background: radial-gradient(50% 80% at 92% 18%, rgb(255 106 19 / .22), transparent 60%), #EBE6DB">
+                                    <div class="card-body">
+                                        <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
+                                        <div class="text-sm space-y-1">
+                                            <p><span class="opacity-70">Team Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
+                                            <p><span class="opacity-70">Contact Person Email:</span> {{ $team->captain_email }}</p>
+                                            <p><span class="opacity-70">Contact Person Phone:</span> {{ $team->captain_phone }}</p>
+                                            <p><span class="opacity-70">Members:</span> {{ $team->members->count() }}/12</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto opacity-50">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                            </svg>
+                            <p class="mt-4 text-base-content/70">No teams yet</p>
+                            <p class="text-sm text-base-content/50">You can register up to {{ $maxTeamCount }} teams</p>
+                        </div>
                     @endif
                 </div>
-
-                @if($user->teams->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($user->teams as $team)
-                            <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 transition-colors cursor-pointer">
-                                <div class="card-body">
-                                    <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
-                                    <div class="text-sm space-y-1">
-                                        <p><span class="opacity-70">Team Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
-                                        <p><span class="opacity-70">Contact Person Email:</span> {{ $team->captain_email }}</p>
-                                        <p><span class="opacity-70">Contact Person Phone:</span> {{ $team->captain_phone }}</p>
-                                        <p><span class="opacity-70">Members:</span> {{ $team->members->count() }}/12</p>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto opacity-50">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                        </svg>
-                        <p class="mt-4 text-base-content/70">No teams yet</p>
-                        <p class="text-sm text-base-content/50">You can register up to {{ $maxTeamCount }} teams</p>
-                    </div>
-                @endif
             </div>
+
         </div>
     </div>
 

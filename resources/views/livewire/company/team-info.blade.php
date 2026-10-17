@@ -166,8 +166,9 @@ new class extends Component {
                     </div>
                 </div>
             </div>
+            <hr class="border-base-300 border-1/2 my-2">
             @if(!$team->locked)
-                <div class="mt-4">
+                <div class="">
                     <livewire:company.lock-team :team="$team" />
                 </div>
             @endif

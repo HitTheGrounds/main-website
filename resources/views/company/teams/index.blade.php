@@ -5,7 +5,7 @@
     @endphp
 
     <div class="w-full h-full">
-        <div class="flex justify-between items-center mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4 border-b-2 border-base-300">
+        <div class="flex justify-between items-center mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 pb-4 lg:pb-4 border-b-2 border-base-300">
             <div>
                 <h1 class="text-3xl font-bold text-accent">My Teams</h1>
                 <p class="mt-2 text-accent">Manage your tournament teams
@@ -13,7 +13,7 @@
             </div>
             @if($user->teams->count() < $maxTeamCount)
                 @if(config('registration.team_enabled'))
-                    <a href="{{ route('company.teams.create') }}" class="btn btn-secondary">
+                    <a href="{{ route('company.teams.create') }}" class="btn btn-primary bg-white/80">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

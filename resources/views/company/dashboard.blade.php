@@ -8,7 +8,7 @@
         <!-- Header -->
         <div class="mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4 border-b-2 border-base-300">
             <h1 class="text-3xl font-bold text-accent">Company Dashboard</h1>
-            <p class="mt-2 text-accent/70">Welcome, {{ $user->name }}</p>
+            <p class="mt-2 text-accent">Welcome, {{ $user->name }}</p>
         </div>
         <!-- <div class="mb-6">
             <h1 class="text-3xl font-bold bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4  text-accent">Company Dashboard</h1>

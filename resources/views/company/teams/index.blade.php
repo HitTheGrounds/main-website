@@ -8,7 +8,7 @@
         <div class="flex justify-between items-center mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4 border-b-2 border-base-300">
             <div>
                 <h1 class="text-3xl font-bold text-accent">My Teams</h1>
-                <p class="mt-2 text-accent/70">Manage your tournament teams
+                <p class="mt-2 text-accent">Manage your tournament teams
                     ({{ $user->teams->count() }}/{{ $maxTeamCount }})</p>
             </div>
             @if($user->teams->count() < $maxTeamCount)

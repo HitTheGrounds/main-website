@@ -6,16 +6,22 @@
 
     <div>
         <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-base-content">Company Dashboard</h1>
-            <p class="mt-2 text-base-content/70">Welcome, {{ $user->name }}</p>
+        <div class="mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-accent">Company Dashboard</h1>
+            <p class="mt-2 text-accent/70">Welcome, {{ $user->name }}</p>
         </div>
+        <!-- <div class="mb-6">
+            <h1 class="text-3xl font-bold bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4  text-accent">Company Dashboard</h1>
+            <p class="mt-2 mt-6">Welcome, {{ $user->name }}</p>
+        </div> -->
 
             <!-- Company Details Card -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                 <div class="card bg-base-100 border-base-300 border-2 md:col-span-2">
                     <div class="card-body">
-                        <h2 class="card-title">Company Information</h2>
+                        <div>
+                            <h2 class="card-title">Company Information</h2>
+                        </div>
                         <div class="space-y-3">
                             <div>
                                 <p class="text-sm text-base-content/70">Company Name</p>
@@ -95,7 +101,7 @@
                     @if($user->teams->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
                             @foreach($user->teams as $team)
-                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-300 transition-colors cursor-pointer" style="background: radial-gradient(50% 80% at 92% 18%, rgb(255 106 19 / .22), transparent 60%), #EBE6DB">
+                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-300 transition-colors cursor-pointer">
                                     <div class="card-body">
                                         <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
                                         <div class="text-sm space-y-1">

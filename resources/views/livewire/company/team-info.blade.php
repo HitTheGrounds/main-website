@@ -70,7 +70,7 @@ new class extends Component {
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs text-base-content/70">Team Name</p>
-                        <p class="font-medium truncate">{{ $team->team_name }}</p>
+                        <p class="font-medium">{{ $team->team_name }}</p>
                     </div>
                 </div>
 
@@ -82,7 +82,7 @@ new class extends Component {
                     </div>
                     <div class="min-w-0">
                         <p class="text-xs text-base-content/70">Team Captain</p>
-                        <p class="font-medium truncate">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
+                        <p class="font-medium">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
                     </div>
                 </div>
 

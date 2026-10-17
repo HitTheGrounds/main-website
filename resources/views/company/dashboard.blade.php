@@ -6,42 +6,113 @@
 
     <div>
         <!-- Header -->
-        <div class="mb-6">
-            <h1 class="text-3xl font-bold text-base-content">Company Dashboard</h1>
-            <p class="mt-2 text-base-content/70">Welcome, {{ $user->name }}</p>
+        <div class="mb-6 bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 pb-4 lg:pb-4 border-b-2 border-base-300">
+            <h1 class="text-3xl font-bold text-accent">Company Dashboard</h1>
+            <p class="mt-2 text-accent">Welcome, {{ $user->name }}</p>
         </div>
+        <!-- <div class="mb-6">
+            <h1 class="text-3xl font-bold bg-primary -mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 lg:px-6 pt-4 lg:pt-6 lg:pb-4  text-accent">Company Dashboard</h1>
+            <p class="mt-2 mt-6">Welcome, {{ $user->name }}</p>
+        </div> -->
 
             <!-- Company Details Card -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="card bg-base-100 border-base-300 border-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+                <div class="card bg-base-100 border-base-300 border-1 md:col-span-2">
                     <div class="card-body">
-                        <h2 class="card-title">Company Information</h2>
+                        <div class="flex items-center gap-2">
+                            <div class="rounded-full bg-primary/20 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-primary/80">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                                </svg>
+                            </div>
+                            <h2 class="card-title">Company Information</h2>
+                        </div>
+                        <hr class="border-base-300 border-1/2 my-2">
                         <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-base-content/70">Company Name</p>
-                                <p class="font-medium">{{ $user->company?->name ?? $user->company_name ?? 'N/A' }}</p>
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-base-200 p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                        <path fill-rule="evenodd" d="M1.75 2a.75.75 0 0 0 0 1.5H2v9h-.25a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 .75-.75v-1.5a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v1.5c0 .414.336.75.75.75h.5a.75.75 0 0 0 .75-.75V3.5h.25a.75.75 0 0 0 0-1.5h-7.5ZM3.5 5.5A.5.5 0 0 1 4 5h.5a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5v-.5Zm.5 2a.5.5 0 0 0-.5.5v.5A.5.5 0 0 0 4 9h.5a.5.5 0 0 0 .5-.5V8a.5.5 0 0 0-.5-.5H4Zm2-2a.5.5 0 0 1 .5-.5H7a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-.5.5h-.5A.5.5 0 0 1 6 6v-.5Zm.5 2A.5.5 0 0 0 6 8v.5a.5.5 0 0 0 .5.5H7a.5.5 0 0 0 .5-.5V8a.5.5 0 0 0-.5-.5h-.5ZM11.5 6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.75a.75.75 0 0 0 0-1.5H14v-5h.25a.75.75 0 0 0 0-1.5H11.5Zm.5 1.5h.5a.5.5 0 0 1 .5.5v.5a.5.5 0 0 1-.5.5H12a.5.5 0 0 1-.5-.5V8a.5.5 0 0 1 .5-.5Zm0 2.5a.5.5 0 0 0-.5.5v.5a.5.5 0 0 0 .5.5h.5a.5.5 0 0 0 .5-.5v-.5a.5.5 0 0 0-.5-.5H12Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-base-content/70 flex items-center gap-1">
+                                        Company Name
+                                    </p>
+                                    <p class="font-medium">{{ $user->company?->name ?? $user->company_name ?? 'N/A' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-base-content/70">Contact Person</p>
-                                <p class="font-medium">{{ $user->name }}</p>
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-base-200 p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                        <path fill-rule="evenodd" d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-base-content/70 flex items-center gap-1">
+                                        Contact Person
+                                    </p>
+                                    <p class="font-medium">{{ $user->name }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-base-content/70">Email</p>
-                                <p class="font-medium">{{ $user->email }}</p>
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-base-200 p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                        <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                                        <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="inline-flex items-center gap-2">
+                                        <p class="text-xs text-base-content/70 flex items-center gap-1">
+                                            Email
+                                        </p>
+                                        @if($user->email_verified_at)
+                                            <div class="badge badge-sm badge-soft badge-success inline-flex items-center gap-0.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-3.5">
+                                                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                                                </svg>
+                                                Verified
+                                            </div>
+                                        @else
+                                            <div class="badge badge-sm badge-outline badge-warning">Not Verified</div>
+                                        @endif
+                                    </div>
+                                    <p class="font-medium">{{ $user->email }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-base-content/70">Phone</p>
-                                <p class="font-medium">{{ $user->company?->phone ?? $user->phone ?? 'N/A' }}</p>
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-base-200 p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                        <path fill-rule="evenodd" d="m3.855 7.286 1.067-.534a1 1 0 0 0 .542-1.046l-.44-2.858A1 1 0 0 0 4.036 2H3a1 1 0 0 0-1 1v2c0 .709.082 1.4.238 2.062a9.012 9.012 0 0 0 6.7 6.7A9.024 9.024 0 0 0 11 14h2a1 1 0 0 0 1-1v-1.036a1 1 0 0 0-.848-.988l-2.858-.44a1 1 0 0 0-1.046.542l-.534 1.067a7.52 7.52 0 0 1-4.86-4.859Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-base-content/70 flex items-center gap-1">
+                                        Phone
+                                    </p>
+                                    <p class="font-medium">{{ $user->company?->phone ?? $user->phone ?? 'N/A' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-base-content/70">Registered At</p>
-                                <p class="font-medium">{{ $user->created_at?->timezone('Asia/Colombo')->format('F d, Y h:i A') ?? 'N/A' }}</p>
+                            <div class="flex items-center gap-2">
+                                <div class="rounded-full bg-base-200 p-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                        <path fill-rule="evenodd" d="M4 1.75a.75.75 0 0 1 1.5 0V3h5V1.75a.75.75 0 0 1 1.5 0V3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2V1.75ZM4.5 6a1 1 0 0 0-1 1v4.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-7Z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-base-content/70 flex items-center gap-1">
+                                        Registered At
+                                    </p>
+                                    <p class="font-medium">{{ $user->created_at?->timezone('Asia/Colombo')->format('F d, Y h:i A') ?? 'N/A' }}</p>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
 
-                <div class="card bg-base-100 border-base-300 border-2">
+                <!-- <div class="card bg-base-100 border-base-300 border-2">
                     <div class="card-body">
                         <h2 class="card-title">Status</h2>
                         <div class="space-y-3">
@@ -55,59 +126,115 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div> -->
+            <!-- </div> -->
 
-        <!-- Teams Section -->
-        <div class="card bg-base-100 border-base-300 border-2">
-            <div class="card-body">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="card-title">My Teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</h2>
-                    @if($user->teams->count() < $maxTeamCount)
-                        @if(config('registration.team_enabled'))
-                            <a href="{{ route('company.teams.create') }}" class="btn btn-primary btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            <!-- Teams Section -->
+            <div class="card bg-base-100 border-base-300 border-1 md:col-span-3">
+                <div class="card-body">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="rounded-full bg-primary/20 p-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-primary/80">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
                                 </svg>
-                                Add Team
-                            </a>
-                        @else
-                            <button onclick="dashboard_team_closed_modal.showModal()" class="btn btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                Team Registration Closed
-                            </button>
+                            </div>
+                            <h2 class="card-title">My Teams ({{ $user->teams->count() }}/{{ $maxTeamCount }})</h2>
+                        </div>
+
+                        @if($user->teams->count() < $maxTeamCount)
+                            @if(config('registration.team_enabled'))
+                                <a href="{{ route('company.teams.create') }}" class="btn btn-primary btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Add Team
+                                </a>
+                            @else
+                                <button onclick="dashboard_team_closed_modal.showModal()" class="btn btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Team Registration Closed
+                                </button>
+                            @endif
                         @endif
+                    </div>
+
+                    <hr class="border-base-300 border-1/2 my-2">
+
+                    @if($user->teams->count() > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            @foreach($user->teams as $team)
+                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-content/10 transition-colors cursor-pointer">
+                                    <div class="card-body">
+                                        <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="rounded-full bg-base-content/10 p-2 shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-xs text-base-content/70">Team Captain</p>
+                                                    <p class="font-medium truncate">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="rounded-full bg-base-content/10 p-2 shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                                        <path d="M8 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.156 11.763c.16-.629.44-1.21.813-1.72a2.5 2.5 0 0 0-2.725 1.377c-.136.287.102.58.418.58h1.449c.01-.077.025-.156.045-.237ZM12.847 11.763c.02.08.036.16.046.237h1.446c.316 0 .554-.293.417-.579a2.5 2.5 0 0 0-2.722-1.378c.374.51.653 1.09.813 1.72ZM14 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM3.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 13c-.552 0-1.013-.455-.876-.99a4.002 4.002 0 0 1 7.753 0c.136.535-.324.99-.877.99H5Z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-xs text-base-content/70">Members</p>
+                                                    <p class="font-medium truncate">{{ $team->members->count() }}/12</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="rounded-full bg-base-content/10 p-2 shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                                        <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                                                        <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-xs text-base-content/70">Contact Person Email</p>
+                                                    <p class="font-medium truncate">{{ $team->captain_email }}</p>
+                                                </div>
+                                            </div>
+
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="rounded-full bg-base-content/10 p-2 shrink-0">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                                                        <path fill-rule="evenodd" d="m3.855 7.286 1.067-.534a1 1 0 0 0 .542-1.046l-.44-2.858A1 1 0 0 0 4.036 2H3a1 1 0 0 0-1 1v2c0 .709.082 1.4.238 2.062a9.012 9.012 0 0 0 6.7 6.7A9.024 9.024 0 0 0 11 14h2a1 1 0 0 0 1-1v-1.036a1 1 0 0 0-.848-.988l-2.858-.44a1 1 0 0 0-1.046.542l-.534 1.067a7.52 7.52 0 0 1-4.86-4.859Z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-xs text-base-content/70">Contact Person Phone</p>
+                                                    <p class="font-medium truncate">{{ $team->captain_phone }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto opacity-50">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                            </svg>
+                            <p class="mt-4 text-base-content/70">No teams yet</p>
+                            <p class="text-sm text-base-content/50">You can register up to {{ $maxTeamCount }} teams</p>
+                        </div>
                     @endif
                 </div>
-
-                @if($user->teams->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @foreach($user->teams as $team)
-                            <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 transition-colors cursor-pointer">
-                                <div class="card-body">
-                                    <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
-                                    <div class="text-sm space-y-1">
-                                        <p><span class="opacity-70">Team Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
-                                        <p><span class="opacity-70">Contact Person Email:</span> {{ $team->captain_email }}</p>
-                                        <p><span class="opacity-70">Contact Person Phone:</span> {{ $team->captain_phone }}</p>
-                                        <p><span class="opacity-70">Members:</span> {{ $team->members->count() }}/12</p>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="text-center py-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mx-auto opacity-50">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                        </svg>
-                        <p class="mt-4 text-base-content/70">No teams yet</p>
-                        <p class="text-sm text-base-content/50">You can register up to {{ $maxTeamCount }} teams</p>
-                    </div>
-                @endif
             </div>
+
         </div>
     </div>
 

@@ -20,7 +20,7 @@ new class extends Component {
         $user = CompanyAuth::user();
 
         if (!$user) {
-            $this->redirect(route('company.login'), navigate: true);
+            $this->redirect(route('login'), navigate: true);
             return;
         }
 

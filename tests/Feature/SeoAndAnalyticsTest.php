@@ -81,4 +81,26 @@ class SeoAndAnalyticsTest extends TestCase
 
         $this->get('/')->assertDontSee('googletagmanager.com', false);
     }
+
+    public function test_sitemap_lists_the_indexable_pages(): void
+    {
+        $response = $this->get('/sitemap.xml')->assertOk()->assertHeader('Content-Type', 'application/xml');
+
+        foreach (config('seo.indexable') as $name) {
+            $response->assertSee('<loc>'.route($name).'</loc>', false);
+        }
+        $response->assertDontSee(route('login'), false);
+    }
+
+    public function test_robots_txt_points_to_the_sitemap_and_blocks_private_areas(): void
+    {
+        $this->get('/robots.txt')->assertOk()->assertSee(['Sitemap: '.route('sitemap'), 'Disallow: /admin', 'Disallow: /company']);
+    }
+
+    public function test_only_public_pages_are_indexable(): void
+    {
+        $this->get('/')->assertSee('content="index, follow', false)->assertSee('"@type":"SportsEvent"', false);
+        $this->get('/login')->assertSee('content="noindex, nofollow"', false);
+        $this->get('/nowhere')->assertSee('content="noindex, nofollow"', false);
+    }
 }

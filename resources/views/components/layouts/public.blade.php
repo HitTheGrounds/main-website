@@ -11,12 +11,13 @@
     <x-Navbar />
 
     <!-- Main Content -->
-    <main class="min-h-screen">
+    <main id="public-page-content" class="min-h-screen">
         {{ $slot }}
     </main>
 
     <!-- Footer -->
     <x-FooterSection />
+    <x-page-scrollbar />
     @livewireScripts
 </body>
 

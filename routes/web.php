@@ -8,6 +8,22 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/sitemap.xml', function () {
+    $urls = collect(config('seo.indexable'))->map(fn ($name) => route($name));
+
+    return response()->view('sitemap', ['urls' => $urls])->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    $body = "User-agent: *\nDisallow: /admin\nDisallow: /company\nDisallow: /login\nDisallow: /register\nDisallow: /dashboard\nDisallow: /teams\n\nSitemap: ".route('sitemap')."\n";
+
+    return response($body)->header('Content-Type', 'text/plain');
+})->name('robots');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 Route::get('/awards', function () {
     return view('awards');
 })->name('awards');

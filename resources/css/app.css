@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
 @import "aos/dist/aos.css";
+@import './page-scrollbar.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -1399,3 +1400,8 @@ h3 {
     animation: none;
   }
 }
+/* In-page links land below the sticky header */
+html { scroll-padding-top: 5.5rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+[x-cloak] { display: none !important; }

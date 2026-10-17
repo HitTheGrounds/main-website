@@ -182,10 +182,17 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 border-base-300 border-2">
+    <div class="card bg-base-100 border-base-300 border-1">
         <div class="card-body">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-primary/20 p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-primary/80">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>
+                </div>
                 @if(!$team->locked)
                 <button wire:click="openAddModal" class="btn btn-primary btn-sm" {{ $team->members->count() >= 12 ? 'disabled' : '' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
@@ -195,6 +202,8 @@ new class extends Component {
                 </button>
                 @endif
             </div>
+
+            <hr class="border-base-300 border-1/2 my-2">
 
             @if(!$team->locked && $team->members->count() >= 12)
                 <p class="text-sm text-base-content/70 mb-4">All 12 player slots are filled. Edit or remove an existing member to change the team. The team must have 9 male and 3 female players.</p>

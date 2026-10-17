@@ -182,10 +182,17 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 border-base-300 border-2">
+    <div class="card bg-base-100 border border-base-300 shadow-xs">
         <div class="card-body">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="rounded-full bg-primary/10 p-2 text-primary-ink">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                        </svg>
+                    </div>
+                    <h2 class="card-title text-base font-bold text-base-content">Team Members ({{ $team->members->count() }}/12)</h2>
+                </div>
                 @if(!$team->locked)
                 <button wire:click="openAddModal" class="btn btn-primary btn-sm" {{ $team->members->count() >= 12 ? 'disabled' : '' }}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
@@ -195,6 +202,8 @@ new class extends Component {
                 </button>
                 @endif
             </div>
+
+            <hr class="border-base-300 my-3">
 
             @if(!$team->locked && $team->members->count() >= 12)
                 <p class="text-sm text-base-content/70 mb-4">All 12 player slots are filled. Edit or remove an existing member to change the team. The team must have 9 male and 3 female players.</p>
@@ -298,22 +307,22 @@ new class extends Component {
             @if($team->members->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($team->members as $member)
-                        <div class="card bg-base-200 shadow-sm">
-                            <figure class="px-4 pt-4">
+                        <div class="card bg-base-100 border border-base-300 hover:border-primary/40 transition-colors shadow-xs">
+                            <figure class="px-2 pt-2">
                                 <img
                                     src="{{ $member->picture ? Storage::url($member->picture) : ($member->gender === 'Female' ? '/placeholder/female.avif' : '/placeholder/male.avif') }}"
                                     alt="{{ $member->name }}"
                                     class="rounded-lg h-32 w-32 object-cover"
                                 />
                             </figure>
-                            <div class="card-body p-4">
-                                <h3 class="font-semibold text-sm">{{ $member->name }}</h3>
+                            <div class="card-body p-2.5">
+                                <h3 class="font-semibold text-sm text-base-content">{{ $member->name }}</h3>
                                 <p class="text-xs text-base-content/70">{{ $member->gender }}</p>
                                 <div class="flex gap-1 flex-wrap mt-1">
                                     @if($member->is_captain)
-                                        <span class="badge badge-primary badge-xs">Captain</span>
+                                        <span class="badge badge-primary text-primary-content font-semibold badge-xs">Captain</span>
                                     @else
-                                        <span class="badge badge-ghost badge-xs">Member</span>
+                                        <span class="badge badge-xs bg-base-100 border border-base-300 text-base-content/70 font-medium">Member</span>
                                     @endif
                                 </div>
                                 @if(!$team->locked)

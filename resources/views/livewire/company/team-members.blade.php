@@ -308,21 +308,21 @@ new class extends Component {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($team->members as $member)
                         <div class="card bg-base-200 shadow-sm">
-                            <figure class="px-4 pt-4">
+                            <figure class="px-2 pt-2">
                                 <img
                                     src="{{ $member->picture ? Storage::url($member->picture) : ($member->gender === 'Female' ? '/placeholder/female.avif' : '/placeholder/male.avif') }}"
                                     alt="{{ $member->name }}"
                                     class="rounded-lg h-32 w-32 object-cover"
                                 />
                             </figure>
-                            <div class="card-body p-4">
+                            <div class="card-body p-2">
                                 <h3 class="font-semibold text-sm">{{ $member->name }}</h3>
                                 <p class="text-xs text-base-content/70">{{ $member->gender }}</p>
                                 <div class="flex gap-1 flex-wrap mt-1">
                                     @if($member->is_captain)
-                                        <span class="badge badge-primary badge-xs">Captain</span>
+                                        <span class="badge badge-primary text-white/80 badge-xs">Captain</span>
                                     @else
-                                        <span class="badge badge-ghost badge-xs">Member</span>
+                                        <span class="badge badge-xs bg-base-100 border-base-100 text-base-content/80 font-medium">Member</span>
                                     @endif
                                 </div>
                                 @if(!$team->locked)

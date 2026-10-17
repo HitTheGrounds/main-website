@@ -17,7 +17,7 @@
 
             <!-- Company Details Card -->
             <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-                <div class="card bg-base-100 border-base-300 border-2 md:col-span-2">
+                <div class="card bg-base-100 border-base-300 border-1 md:col-span-2">
                     <div class="card-body">
                         <div class="flex items-center gap-2">
                             <div class="rounded-full bg-primary/20 p-2">
@@ -130,7 +130,7 @@
             <!-- </div> -->
 
             <!-- Teams Section -->
-            <div class="card bg-base-100 border-base-300 border-2 md:col-span-3">
+            <div class="card bg-base-100 border-base-300 border-1 md:col-span-3">
                 <div class="card-body">
                     <div class="flex justify-between items-center">
                         <div class="flex items-center gap-2">

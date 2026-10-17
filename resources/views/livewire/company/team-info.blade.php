@@ -16,10 +16,17 @@ new class extends Component {
 }; ?>
 
 <div class="lg:col-span-1">
-    <div class="card bg-base-100 border-base-300 border-2">
+    <div class="card bg-base-100 border-base-300 border-1">
         <div class="card-body">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="card-title">Team Information</h2>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-primary/20 p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 text-primary/80">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Team Information</h2>
+                </div>
                 @if(!$team->locked)
                     <div class="dropdown dropdown-end">
                         <label tabindex="0" class="btn btn-ghost btn-sm btn-circle">
@@ -51,40 +58,91 @@ new class extends Component {
                     </div>
                 @endif
             </div>
-            <div class="space-y-3 text-sm">
-                <div>
-                    <p class="font-semibold">Team Name</p>
-                    <p class="text-base-content/70">{{ $team->team_name }}</p>
+
+            <hr class="border-base-300 border-1/2 my-2">
+
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                            <path fill-rule="evenodd" d="M12 1.69a.494.494 0 0 0-.438-.494 32.352 32.352 0 0 0-7.124 0A.494.494 0 0 0 4 1.689v.567c-.811.104-1.612.24-2.403.406a.75.75 0 0 0-.595.714 4.5 4.5 0 0 0 4.35 4.622A3.99 3.99 0 0 0 7 8.874V10H6a1 1 0 0 0-1 1v2h-.667C3.597 13 3 13.597 3 14.333c0 .368.298.667.667.667h8.666a.667.667 0 0 0 .667-.667c0-.736-.597-1.333-1.333-1.333H11v-2a1 1 0 0 0-1-1H9V8.874a3.99 3.99 0 0 0 1.649-.876 4.5 4.5 0 0 0 4.35-4.622.75.75 0 0 0-.596-.714A30.897 30.897 0 0 0 12 2.256v-.567ZM4 3.768c-.49.066-.976.145-1.458.235a3.004 3.004 0 0 0 1.64 2.192A3.999 3.999 0 0 1 4 5V3.769Zm8 0c.49.066.976.145 1.458.235a3.004 3.004 0 0 1-1.64 2.192C11.936 5.818 12 5.416 12 5V3.769Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-base-content/70">Team Name</p>
+                        <p class="font-medium truncate">{{ $team->team_name }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">Contact Person Email</p>
-                    <p class="text-base-content/70">{{ $team->captain_email }}</p>
+
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-content/80">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-base-content/70">Team Captain</p>
+                        <p class="font-medium truncate">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">Contact Person Phone</p>
-                    <p class="text-base-content/70">{{ $team->captain_phone }}</p>
+
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-content/80">
+                            <path d="M8 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.156 11.763c.16-.629.44-1.21.813-1.72a2.5 2.5 0 0 0-2.725 1.377c-.136.287.102.58.418.58h1.449c.01-.077.025-.156.045-.237ZM12.847 11.763c.02.08.036.16.046.237h1.446c.316 0 .554-.293.417-.579a2.5 2.5 0 0 0-2.722-1.378c.374.51.653 1.09.813 1.72ZM14 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM3.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 13c-.552 0-1.013-.455-.876-.99a4.002 4.002 0 0 1 7.753 0c.136.535-.324.99-.877.99H5Z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-base-content/70">Total Members</p>
+                        <p class="font-medium truncate">{{ $team->members->count() }}/12</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">Total Members</p>
-                    <p class="text-base-content/70">{{ $team->members->count() }}/12</p>
+
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-content/80">
+                            <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                            <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-base-content/70">Contact Person Email</p>
+                        <p class="font-medium truncate">{{ $team->captain_email }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">Team Captain</p>
-                    <p class="text-base-content/70">{{ $team->captain()?->name ?? 'Not assigned' }}</p>
+
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-base-content/80">
+                            <path fill-rule="evenodd" d="m3.855 7.286 1.067-.534a1 1 0 0 0 .542-1.046l-.44-2.858A1 1 0 0 0 4.036 2H3a1 1 0 0 0-1 1v2c0 .709.082 1.4.238 2.062a9.012 9.012 0 0 0 6.7 6.7A9.024 9.024 0 0 0 11 14h2a1 1 0 0 0 1-1v-1.036a1 1 0 0 0-.848-.988l-2.858-.44a1 1 0 0 0-1.046.542l-.534 1.067a7.52 7.52 0 0 1-4.86-4.859Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-base-content/70">Contact Person Phone</p>
+                        <p class="font-medium truncate">{{ $team->captain_phone }}</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="font-semibold">Status</p>
-                    <div class="flex gap-2">
-                        @if($team->locked)
-                            <span class="badge badge-warning">Locked</span>
-                        @else
-                            <span class="badge badge-info">Open</span>
-                        @endif
-                        @if($team->approved)
-                            <span class="badge badge-success">Approved</span>
-                        @else
-                            <span class="badge badge-ghost">Pending</span>
-                        @endif
+
+                <div class="flex items-center gap-2">
+                    <div class="rounded-full bg-base-200 p-2 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4 text-content/80">
+                            <path fill-rule="evenodd" d="M4.5 2A2.5 2.5 0 0 0 2 4.5v2.879a2.5 2.5 0 0 0 .732 1.767l4.5 4.5a2.5 2.5 0 0 0 3.536 0l2.878-2.878a2.5 2.5 0 0 0 0-3.536l-4.5-4.5A2.5 2.5 0 0 0 7.38 2H4.5ZM5 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-base-content/70">Status</p>
+                        <div class="flex gap-2 mt-0.5">
+                            @if($team->locked)
+                                <span class="badge badge-warning badge-sm">Locked</span>
+                            @else
+                                <span class="badge badge-info badge-sm">Open</span>
+                            @endif
+                            @if($team->approved)
+                                <span class="badge badge-success badge-sm">Approved</span>
+                            @else
+                                <span class="badge badge-ghost badge-sm">Pending</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

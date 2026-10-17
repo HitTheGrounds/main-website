@@ -166,14 +166,42 @@
                     @if($user->teams->count() > 0)
                         <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
                             @foreach($user->teams as $team)
-                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-300 transition-colors cursor-pointer">
+                                <a href="{{ route('company.teams.show', $team) }}" class="card bg-base-200 hover:bg-base-300 border border-base-100 hover:border-base-content/10 transition-colors cursor-pointer">
                                     <div class="card-body">
                                         <h3 class="font-bold text-lg">{{ $team->team_name }}</h3>
-                                        <div class="text-sm space-y-1">
-                                            <p><span class="opacity-70">Team Captain:</span> {{ $team->captain()?->name ?? 'Not assigned' }}</p>
-                                            <p><span class="opacity-70">Contact Person Email:</span> {{ $team->captain_email }}</p>
-                                            <p><span class="opacity-70">Contact Person Phone:</span> {{ $team->captain_phone }}</p>
-                                            <p><span class="opacity-70">Members:</span> {{ $team->members->count() }}/12</p>
+                                        <div class="grid grid-cols-[auto_auto_1fr] items-center gap-x-2 gap-y-2.5 text-sm">
+                                            <div class="rounded-full bg-base-content/10 p-1.5 shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5 text-base-content/70">
+                                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+                                                </svg>
+                                            </div>
+                                            <span class="opacity-70 pr-5">Team Captain</span>
+                                            <span class="font-medium">{{ $team->captain()?->name ?? 'Not assigned' }}</span>
+
+                                            <div class="rounded-full bg-base-content/10 p-1.5 shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5 text-base-content/70">
+                                                    <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
+                                                    <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
+                                                </svg>
+                                            </div>
+                                            <span class="opacity-70 pr-5">Contact Person Email</span>
+                                            <span class="font-medium break-all">{{ $team->captain_email }}</span>
+
+                                            <div class="rounded-full bg-base-content/10 p-1.5 shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5 text-base-content/70">
+                                                    <path fill-rule="evenodd" d="m3.855 7.286 1.067-.534a1 1 0 0 0 .542-1.046l-.44-2.858A1 1 0 0 0 4.036 2H3a1 1 0 0 0-1 1v2c0 .709.082 1.4.238 2.062a9.012 9.012 0 0 0 6.7 6.7A9.024 9.024 0 0 0 11 14h2a1 1 0 0 0 1-1v-1.036a1 1 0 0 0-.848-.988l-2.858-.44a1 1 0 0 0-1.046.542l-.534 1.067a7.52 7.52 0 0 1-4.86-4.859Z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <span class="opacity-70 pr-5">Contact Person Phone</span>
+                                            <span class="font-medium">{{ $team->captain_phone }}</span>
+
+                                            <div class="rounded-full bg-base-content/10 p-1.5 shrink-0">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3.5 text-base-content/70">
+                                                    <path d="M8 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM3.156 11.763c.16-.629.44-1.21.813-1.72a2.5 2.5 0 0 0-2.725 1.377c-.136.287.102.58.418.58h1.449c.01-.077.025-.156.045-.237ZM12.847 11.763c.02.08.036.16.046.237h1.446c.316 0 .554-.293.417-.579a2.5 2.5 0 0 0-2.722-1.378c.374.51.653 1.09.813 1.72ZM14 7.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM3.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 13c-.552 0-1.013-.455-.876-.99a4.002 4.002 0 0 1 7.753 0c.136.535-.324.99-.877.99H5Z" />
+                                                </svg>
+                                            </div>
+                                            <span class="opacity-70 pr-5">Members</span>
+                                            <span class="font-medium">{{ $team->members->count() }}/12</span>
                                         </div>
                                     </div>
                                 </a>

@@ -18,19 +18,6 @@ class EnsureCompanyAuthenticated
     {
         $token = $request->cookie('company_token');
 
-        // --- Dev bypass: auto-authenticate in local environment ---
-        if (!$token && app()->environment('local') && config('app.debug')) {
-            $user = \App\Models\User::first();
-
-            if ($user) {
-                $request->attributes->set('user', $user);
-                $request->attributes->set('company', $user);
-
-                return $next($request);
-            }
-        }
-        // --- End dev bypass ---
-
         if (!$token) {
             return redirect()->route('login');
         }

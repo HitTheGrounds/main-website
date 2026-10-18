@@ -23,7 +23,6 @@
     <section id="awards" class="bg-base-100">
         <x-PageContainer class="!pb-6">
             <div class="mb-6 text-center" data-aos="fade-up">
-                <p class="text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">Awards</p>
                 <h2 class="mt-2 font-heading text-[clamp(2.2rem,9vw,3rem)] text-base-content">Awards &amp; <span class="text-primary">Recognition</span></h2>
             </div>
             <div class="mb-5"><x-AwardsStage /></div>

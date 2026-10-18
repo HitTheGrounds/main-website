@@ -166,7 +166,14 @@ new class extends Component {
                 <label class="label">
                     <span class="label-text font-medium">Description (Markdown supported)</span>
                 </label>
-                <x-mary-markdown wire:model="description" label="" />
+                <x-mary-markdown wire:model="description" label="" :config="[
+                    'uploadImage' => false,
+                    'toolbar' => [
+                        'heading', 'bold', 'italic', 'strikethrough', '|',
+                        'code', 'quote', 'unordered-list', 'ordered-list', 'horizontal-rule', '|',
+                        'link', 'table', '|', 'preview', 'side-by-side',
+                    ],
+                ]" />
                 @error('description')
                     <label class="label">
                         <span class="label-text-alt text-error">{{ $message }}</span>

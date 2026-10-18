@@ -2,6 +2,7 @@
     // Whole days left, counted in Sri Lanka time so the number changes at local midnight.
     $today = now('Asia/Colombo')->startOfDay();
     $regDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 8, 0, 0, 0, 'Asia/Colombo'), false);
+    $tournamentDays = (int) $today->diffInDays(\Carbon\Carbon::create(2026, 11, 21, 0, 0, 0, 'Asia/Colombo'), false);
 @endphp
 
 <x-TimelineSection />
@@ -22,12 +23,12 @@
         <p class="mt-3 font-heading text-3xl sm:text-6xl text-primary">
           {{ $regDays > 1 ? $regDays . ' Days' : ($regDays === 1 ? '1 Day' : ($regDays === 0 ? 'Last Day' : 'Closed')) }}
         </p>
-        <p class="mt-3 text-sm text-base-content/75 sm:text-base">{{ $regDays >= 0 ? 'Until November 8, 2026' : 'November 8, 2026' }}</p>
+        <p class="mt-3 text-sm text-base-content/75 sm:text-base">November 8, 2026</p>
       </div>
 
       <div class="border-t-2 border-base-content pt-6 text-center" data-aos="fade-up">
-        <h3 class="text-sm font-semibold text-base-content sm:text-lg">Tournament Date</h3>
-        <p class="mt-3 font-heading text-3xl sm:text-6xl text-primary">Nov 21</p>
+        <h3 class="text-sm font-semibold text-base-content sm:text-lg">{{ $tournamentDays > 0 ? 'Tournament Starts In' : 'Tournament' }}</h3>
+        <p class="mt-3 font-heading text-3xl sm:text-6xl text-primary">{{ $tournamentDays > 1 ? $tournamentDays . ' Days' : ($tournamentDays === 1 ? '1 Day' : ($tournamentDays === 0 ? 'Today' : 'Completed')) }}</p>
         <p class="mt-3 text-sm text-base-content/75 sm:text-base">November 21, 2026</p>
       </div>
 

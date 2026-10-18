@@ -122,8 +122,11 @@ class PublicContentTest extends TestCase
         $this->travelTo(\Carbon\Carbon::create(2026, 11, 9, 9, 0, 0, 'Asia/Colombo'));
         $this->get(route('timeline'))->assertSee('Closed');
 
-        $this->travelTo(\Carbon\Carbon::create(2026, 11, 21, 9, 0, 0, 'Asia/Colombo'));
-        $this->get(route('timeline'))->assertSee('Tournament Date')->assertSee('Closed');
+        $this->travelTo(\Carbon\Carbon::create(2026, 11, 20, 23, 59, 0, 'Asia/Colombo'));
+        $this->get(route('timeline'))->assertSee('Tournament Starts In')->assertSee('1 Day');
+
+        $this->travelTo(\Carbon\Carbon::create(2026, 11, 21, 0, 0, 0, 'Asia/Colombo'));
+        $this->get(route('timeline'))->assertSee('Today')->assertSee('Closed')->assertDontSee('Tournament Starts In');
     }
 
     public function test_unknown_pages_return_404(): void

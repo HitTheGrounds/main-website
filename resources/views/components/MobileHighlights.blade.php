@@ -23,16 +23,15 @@
     <section id="awards" class="bg-base-100">
         <x-PageContainer class="!pb-6">
             <div class="mb-6 text-center" data-aos="fade-up">
-                <p class="text-sm font-bold uppercase tracking-[0.22em] text-primary-ink">Awards</p>
                 <h2 class="mt-2 font-heading text-[clamp(2.2rem,9vw,3rem)] text-base-content">Awards &amp; <span class="text-primary">Recognition</span></h2>
             </div>
             <div class="mb-5"><x-AwardsStage /></div>
             <ul class="grid grid-cols-2 gap-3">
                 @foreach ($awards as [$title, $blurb, $img])
-                    <li class="rounded-[1.75rem] bg-[#17120E] p-3 text-center text-base-100">
-                        <img src="/award/{{ $img }}.avif" alt="{{ $title }} trophy" loading="lazy" class="mx-auto h-28 w-auto max-w-full object-contain drop-shadow-[0_16px_16px_rgb(0_0_0_/_.5)]">
+                    <li class="rounded-[1.75rem] border border-base-300 bg-base-200 p-3 text-center text-base-content">
+                        <img src="/award/{{ $img }}.avif" alt="{{ $title }} trophy" loading="lazy" class="mx-auto h-28 w-auto max-w-full object-contain drop-shadow-[0_8px_12px_rgb(31_27_22_/_.15)]">
                         <h3 class="mt-3 font-heading text-lg leading-tight">{{ $title }}</h3>
-                        <p class="mt-1 text-[13px] leading-snug text-base-100/70">{{ $blurb }}</p>
+                        <p class="mt-1 text-[13px] leading-snug text-base-content/75">{{ $blurb }}</p>
                     </li>
                 @endforeach
             </ul>

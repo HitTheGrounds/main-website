@@ -29,7 +29,7 @@
                         <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Special Situations
                     </a>
                     <a href="#finals" data-spy="finals" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
-                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Finals - Special Rules
+                        <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>Semi-finals and Finals - Special Rules
                     </a>
                     <a href="#general" data-spy="general" class="group flex items-center gap-3 py-1.5 text-sm font-semibold text-base-content/60 transition-colors duration-300 hover:text-base-content aria-[current=true]:text-base-content">
                         <span class="size-1.5 shrink-0 bg-primary opacity-0 transition-opacity duration-300 group-aria-[current=true]:opacity-100"></span>General Regulations
@@ -48,7 +48,7 @@
                         <a href="#bowling" data-spy="bowling" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Bowling Rules</a>
                         <a href="#fielding-wides" data-spy="fielding-wides" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Fielding and Wide Rules</a>
                         <a href="#special-situations" data-spy="special-situations" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Special Situations</a>
-                        <a href="#finals" data-spy="finals" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Finals - Special Rules</a>
+                        <a href="#finals" data-spy="finals" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Semi-finals and Finals - Special Rules</a>
                         <a href="#general" data-spy="general" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">General Regulations</a>
                         <a href="#umpire" data-spy="umpire" class="shrink-0 snap-start whitespace-nowrap rounded-full border-2 border-base-content/20 px-4 py-2 text-sm font-semibold text-base-content transition-colors duration-300 aria-[current=true]:border-base-content aria-[current=true]:bg-secondary aria-[current=true]:text-secondary-content">Umpire Authority</a>
                         </div>
@@ -64,20 +64,26 @@
           <div class="lg:col-span-7 divide-y divide-base-300">
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Overs and Deliveries</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">Each match consists of <span class="font-bold text-primary-ink">five overs</span>, with each over comprising <span class="font-bold text-primary-ink">four legal deliveries</span>.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">Each group-stage match consists of <span class="font-bold text-primary-ink">five overs</span>, with each over comprising <span class="font-bold text-primary-ink">four legal deliveries</span>.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">The tournament committee reserves the right to modify the number of balls per over in the later stages of the tournament.</p>
             </div>
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Team Size</h3>
               <ul class="mt-3 space-y-2 text-base-content/80 leading-relaxed">
                 <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>Every team must have a squad of <span class="font-bold text-primary-ink">12 players</span> (9 male, 3 female).</span></li>
                 <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>The playing team will consist of <span class="font-bold text-primary-ink">8 players</span>.</span></li>
-                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>11 players can be chosen for one match, where any 8 can be active on the field at a time.</span></li>
-                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>Out of the 8 active players in any innings, at least 2 must be female.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>11 players can be chosen for one match, with only 8 active on the field at a time. The 8 players for each innings must be selected from the named 11.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>At all times, the fielding side must consist of 2 female players and 6 male players.</span></li>
               </ul>
             </div>
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Player Substitution</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">The players chosen to bat and those chosen to bowl may be different, but once an innings begins, no changes to the selected players are allowed.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">The players chosen to bat and those chosen to bowl may be different, but all must come from the named 11. Once an innings begins, no changes to the selected 8 players are allowed, except for injury substitutions as described below.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">Substitutions are only allowed in the event of injury and must be like-for-like (female for female, male for male), with the umpire's approval.</p>
+            </div>
+            <div class="py-5">
+              <h3 class="font-semibold text-lg text-base-content">Subsequent Overs</h3>
+              <p class="mt-2 text-base-content/80 leading-relaxed">After the first over, male players will bat. The fielding side must consist of 6 male players and 2 female players. The exception allowing remaining female players to bat after all male players are dismissed is explained under Special Situations.</p>
             </div>
           </div>
         </section>
@@ -139,11 +145,11 @@
               <ul class="mt-3 space-y-4">
                 <li class="flex items-center gap-4">
                   <img src="/images/rulebook_illustrations/orange/no_ball_height.avif" alt="Height No-Ball" class="size-16 shrink-0 ">
-                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Over-height no-balls</span> judged at chest height. Bouncers are no-balls.</span>
+                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Over-height no-balls</span> judged at chest height. Only one bouncer per over is permitted; any subsequent bouncers will be called no-balls.</span>
                 </li>
                 <li class="flex items-center gap-4">
                   <img src="/images/rulebook_illustrations/orange/no_ball_foot.avif" alt="Foot No-Ball" class="size-16 shrink-0 ">
-                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Front-foot no-ball</span> called if foot lands beyond popping crease.</span>
+                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Front-foot no-ball</span> called if the bowler's leading foot lands completely beyond the popping crease.</span>
                 </li>
                 <li class="flex gap-3 text-base-content/80 italic"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>No free hits will be awarded for no-balls</span></li>
               </ul>
@@ -166,6 +172,7 @@
               <ul class="mt-3 space-y-2 text-base-content/80 leading-relaxed">
                 <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>For right-handed batters, the <span class="font-bold text-primary-ink">leg side relative to their stance will always be treated as wide</span>.</span></li>
                 <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>For left-handed batters, the opposite applies.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>A fixed crease mark on the off side determines the wide-ball limit. Any ball passing beyond this mark on the off side will be called a wide.</span></li>
               </ul>
             </div>
             <div class="py-5">
@@ -194,28 +201,38 @@
             </div>
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Match Tie</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">If a match concludes with both teams scoring the same number of runs, <span class="font-bold text-primary-ink">each team will be awarded one point</span>.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">If a group-stage match ends in a tie or is declared abandoned, <span class="font-bold text-primary-ink">each team will be awarded one point</span>. Ties in the semi-finals and final are decided under the Super Over rules below.</p>
+            </div>
+            <div class="py-5">
+              <h3 class="font-semibold text-lg text-base-content">Group-stage Rankings</h3>
+              <p class="mt-2 text-base-content/80 leading-relaxed">Net Run Rate (NRR) will be used to rank teams during the group stage when two or more teams have equal points.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">NRR = (total runs scored / total overs faced) - (total runs conceded / total overs bowled).</p>
+            </div>
+            <div class="py-5">
+              <h3 class="font-semibold text-lg text-base-content">Rain and Interruptions</h3>
+              <p class="mt-2 text-base-content/80 leading-relaxed">If a match is interrupted by rain or other unavoidable circumstances, the number of overs may be reduced.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">If the interruption occurs during the second innings, the DLS method will be applied after at least 2 overs have been bowled to calculate the revised target and par score.</p>
             </div>
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Time Wasting</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">Any attempt at deliberately wasting time, as judged by the umpire, will result in a penalty.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">Any attempt at deliberately wasting time, as judged by the umpire, will result in a <span class="font-bold text-primary-ink">one-point penalty</span>.</p>
             </div>
           </div>
         </section>
 
         <section id="finals" class="scroll-mt-36 lg:scroll-mt-28 border-t-2 border-base-content pt-8 grid lg:grid-cols-12 gap-8 lg:gap-14" data-aos="fade-up">
           <div class="lg:col-span-5 lg:sticky lg:top-28 self-start">
-            <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Finals - Special Rules</h2>
+            <h2 class="font-heading text-3xl sm:text-4xl text-base-content">Semi-finals and Finals - Special Rules</h2>
             <img src="/images/rulebook_illustrations/orange/header_finals.avif" alt="Finals" class="mt-6 w-full max-w-md h-auto ">
           </div>
           <div class="lg:col-span-7 divide-y divide-base-300">
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Extended Overs</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">Matches in the finals will consist of <span class="font-bold text-primary-ink">five overs</span>, with each over comprising <span class="font-bold text-primary-ink">six deliveries</span> (instead of four).</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">Matches in the semi-finals and final will consist of <span class="font-bold text-primary-ink">five overs</span>, with each over comprising <span class="font-bold text-primary-ink">six deliveries</span> (instead of four).</p>
             </div>
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Super Over</h3>
-              <p class="mt-2 text-base-content/80 leading-relaxed">If both teams finish with the same score in the finals, the winner will be determined through a <span class="font-bold text-primary-ink">super over</span>.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">If both teams finish with the same score in the semi-finals or final, the winner will be decided by a <span class="font-bold text-primary-ink">Super Over consisting of six deliveries</span>. If the Super Over also results in a tie, the winner will be determined by a <span class="font-bold text-primary-ink">coin toss</span>.</p>
             </div>
           </div>
         </section>
@@ -244,6 +261,7 @@
             <div class="py-5">
               <h3 class="font-semibold text-lg text-base-content">Rule Amendments</h3>
               <p class="mt-2 text-base-content/80 leading-relaxed">The tournament committee retains the right to amend any rules before the commencement of league, semi-final, or final rounds.</p>
+              <p class="mt-2 text-base-content/80 leading-relaxed">The match structure will be adjusted according to the situation.</p>
             </div>
           </div>
         </section>

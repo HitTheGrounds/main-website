@@ -77,9 +77,17 @@ new class extends Component {
 }; ?>
 
 <div>
-    <div class="card bg-base-100 border-base-300 border-2">
+    <div class="card bg-base-100 border border-base-300 shadow-xs">
         <div class="card-body">
-            <h2 class="card-title">Edit Company Details</h2>
+            <div class="flex items-center gap-2.5">
+                <div class="rounded-lg bg-primary/10 p-2 text-primary-ink">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                    </svg>
+                </div>
+                <h2 class="card-title text-base font-bold text-base-content">Edit Company Details</h2>
+            </div>
+            <hr class="border-base-300 my-3">
 
             <form wire:submit="updateCompany" class="space-y-4">
                 <!-- Company Name -->
@@ -158,7 +166,14 @@ new class extends Component {
                 <label class="label">
                     <span class="label-text font-medium">Description (Markdown supported)</span>
                 </label>
-                <x-mary-markdown wire:model="description" label="" />
+                <x-mary-markdown wire:model="description" label="" :config="[
+                    'uploadImage' => false,
+                    'toolbar' => [
+                        'heading', 'bold', 'italic', 'strikethrough', '|',
+                        'code', 'quote', 'unordered-list', 'ordered-list', 'horizontal-rule', '|',
+                        'link', 'table', '|', 'preview', 'side-by-side',
+                    ],
+                ]" />
                 @error('description')
                     <label class="label">
                         <span class="label-text-alt text-error">{{ $message }}</span>

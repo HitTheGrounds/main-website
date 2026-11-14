@@ -2,6 +2,8 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Helpers\CompanyAuth;
+use App\Services\Tournament\RosterProtectionService;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -85,13 +87,10 @@ new class extends Component {
 
     public function deleteMember(int $id): void
     {
-        $member = TeamMember::find($id);
-        if ($member && $member->team_id === $this->team->id) {
-            // Delete picture if exists
-            if ($member->picture) {
-                Storage::disk('public')->delete($member->picture);
-            }
-            $member->delete();
+        $this->resetErrorBag('team');
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
+        if (app(RosterProtectionService::class)->deleteMember($this->team->id, $id, $user, asAdmin: true)) {
             $this->team->refresh();
         }
     }
@@ -104,6 +103,9 @@ new class extends Component {
 }; ?>
 
 <div>
+    @error('team')
+        <div role="alert" class="alert alert-error mb-4">{{ $message }}</div>
+    @enderror
     <div class="flex justify-between items-center mb-4">
         <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>
         <button wire:click="openAddModal" class="btn btn-primary btn-sm" {{ $team->members->count() >= 12 ? 'disabled' : '' }}>

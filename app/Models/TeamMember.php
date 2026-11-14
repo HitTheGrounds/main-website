@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Tournament\RosterProtectionService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,22 @@ class TeamMember extends Model
     protected $casts = [
         'is_captain' => 'boolean',
     ];
+
+    public function save(array $options = [])
+    {
+        // Existing forms do not move players. Guard model-based reassignment too,
+        // without changing ordinary registration, name, gender, or picture edits.
+        if (! $this->exists || ! $this->isDirty('team_id')) {
+            return parent::save($options);
+        }
+
+        return $this->getConnection()->transaction(function () use ($options) {
+            $member = static::whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+            app(RosterProtectionService::class)->assertMemberUnreferenced($member);
+
+            return parent::save($options);
+        });
+    }
 
     public function team(): BelongsTo
     {

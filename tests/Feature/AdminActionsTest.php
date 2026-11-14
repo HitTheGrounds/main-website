@@ -94,6 +94,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_delete_a_team_and_its_members(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create();
         TeamMember::factory()->count(3)->create(['team_id' => $team->id]);
 

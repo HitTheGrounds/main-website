@@ -2,6 +2,8 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Helpers\CompanyAuth;
+use App\Services\Tournament\RosterProtectionService;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -163,18 +165,15 @@ new class extends Component {
 
     public function deleteMember(int $id): void
     {
+        $this->resetErrorBag('team');
         // Check if team is locked
         if ($this->team->locked) {
             return;
         }
 
-        $member = TeamMember::find($id);
-        if ($member && $member->team_id === $this->team->id) {
-            // Delete picture if exists
-            if ($member->picture) {
-                Storage::disk('public')->delete($member->picture);
-            }
-            $member->delete();
+        $user = CompanyAuth::user();
+        abort_unless($user && $this->team->user_id === $user->id, 403);
+        if (app(RosterProtectionService::class)->deleteMember($this->team->id, $id, $user)) {
             $this->team->refresh();
             $this->dispatch("team-members-updated.{$this->team->id}");
         }
@@ -182,6 +181,9 @@ new class extends Component {
 }; ?>
 
 <div>
+    @error('team')
+        <div role="alert" class="alert alert-error mb-4">{{ $message }}</div>
+    @enderror
     <div class="card bg-base-100 border border-base-300 shadow-xs">
         <div class="card-body">
             <div class="flex justify-between items-center">

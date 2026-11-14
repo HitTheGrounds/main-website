@@ -105,4 +105,44 @@ class CsrfProtectionTest extends TestCase
         $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
         $this->assertTrue($team->fresh()->approved);
     }
+
+    public function test_real_scorer_account_creation_and_revocation_require_csrf(): void
+    {
+        $this->enforceCsrf();
+        config(['tournament.enabled' => true]);
+        \Illuminate\Support\Facades\Route::middleware('web')->group(base_path('routes/tournament.php'));
+        \Illuminate\Support\Facades\Route::getRoutes()->refreshNameLookups();
+        $this->signedIn(User::factory()->create(['is_admin' => true]))
+            ->withSession(['_token' => 'test-csrf-token']);
+        $html = $this->get('/admin/tournament/scorers')->assertOk()->getContent();
+        preg_match_all('/wire:snapshot="([^"]+)"/', $html, $matches);
+        $snapshot = null;
+        foreach ($matches[1] as $encoded) {
+            $decoded = html_entity_decode($encoded, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (json_decode($decoded, true)['memo']['name'] === 'admin.scorer-accounts-manager') {
+                $snapshot = $decoded;
+                break;
+            }
+        }
+        $this->assertNotNull($snapshot);
+        $payload = ['components' => [[
+            'snapshot' => $snapshot, 'updates' => ['name' => 'CSRF scorer', 'email' => 'csrf-scorer@example.com'],
+            'calls' => [['path' => '', 'method' => 'createScorer', 'params' => []]],
+        ]]];
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertStatus(419);
+        $this->assertDatabaseMissing('users', ['email' => 'csrf-scorer@example.com']);
+        $payload['_token'] = 'test-csrf-token';
+        $response = $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $scorer = User::where('email', 'csrf-scorer@example.com')->firstOrFail();
+        $this->assertTrue($scorer->is_scorer);
+        $payload = ['components' => [[
+            'snapshot' => $response->json('components.0.snapshot'), 'updates' => [],
+            'calls' => [['path' => '', 'method' => 'revokeScorer', 'params' => [$scorer->id]]],
+        ]]];
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertStatus(419);
+        $this->assertTrue($scorer->fresh()->is_scorer);
+        $payload['_token'] = 'test-csrf-token';
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $this->assertFalse($scorer->fresh()->is_scorer);
+    }
 }

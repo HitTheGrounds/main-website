@@ -55,6 +55,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'jwt_expires_at' => 'datetime',
             'is_admin' => 'boolean',
+            'is_scorer' => 'boolean',
         ];
     }
 

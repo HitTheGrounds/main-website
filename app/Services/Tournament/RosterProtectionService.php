@@ -118,7 +118,7 @@ class RosterProtectionService
 
     private function authorize(Team $team, User $actor, bool $asAdmin): void
     {
-        abort_unless($asAdmin ? $actor->is_admin : $team->user_id === $actor->id, 403);
+        abort_unless($asAdmin ? $actor->is_admin : (! $actor->is_scorer && $team->user_id === $actor->id), 403);
     }
 
     private function protect(callable $operation): mixed

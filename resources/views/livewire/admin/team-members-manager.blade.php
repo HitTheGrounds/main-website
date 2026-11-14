@@ -21,12 +21,16 @@ new class extends Component {
 
     public function openAddModal(): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $this->reset('member_name', 'gender', 'is_captain', 'editingId');
         $this->showModal = true;
     }
 
     public function openEditModal(int $id): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $member = TeamMember::find($id);
         if ($member && $member->team_id === $this->team->id) {
             $this->editingId = $id;
@@ -39,6 +43,8 @@ new class extends Component {
 
     public function saveMember(): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         // Check member limit for new members
         if (!$this->editingId && $this->team->members()->count() >= 12) {
             $this->addError('member_name', 'Team can only have up to 12 members.');

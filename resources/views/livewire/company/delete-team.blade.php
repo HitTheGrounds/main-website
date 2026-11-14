@@ -12,6 +12,7 @@ new class extends Component {
     {
         $this->resetErrorBag('team');
         $user = CompanyAuth::user();
+        abort_if($user?->is_scorer, 403);
 
         if (!$user || $this->team->user_id !== $user->id) {
             $this->redirect(route('company.teams'), navigate: true);

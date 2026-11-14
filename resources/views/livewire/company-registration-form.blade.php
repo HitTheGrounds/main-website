@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Helpers\CompanyAuth;
 use App\Support\IpThrottle;
 use App\Models\Company;
 use App\Models\VerificationCode;
@@ -174,7 +175,7 @@ new class extends Component {
         cookie()->queue('company_token', $token, config('app.jwt_ttl'), '/', null, $secure, true, false, 'strict');
 
         // Redirect to dashboard
-        $this->redirect('/company/dashboard', navigate: true);
+        $this->redirect(route(CompanyAuth::dashboardRoute($user), absolute: false), navigate: true);
     }
 }; ?>
 

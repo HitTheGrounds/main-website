@@ -31,27 +31,18 @@
     <!-- CTA Button -->
     <div class="navbar-end">
       @php
-        $token = request()->cookie('company_token');
-        $user = null;
-        $isAdmin = false;
-
-        if ($token) {
-            $jwtService = new App\Services\JWTService();
-            $user = $jwtService->getUserFromToken($token);
-            if ($user) {
-                $isAdmin = $user->is_admin == true;
-            }
-        }
+        $user = App\Helpers\CompanyAuth::user();
+        $isAdmin = $user?->is_admin === true;
       @endphp
 
       @if($user)
         @if($isAdmin)
-          <a href="{{ route('admin.dashboard') }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+          <a href="{{ route(App\Helpers\CompanyAuth::dashboardRoute($user)) }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
             <span class="hidden sm:inline">Admin Dashboard</span>
             <span class="sm:hidden">Admin</span>
           </a>
         @else
-          <a href="{{ route('company.dashboard') }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
+          <a href="{{ route(App\Helpers\CompanyAuth::dashboardRoute($user)) }}" class="btn btn-primary rounded-full btn-sm sm:btn-md text-xs sm:text-sm md:text-base">
             <span class="hidden sm:inline">Dashboard</span>
             <span class="sm:hidden">Dashboard</span>
           </a>

@@ -34,6 +34,42 @@ class ConsoleCommandsTest extends TestCase
         $this->artisan('user:set-admin', ['email' => 'nobody@example.com'])->assertExitCode(1);
     }
 
+    public function test_set_admin_rejects_scorers_without_changing_any_account_fields(): void
+    {
+        config(['tournament.enabled' => false]);
+        foreach ([false, true] as $admin) {
+            $user = User::factory()->create(['company_id' => null, 'is_admin' => $admin]);
+            $user->is_scorer = true;
+            $user->save();
+            $before = $user->fresh()->getAttributes();
+            $this->artisan('user:set-admin', ['email' => $user->email])
+                ->expectsOutput('Cannot promote scorer accounts to admin. Use a separate admin account.')
+                ->assertExitCode(1);
+            $this->assertSame($before, $user->fresh()->getAttributes());
+        }
+    }
+
+    public function test_set_admin_can_revoke_an_ambiguous_scorer_admin_combination(): void
+    {
+        $user = User::factory()->create(['company_id' => null, 'is_admin' => true]);
+        $user->is_scorer = true;
+        $user->save();
+        $this->artisan('user:set-admin', ['email' => $user->email, '--revoke' => true])->assertExitCode(0);
+        $this->assertFalse($user->fresh()->is_admin);
+        $this->assertTrue($user->fresh()->is_scorer);
+        $this->assertNull($user->fresh()->company_id);
+    }
+
+    public function test_set_admin_preserves_existing_company_associations(): void
+    {
+        $company = \App\Models\Company::factory()->create();
+        $user = User::factory()->create(['company_id' => $company->id, 'is_admin' => true]);
+        $this->artisan('user:set-admin', ['email' => $user->email])->assertExitCode(0);
+        $this->assertTrue($user->fresh()->is_admin);
+        $this->assertSame($company->id, $user->fresh()->company_id);
+        $this->assertFalse($user->fresh()->is_scorer);
+    }
+
     public function test_cleanup_deletes_only_expired_and_used_codes(): void
     {
         $user = User::factory()->create();

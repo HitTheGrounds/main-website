@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Company;
+use App\Helpers\CompanyAuth;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
 
@@ -26,6 +27,7 @@ new class extends Component {
 
     public function updateCompany(): void
     {
+        $this->authorizeCompanyOwner();
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -39,8 +41,8 @@ new class extends Component {
 
         if ($this->logo) {
             // Delete old logo if exists
-            if ($this->existingLogo) {
-                \Storage::disk('public')->delete($this->existingLogo);
+            if ($this->company->logo) {
+                \Storage::disk('public')->delete($this->company->logo);
             }
             $data['logo'] = $this->logo->store('company-logos', 'public');
             $this->existingLogo = $data['logo'];
@@ -53,6 +55,7 @@ new class extends Component {
 
     public function openDescriptionModal(): void
     {
+        $this->authorizeCompanyOwner();
         $this->showDescriptionModal = true;
     }
 
@@ -63,6 +66,7 @@ new class extends Component {
 
     public function updateDescription(): void
     {
+        $this->authorizeCompanyOwner();
         $validated = $this->validate([
             'description' => ['nullable', 'string', 'max:5000'],
         ]);
@@ -73,6 +77,13 @@ new class extends Component {
 
         $this->closeDescriptionModal();
         $this->dispatch('company-updated');
+    }
+
+    private function authorizeCompanyOwner(): void
+    {
+        $user = CompanyAuth::user();
+        $this->company->refresh();
+        abort_unless($user && !$user->is_scorer && $user->company_id === $this->company->id, 403);
     }
 }; ?>
 

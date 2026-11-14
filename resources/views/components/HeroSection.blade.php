@@ -1,15 +1,6 @@
 @php
-  $token = request()->cookie('company_token');
-  $user = null;
-  $isAdmin = false;
-
-  if ($token) {
-      $jwtService = new App\Services\JWTService();
-      $user = $jwtService->getUserFromToken($token);
-      if ($user) {
-          $isAdmin = $user->is_admin == true;
-      }
-  }
+  $user = App\Helpers\CompanyAuth::user();
+  $isAdmin = $user?->is_admin === true;
 @endphp
 
 <section class="relative overflow-hidden bg-base-100 min-h-[calc(100dvh-5rem)] flex items-center">
@@ -30,7 +21,7 @@
 
       <div class="reveal reveal-d3 mt-9 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
         @if($user)
-          <a href="{{ $isAdmin ? route('admin.dashboard') : route('company.dashboard') }}" class="btn-island btn-island-solid group justify-between sm:justify-start">
+          <a href="{{ route(App\Helpers\CompanyAuth::dashboardRoute($user)) }}" class="btn-island btn-island-solid group justify-between sm:justify-start">
             {{ $isAdmin ? 'Admin Dashboard' : 'Dashboard' }}
             <span class="btn-dot"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </a>

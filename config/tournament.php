@@ -10,6 +10,9 @@ return [
 
     'timezone' => 'Asia/Colombo',
 
+    // Shared by scorer mutation actions, in addition to the existing network limit.
+    'writes_per_minute' => 30,
+
     // Creation defaults only; the scorer selects four or six for each match.
     'default_balls_per_over' => [
         'group' => 4,

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Team;
+use App\Helpers\CompanyAuth;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -11,6 +12,8 @@ new class extends Component {
 
     public function approveTeam(int $teamId): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $team = Team::findOrFail($teamId);
         $team->update(['approved' => true]);
 
@@ -19,6 +22,8 @@ new class extends Component {
 
     public function toggleLock(int $teamId): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $team = Team::findOrFail($teamId);
         $team->update(['locked' => !$team->locked]);
 

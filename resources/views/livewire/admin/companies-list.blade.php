@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Company;
+use App\Helpers\CompanyAuth;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -19,6 +20,8 @@ new class extends Component {
 
     public function updateMaxTeamCount($companyId)
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $this->validate([
             'maxTeamCount' => 'required|integer|min:0|max:100',
         ]);

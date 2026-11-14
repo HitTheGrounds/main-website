@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Helpers\CompanyAuth;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -11,7 +12,14 @@ new class extends Component {
 
     public function promoteToAdmin(int $userId): void
     {
+        $actor = CompanyAuth::user();
+        abort_unless($actor && $actor->is_admin, 403);
         $user = User::findOrFail($userId);
+
+        if ($user->is_scorer) {
+            $this->dispatch('error', message: 'Cannot promote scorer accounts to admin. Use a separate admin account.');
+            return;
+        }
 
         // Only promote users without a company
         if ($user->company_id) {
@@ -75,12 +83,16 @@ new class extends Component {
                                 <td>
                                     @if($user->is_admin)
                                         <span class="badge badge-primary badge-sm">Admin</span>
+                                    @elseif($user->is_scorer)
+                                        <span class="badge badge-ghost badge-sm">Scorer</span>
                                     @else
                                         <span class="badge badge-ghost badge-sm">User</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if(!$user->company_id)
+                                    @if($user->is_scorer)
+                                        <span class="text-xs text-base-content/50">Scorer account</span>
+                                    @elseif(!$user->company_id)
                                         @if($user->is_admin)
                                             <span class="text-xs text-base-content/50">—</span>
                                         @else

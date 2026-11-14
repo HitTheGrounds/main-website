@@ -18,6 +18,7 @@ new class extends Component {
     public function save(): void
     {
         $user = CompanyAuth::user();
+        abort_if($user?->is_scorer, 403);
 
         if (!$user) {
             $this->redirect(route('login'), navigate: true);

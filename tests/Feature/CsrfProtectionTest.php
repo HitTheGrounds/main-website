@@ -54,6 +54,30 @@ class CsrfProtectionTest extends TestCase
         $this->assertNull($user->fresh()->jwt_token);
     }
 
+    public function test_real_group_creation_requires_csrf(): void
+    {
+        $this->enforceCsrf();
+        config(['tournament.enabled' => true]);
+        \Illuminate\Support\Facades\Route::middleware('web')->group(base_path('routes/tournament.php'));
+        \Illuminate\Support\Facades\Route::getRoutes()->refreshNameLookups();
+        $scorer = User::factory()->create(['company_id' => null, 'is_admin' => false]);
+        $scorer->is_scorer = true;
+        $scorer->save();
+        $this->signedIn($scorer)->withSession(['_token' => 'test-csrf-token']);
+        $html = $this->get('/scorer/groups')->assertOk()->getContent();
+        preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
+        $snapshot = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $payload = ['components' => [[
+            'snapshot' => $snapshot, 'updates' => ['newGroupName' => 'CSRF group'],
+            'calls' => [['path' => '', 'method' => 'createGroup', 'params' => []]],
+        ]]];
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertStatus(419);
+        $this->assertDatabaseCount('tournament_groups', 0);
+        $payload['_token'] = 'test-csrf-token';
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $this->assertDatabaseHas('tournament_groups', ['name' => 'CSRF group']);
+    }
+
     public function test_real_livewire_admin_mutation_requires_csrf(): void
     {
         $this->enforceCsrf();

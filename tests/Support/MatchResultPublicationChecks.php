@@ -4,6 +4,8 @@ namespace Tests\Support;
 
 use App\Models\Company;
 use App\Models\GroupTeam;
+use App\Models\PlayerMatchStat;
+use App\Models\PlayerTournamentStat;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\TournamentGroup;
@@ -12,6 +14,8 @@ use App\Models\User;
 use App\Services\Tournament\GroupStandingsCalculator;
 use App\Services\Tournament\MatchResultService;
 use App\Services\Tournament\MatchSchedulingService;
+use App\Services\Tournament\PlayerPublicationService;
+use App\Services\Tournament\PlayerStatsService;
 use App\Services\Tournament\TournamentGroupService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -290,31 +294,147 @@ trait MatchResultPublicationChecks
         $this->assertSame($before, $match->fresh()->getAttributes());
     }
 
-    public static function blockedResultDependencies(): array
-    {
-        return [['player marker'], ['published player'], ['knockout']];
-    }
-
-    #[DataProvider('blockedResultDependencies')]
-    public function test_publication_waits_for_unimplemented_player_and_bracket_dependencies(string $dependency): void
+    public function test_publication_waits_for_unimplemented_bracket_dependencies(): void
     {
         $match = $this->resultFixture();
         $this->resultService()->saveDraft(2026, $match->id, 1, $this->resultInput($match));
-        if ($dependency === 'player marker') {
-            DB::table('matches')->where('id', $match->id)->update(['player_stats_published_at' => now()]);
-        } elseif ($dependency === 'published player') {
-            $member = TeamMember::factory()->create(['team_id' => $match->team1_id]);
-            DB::table('player_match_stats')->insert(['match_id' => $match->id, 'team_id' => $match->team1_id,
-                'team_member_id' => $member->id, 'record_state' => 'published', 'pending_action' => null,
-                'published_at' => now(), 'player_name' => $member->name, 'player_gender' => $member->gender]);
-        } else {
-            DB::table('matches')->insert(['tournament_year' => 2026, 'stage' => 'QF', 'bracket_position' => 1,
-                'team1_id' => $match->team1_id, 'team2_id' => $match->team2_id, 'balls_per_over' => 4]);
-        }
+        DB::table('matches')->insert(['tournament_year' => 2026, 'stage' => 'QF', 'bracket_position' => 1,
+            'team1_id' => $match->team1_id, 'team2_id' => $match->team2_id, 'balls_per_over' => 4]);
         $before = $match->fresh()->getAttributes();
         $review = $this->resultService()->review(2026, $match->id);
         $this->resultRejected(fn () => $this->resultService()->publish(2026, $match->id, $review['version'], $review['draft_hash']));
         $this->assertSame($before, $match->fresh()->getAttributes());
+    }
+
+    private function resultWithPublishedPlayers(): array
+    {
+        $match = $this->resultFixture();
+        $match = $this->reviewedPublish($match, $this->resultInput($match));
+        $members = [];
+        foreach ([$match->team1_id, $match->team2_id] as $teamId) {
+            $member = TeamMember::factory()->create(['team_id' => $teamId]);
+            $members[] = $member;
+            app(PlayerStatsService::class)->saveDraft(2026, $match->id, $teamId, $member->id,
+                ['draft' => null, 'published' => null], ['runs_scored' => 30, 'dot_balls' => 0]);
+        }
+        $publisher = app(PlayerPublicationService::class);
+        $review = $publisher->review(2026, $match->id);
+        $match = $publisher->publish(2026, $match->id, $review['version'], $review['player_stats_revision'], $review['receipt']);
+        // One correction and one withdrawal remain drafts throughout result changes.
+        foreach ($members as $index => $member) {
+            $official = PlayerMatchStat::where('match_id', $match->id)->where('team_member_id', $member->id)->firstOrFail();
+            $expected = ['draft' => null, 'published' => ['id' => $official->id, 'version' => $official->version]];
+            if ($index === 0) {
+                app(PlayerStatsService::class)->saveDraft(2026, $match->id, $member->team_id, $member->id, $expected, ['runs_scored' => 99]);
+            } else {
+                app(PlayerStatsService::class)->stageWithdrawal(2026, $match->id, $member->team_id, $member->id, $expected);
+            }
+        }
+
+        return [$match->fresh(), $members];
+    }
+
+    public static function excludedPlayerOutcomes(): array
+    {
+        return [['abandoned'], ['no_result']];
+    }
+
+    #[DataProvider('excludedPlayerOutcomes')]
+    public function test_result_exclusion_and_reinstatement_update_both_teams_without_publishing_player_drafts(string $outcome): void
+    {
+        [$match, $members] = $this->resultWithPublishedPlayers();
+        $sources = PlayerMatchStat::orderBy('id')->get()->map->getAttributes()->all();
+        $revision = $match->player_stats_revision;
+        $playerTime = $match->player_stats_published_at;
+        $excluded = ['result_type' => $outcome, 'result_note' => 'Committee correction'];
+        $this->resultService()->saveDraft(2026, $match->id, $match->version, $excluded);
+        $this->resultService()->review(2026, $match->id);
+        $this->assertDatabaseCount('player_tournament_stats', 2);
+        $match = $this->reviewedPublish($match, $excluded);
+        $this->assertDatabaseCount('player_tournament_stats', 0);
+        $this->assertSame(0, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->wins);
+        $this->assertSame($sources, PlayerMatchStat::orderBy('id')->get()->map->getAttributes()->all());
+        $match = $this->reviewedPublish($match, $this->resultInput($match));
+        foreach ($members as $member) {
+            $total = PlayerTournamentStat::where('team_member_id', $member->id)->firstOrFail();
+            $this->assertSame(30, $total->runs_scored);
+            $this->assertSame(30, $total->highest_score);
+            $this->assertSame(0, $total->dot_balls);
+            $this->assertNull($total->wickets_taken);
+        }
+        $this->assertSame(1, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->wins);
+        $this->assertSame($revision, $match->player_stats_revision);
+        $this->assertTrue($playerTime->equalTo($match->player_stats_published_at));
+        $this->assertSame($sources, PlayerMatchStat::orderBy('id')->get()->map->getAttributes()->all());
+        $this->reviewedPublish($match, $this->resultInput($match));
+        $this->assertSame(60, (int) PlayerTournamentStat::sum('runs_scored'));
+    }
+
+    public static function failedPlayerEligibilityChanges(): array
+    {
+        return [['exclude'], ['restore']];
+    }
+
+    #[DataProvider('failedPlayerEligibilityChanges')]
+    public function test_failed_player_recalculation_rolls_back_result_standings_and_drafts(string $direction): void
+    {
+        [$match] = $this->resultWithPublishedPlayers();
+        $excluded = ['result_type' => 'no_result', 'result_note' => 'Committee correction'];
+        if ($direction === 'restore') {
+            $match = $this->reviewedPublish($match, $excluded);
+        }
+        $this->resultService()->saveDraft(2026, $match->id, $match->fresh()->version,
+            $direction === 'restore' ? $this->resultInput($match) : $excluded);
+        $review = $this->resultService()->review(2026, $match->id);
+        $tables = ['matches', 'tournament_groups', 'group_teams', 'player_match_stats', 'player_tournament_stats'];
+        $before = [];
+        foreach ($tables as $table) {
+            $before[$table] = DB::table($table)->orderBy('id')->get()->toJson();
+        }
+        $event = 'eloquent.'.($direction === 'restore' ? 'created' : 'deleted').': '.PlayerTournamentStat::class;
+        Event::listen($event, fn () => throw new RuntimeException('Synthetic eligibility failure'));
+        try {
+            $this->resultService()->publish(2026, $match->id, $review['version'], $review['draft_hash']);
+            $this->fail('Expected rollback.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Synthetic eligibility failure', $exception->getMessage());
+        } finally {
+            Event::forget($event);
+        }
+        foreach ($tables as $table) {
+            $this->assertSame($before[$table], DB::table($table)->orderBy('id')->get()->toJson(), $table);
+        }
+        $this->resultService()->publish(2026, $match->id, $review['version'], $review['draft_hash']);
+        $this->assertDatabaseCount('player_tournament_stats', $direction === 'restore' ? 2 : 0);
+    }
+
+    public function test_finished_status_reversal_with_published_players_is_still_blocked_without_changing_totals(): void
+    {
+        [$match] = $this->resultWithPublishedPlayers();
+        $before = PlayerTournamentStat::orderBy('id')->get()->map->getAttributes()->all();
+        foreach (['live', 'upcoming'] as $status) {
+            $this->resultRejected(fn () => app(MatchSchedulingService::class)
+                ->updateSchedule(2026, $match->id, $match->version, ['status' => $status]), 'status');
+        }
+        $this->assertSame('finished', $match->fresh()->status);
+        $this->assertSame($before, PlayerTournamentStat::orderBy('id')->get()->map->getAttributes()->all());
+    }
+
+    public function test_eligible_result_correction_keeps_official_player_totals_and_invalidates_old_player_review(): void
+    {
+        [$match] = $this->resultWithPublishedPlayers();
+        $publisher = app(PlayerPublicationService::class);
+        $review = $publisher->review(2026, $match->id);
+        $before = PlayerTournamentStat::orderBy('id')->get()->map->getAttributes()->all();
+        $match = $this->reviewedPublish($match, array_replace($this->resultInput($match), [
+            'result_type' => 'tie', 'winner_id' => null, 'team2_runs' => 100,
+            'team2_overs' => 5, 'team2_wickets' => 3,
+        ]));
+        $this->assertSame($before, PlayerTournamentStat::orderBy('id')->get()->map->getAttributes()->all());
+        $this->assertSame(1, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->ties);
+        $this->resultRejected(fn () => $publisher->publish(2026, $match->id,
+            $review['version'], $review['player_stats_revision'], $review['receipt']), 'player');
+        $this->assertSame(2, PlayerMatchStat::where('record_state', 'draft')->count());
     }
 
     public function test_result_status_reversal_preserves_official_data_drafts_and_standings(): void

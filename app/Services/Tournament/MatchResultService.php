@@ -4,6 +4,7 @@ namespace App\Services\Tournament;
 
 use App\Helpers\CompanyAuth;
 use App\Models\GroupTeam;
+use App\Models\PlayerMatchStat;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
@@ -20,6 +21,7 @@ class MatchResultService
         private GroupStandingsCalculator $standings,
         private MatchResultDescription $descriptions,
         private MatchTransitionGuard $transitions,
+        private PlayerTotalsService $playerTotals,
     ) {}
 
     public function editor(int $year, int $matchId): array
@@ -114,6 +116,14 @@ class MatchResultService
             }
             $group->version++;
             $group->save();
+
+            // Official performances survive eligibility changes. Never promote
+            // corrections/withdrawals from the separate player draft workflow.
+            // Source rows precede summary rows in the shared lock order.
+            $playerIds = PlayerMatchStat::where('match_id', $match->id)
+                ->where('record_state', 'published')->orderBy('id')->lockForUpdate()
+                ->get(['id', 'team_member_id'])->pluck('team_member_id')->unique()->values()->all();
+            $this->playerTotals->recalculate($year, $playerIds);
 
             return $match->refresh();
         }, true);

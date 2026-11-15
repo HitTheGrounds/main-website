@@ -19,7 +19,7 @@ class MatchTransitionGuard
             || $match->result_published_at !== null || $match->result_type !== null
             || $match->winner_id !== null || $this->hasPublishedPlayers($match)) {
             // Do not clear results or derived data through a scheduling update.
-            // Tasks 6/7 must supply atomic totals and dependency handling first.
+            // Reopening still needs the explicit dependency handling in task 7.
             throw ValidationException::withMessages([
                 'status' => 'Published or finished results cannot change status through scheduling.',
             ]);
@@ -28,12 +28,6 @@ class MatchTransitionGuard
 
     public function assertResultPublication(TournamentMatch $match): void
     {
-        if ($this->hasPublishedPlayers($match)) {
-            throw ValidationException::withMessages([
-                'tournament' => 'This match has published player figures. Result corrections require the player-total integration first.',
-            ]);
-        }
-
         // Conservative temporary gate: task 7 replaces this with checks against
         // actual dependent fixtures. Never infer a bracket from table rankings.
         if (TournamentMatch::where('tournament_year', $match->tournament_year)

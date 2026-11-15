@@ -22,6 +22,8 @@
                 <a href="{{ route('scorer.groups.index') }}"
                    @if(request()->routeIs('scorer.groups.*')) aria-current="page" @endif
                    class="btn btn-sm {{ request()->routeIs('scorer.groups.*') ? 'btn-primary' : 'btn-ghost' }}">Group setup</a>
+                <a href="{{ route('scorer.standings') }}" @if(request()->routeIs('scorer.standings')) aria-current="page" @endif
+                   class="btn btn-sm {{ request()->routeIs('scorer.standings') ? 'btn-primary' : 'btn-ghost' }}">Group standings</a>
             </nav>
         </header>
         <main class="w-full p-4 sm:p-6">

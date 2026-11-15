@@ -17,7 +17,11 @@ use Illuminate\Validation\ValidationException;
 
 class MatchSchedulingService
 {
-    public function __construct(private TournamentWriteService $writes, private MatchStructureValidator $structure) {}
+    public function __construct(
+        private TournamentWriteService $writes,
+        private MatchStructureValidator $structure,
+        private MatchTransitionGuard $transitions,
+    ) {}
 
     public function listing(int $year, array $filters = []): LengthAwarePaginator
     {
@@ -119,13 +123,8 @@ class MatchSchedulingService
                 && ($match->structure_locked_at !== null || $match->result_published_at !== null)) {
                 $this->reject('batting_first_id', 'The batting-first team is locked after result publication.');
             }
-            if (isset($details['status']) && $details['status'] !== $match->status
-                && ($match->status === 'finished' || $match->structure_locked_at !== null
-                    || $match->result_published_at !== null || $match->player_stats_published_at !== null
-                    || $match->result_type !== null || $match->winner_id !== null)) {
-                // Later publication services must update standings/player totals
-                // and check downstream fixtures atomically before allowing this.
-                $this->reject('status', 'Published or finished results cannot change status through scheduling.');
+            if (isset($details['status'])) {
+                $this->transitions->assertScheduleStatusChange($match, $details['status']);
             }
             foreach ($details as $field => $value) {
                 $match->$field = $value;

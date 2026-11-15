@@ -11,6 +11,8 @@ Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'scorer'])
     ->prefix('scorer')->name('scorer.')->group(function () {
         Route::view('/dashboard', 'scorer.dashboard')->name('dashboard');
         Route::view('/groups', 'scorer.groups.index')->name('groups.index');
+        Route::view('/standings', 'scorer.standings')->name('standings');
+        Route::view('/matches/{matchId}/result', 'scorer.result')->whereNumber('matchId')->name('matches.result');
     });
 
 Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'admin'])

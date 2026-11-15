@@ -317,6 +317,50 @@ trait MatchResultPublicationChecks
         $this->assertSame($before, $match->fresh()->getAttributes());
     }
 
+    public function test_result_status_reversal_preserves_official_data_drafts_and_standings(): void
+    {
+        $match = $this->resultFixture();
+        $match = $this->reviewedPublish($match, $this->resultInput($match));
+        $match = $this->resultService()->saveDraft(2026, $match->id, $match->version, ['team1_runs' => 101]);
+        $before = $match->fresh()->getAttributes();
+        $standings = GroupTeam::orderBy('id')->get()->map->getAttributes()->all();
+        $group = TournamentGroup::findOrFail($match->group_id)->getAttributes();
+        foreach (['upcoming', 'live'] as $status) {
+            $this->resultRejected(fn () => app(MatchSchedulingService::class)
+                ->updateSchedule(2026, $match->id, $match->version, ['status' => $status, 'venue' => 'Must roll back']), 'status');
+            $this->assertSame($before, $match->fresh()->getAttributes());
+            $this->assertSame($standings, GroupTeam::orderBy('id')->get()->map->getAttributes()->all());
+            $this->assertSame($group, TournamentGroup::findOrFail($match->group_id)->getAttributes());
+        }
+    }
+
+    public function test_published_player_row_blocks_status_change_even_without_publication_marker(): void
+    {
+        $match = $this->resultFixture();
+        $member = TeamMember::factory()->create(['team_id' => $match->team1_id]);
+        DB::table('player_match_stats')->insert(['match_id' => $match->id, 'team_id' => $match->team1_id,
+            'team_member_id' => $member->id, 'record_state' => 'published', 'pending_action' => null,
+            'published_at' => now(), 'player_name' => $member->name, 'player_gender' => $member->gender]);
+        $before = $match->fresh()->getAttributes();
+        $players = DB::table('player_match_stats')->get()->all();
+        $this->resultRejected(fn () => app(MatchSchedulingService::class)
+            ->updateSchedule(2026, $match->id, $match->version, ['status' => 'live']), 'status');
+        $this->assertSame($before, $match->fresh()->getAttributes());
+        $this->assertEquals($players, DB::table('player_match_stats')->get()->all());
+        $updated = app(MatchSchedulingService::class)->updateSchedule(2026, $match->id, $match->version, ['venue' => 'Ground B']);
+        $this->assertSame('Ground B', $updated->venue);
+    }
+
+    public function test_other_year_knockout_does_not_block_current_year_result_publication(): void
+    {
+        $match = $this->resultFixture();
+        DB::table('matches')->insert(['tournament_year' => 2027, 'stage' => 'QF', 'bracket_position' => 1,
+            'team1_id' => $match->team1_id, 'team2_id' => $match->team2_id, 'balls_per_over' => 4]);
+        $published = $this->reviewedPublish($match, $this->resultInput($match));
+        $this->assertSame('finished', $published->status);
+        $this->assertSame(2, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->points);
+    }
+
     public function test_other_year_missing_ids_and_mutation_throttling_are_rejected(): void
     {
         $match = $this->resultFixture();
@@ -418,5 +462,45 @@ trait MatchResultPublicationChecks
         $this->resultRejected(fn () => $this->resultService()->saveDraft(2026, $match->id, $published->version,
             array_replace($this->resultInput($match), ['batting_first_id' => null])), 'batting_first_id');
         $this->assertNull($match->fresh()->draft_result);
+    }
+
+    public function test_seven_four_team_groups_publish_42_fixtures_with_real_pair_coverage(): void
+    {
+        $first = $this->resultFixture(4);
+        $groups = app(TournamentGroupService::class);
+        foreach (range('A', 'G') as $name) {
+            $group = $name === 'A' ? TournamentGroup::findOrFail($first->group_id) : $groups->create(2026, $name);
+            if ($name !== 'A') {
+                foreach (Team::factory()->count(4)->create(['approved' => true]) as $team) {
+                    $groups->assign(2026, $group->id, $group->fresh()->version, $team->id);
+                }
+            }
+            $ids = GroupTeam::where('group_id', $group->id)->orderBy('team_id')->pluck('team_id');
+            foreach (range(0, 2) as $a) {
+                foreach (range($a + 1, 3) as $b) {
+                    if ($name === 'A' && $a === 2 && $b === 3) {
+                        $coverage = collect(app(\App\Services\Tournament\ScorerStandingsService::class)->listing(2026))->firstWhere('id', $group->id)['coverage'];
+                        $this->assertSame(['expected' => 6, 'created' => 5, 'published' => 5, 'missing' => 1, 'unpublished' => 0, 'complete' => false], $coverage);
+                    }
+                    $match = $name === 'A' && $a === 0 && $b === 1 ? $first : app(MatchSchedulingService::class)->create(2026, $group->fresh()->version, [
+                        'stage' => 'G', 'group_id' => $group->id, 'team1_id' => $ids[$a], 'team2_id' => $ids[$b], 'balls_per_over' => $b % 2 === 0 ? 6 : 4,
+                    ]);
+                    $this->reviewedPublish($match, $this->resultInput($match));
+                }
+            }
+            foreach ($ids as $index => $id) {
+                $row = GroupTeam::where('team_id', $id)->firstOrFail();
+                $this->assertSame(3, $row->played);
+                $this->assertSame((3 - $index) * 2, $row->points);
+            }
+        }
+        $listing = app(\App\Services\Tournament\ScorerStandingsService::class)->listing(2026);
+        $this->assertCount(7, $listing);
+        $this->assertSame(42, array_sum(array_column(array_column($listing, 'coverage'), 'published')));
+        foreach ($listing as $group) {
+            $this->assertTrue($group['coverage']['complete']);
+        }
+        $this->assertDatabaseCount('matches', 42);
+        $this->assertDatabaseCount('group_teams', 28);
     }
 }

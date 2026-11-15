@@ -4,7 +4,6 @@ namespace App\Services\Tournament;
 
 use App\Helpers\CompanyAuth;
 use App\Models\GroupTeam;
-use App\Models\PlayerMatchStat;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
@@ -20,6 +19,7 @@ class MatchResultService
         private MatchResultValidator $validator,
         private GroupStandingsCalculator $standings,
         private MatchResultDescription $descriptions,
+        private MatchTransitionGuard $transitions,
     ) {}
 
     public function editor(int $year, int $matchId): array
@@ -27,7 +27,9 @@ class MatchResultService
         $match = $this->read($year, $matchId);
 
         return ['match_id' => $match->id, 'version' => $match->version,
-            'form' => $match->draft_result ?? $this->officialForm($match)];
+            'form' => $match->draft_result ?? $this->officialForm($match),
+            'has_draft' => $match->draft_result !== null,
+            'official' => $match->result_published_at === null ? null : $this->officialForm($match)];
     }
 
     /** A versioned full replacement draft, never a merge into official columns. */
@@ -75,7 +77,7 @@ class MatchResultService
             if (! is_array($match->draft_result) || ! hash_equals($this->digest($match->draft_result), $draftHash)) {
                 $this->reject('The saved result differs from your review. Review the latest draft before publishing.');
             }
-            $this->assertPublicationReady($year, $match);
+            $this->transitions->assertResultPublication($match);
             $result = $this->validator->validate($match, $match->draft_result);
             $this->description($match, $result); // Reject inconsistent descriptions before changing official data.
 
@@ -115,17 +117,6 @@ class MatchResultService
 
             return $match->refresh();
         }, true);
-    }
-
-    private function assertPublicationReady(int $year, TournamentMatch $match): void
-    {
-        if ($match->player_stats_published_at !== null
-            || PlayerMatchStat::where('match_id', $match->id)->where('record_state', 'published')->exists()) {
-            $this->reject('This match has published player figures. Result corrections require the player-total integration first.');
-        }
-        if (TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['QF', 'SF', 'F'])->exists()) {
-            $this->reject('Knockout matches depend on this tournament. Result changes require the bracket dependency checks first.');
-        }
     }
 
     private function mutate(int $year, int $matchId, int $version, callable $write, bool $publication = false): TournamentMatch

@@ -173,7 +173,7 @@ new class extends Component {
     <div class="space-y-2 text-center">
         <h1 class="text-2xl font-bold sm:text-3xl">Scorer dashboard</h1>
         <p class="text-sm text-base-content/70">Tournament {{ $year }}: create matches and manage their schedules.</p>
-        <p class="text-sm text-base-content/70">Result entry and knockout scheduling are not available yet.</p>
+        <p class="text-sm text-base-content/70">Enter team results below. Knockout scheduling and player entry are not available yet.</p>
         <p wire:loading role="status" class="text-sm">Loading match details...</p>
     </div>
     <div aria-live="polite">
@@ -241,7 +241,8 @@ new class extends Component {
                         <p><span class="badge badge-outline">{{ ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'][$match->status] }}</span></p>
                         <p class="text-sm">{{ $match->balls_per_over }} balls per over | {{ $match->overs_per_innings }} overs | {{ $match->max_wickets }} wickets</p>
                         <p class="text-sm">{{ $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('d M Y, H:i') ?? 'Time not set' }} | {{ $match->venue ?? 'Venue not set' }}</p>
-                        @if($match->stage === 'G')<button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>@endif
+                        @if($match->stage === 'G')<button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>
+                            <a href="{{ route('scorer.matches.result', ['matchId' => $match->id]) }}" class="btn btn-primary btn-sm">Enter / review result</a>@endif
                     </article>
                 @empty
                     <p class="text-center md:col-span-2">No matches found for these filters. Create a group match above or change the filters.</p>

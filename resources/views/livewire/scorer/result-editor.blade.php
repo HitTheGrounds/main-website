@@ -145,6 +145,7 @@ new class extends Component {
         <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name }}</p>
         <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Eleven wickets</p>
         <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
+        <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
     </header>
     <div aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif

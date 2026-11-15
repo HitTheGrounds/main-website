@@ -242,7 +242,8 @@ new class extends Component {
                         <p class="text-sm">{{ $match->balls_per_over }} balls per over | {{ $match->overs_per_innings }} overs | {{ $match->max_wickets }} wickets</p>
                         <p class="text-sm">{{ $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('d M Y, H:i') ?? 'Time not set' }} | {{ $match->venue ?? 'Venue not set' }}</p>
                         @if($match->stage === 'G')<button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>
-                            <a href="{{ route('scorer.matches.result', ['matchId' => $match->id]) }}" class="btn btn-primary btn-sm">Enter / review result</a>@endif
+                            <a href="{{ route('scorer.matches.result', ['matchId' => $match->id]) }}" class="btn btn-primary btn-sm">Enter / review result</a>
+                            <a href="{{ route('scorer.matches.players', ['matchId' => $match->id]) }}" class="btn btn-outline btn-sm">Player figures</a>@endif
                     </article>
                 @empty
                     <p class="text-center md:col-span-2">No matches found for these filters. Create a group match above or change the filters.</p>

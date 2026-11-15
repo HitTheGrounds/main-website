@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\PublicTournamentController;
 use App\Http\Middleware\EnsureTournamentEnabled;
 use Illuminate\Support\Facades\Route;
 
 if (config('tournament.enabled') !== true) {
     return;
 }
+
+Route::get('/tournament', PublicTournamentController::class)
+    ->middleware(EnsureTournamentEnabled::class)->name('tournament.index');
 
 Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'scorer'])
     ->prefix('scorer')->name('scorer.')->group(function () {

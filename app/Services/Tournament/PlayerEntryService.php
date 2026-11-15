@@ -24,15 +24,18 @@ class PlayerEntryService
         // A coherent feature snapshot, without consuming the mutation budget.
         return $this->writes->run($year, function () use ($year, $matchId) {
             abort_unless(User::whereKey(CompanyAuth::user()?->id)->sharedLock()->first()?->is_scorer, 403);
-            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->where('stage', 'G')
-                ->first(['id', 'group_id', 'team1_id', 'team2_id', 'status', 'result_type', 'result_published_at']);
+            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F'])
+                ->first(['id', 'stage', 'group_id', 'team1_id', 'team2_id', 'status', 'result_type', 'result_published_at']);
             if (! $match) {
-                throw ValidationException::withMessages(['player' => 'Select a group match in this tournament year.']);
+                throw ValidationException::withMessages(['player' => 'Select a match in this tournament year.']);
             }
             $ids = [$match->team1_id, $match->team2_id];
             $teams = Team::whereIn('id', $ids)->where('approved', true)->orderBy('id')->get(['id', 'team_name']);
-            $assigned = GroupTeam::where('group_id', $match->group_id)->where('tournament_year', $year)
-                ->whereIn('team_id', $ids)->count();
+            $query = GroupTeam::where('tournament_year', $year)->whereIn('team_id', $ids);
+            if ($match->stage === 'G') {
+                $query->where('group_id', $match->group_id);
+            }
+            $assigned = $query->count();
             if ($teams->count() !== 2 || $assigned !== 2) {
                 throw ValidationException::withMessages(['player' => 'Both teams must still be approved and assigned to this group.']);
             }

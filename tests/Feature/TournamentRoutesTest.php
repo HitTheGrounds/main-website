@@ -34,7 +34,7 @@ class TournamentRoutesTest extends TestCase
     {
         config(['tournament.enabled' => false]);
         Route::middleware('web')->group(base_path('routes/tournament.php'));
-        foreach (['/scorer/dashboard', '/scorer/groups', '/admin/tournament/scorers'] as $url) {
+        foreach (['/scorer/dashboard', '/scorer/groups', '/scorer/knockouts', '/admin/tournament/scorers'] as $url) {
             $this->get($url)->assertNotFound();
         }
         $this->assertFalse(Route::has('scorer.dashboard'));
@@ -46,7 +46,7 @@ class TournamentRoutesTest extends TestCase
         $this->registerTournamentRoutes();
         config(['tournament.enabled' => false]);
         $this->assertTrue(Route::has('scorer.dashboard'));
-        foreach (['/scorer/dashboard', '/scorer/groups', '/admin/tournament/scorers'] as $url) {
+        foreach (['/scorer/dashboard', '/scorer/groups', '/scorer/knockouts', '/admin/tournament/scorers'] as $url) {
             $this->get($url)->assertNotFound();
         }
     }
@@ -54,7 +54,7 @@ class TournamentRoutesTest extends TestCase
     public function test_enabled_private_pages_send_guests_to_existing_login(): void
     {
         $this->registerTournamentRoutes();
-        foreach (['/scorer/dashboard', '/scorer/groups', '/admin/tournament/scorers'] as $url) {
+        foreach (['/scorer/dashboard', '/scorer/groups', '/scorer/knockouts', '/admin/tournament/scorers'] as $url) {
             $this->get($url)->assertRedirect(route('login'));
         }
     }
@@ -79,7 +79,7 @@ class TournamentRoutesTest extends TestCase
         } elseif ($state === 'invalid') {
             $token = 'not.a.valid.jwt';
         }
-        foreach (['/scorer/dashboard', '/scorer/groups', '/admin/tournament/scorers'] as $path) {
+        foreach (['/scorer/dashboard', '/scorer/groups', '/scorer/knockouts', '/admin/tournament/scorers'] as $path) {
             $this->withCookie('company_token', $token)->get($path)
                 ->assertRedirect(route('login'))->assertCookieExpired('company_token');
         }
@@ -92,6 +92,7 @@ class TournamentRoutesTest extends TestCase
         $this->get('/scorer/dashboard')->assertOk()->assertSee('Scorer dashboard')->assertSee('Scorer navigation')
             ->assertSee('name="_token"', false)->assertSee(route('company.logout'))->assertSee('noindex, nofollow');
         $this->get('/scorer/groups')->assertOk()->assertSee('Group setup');
+        $this->get('/scorer/knockouts')->assertOk()->assertSee('Qualification &amp; bracket', false);
         $this->get('/admin/tournament/scorers')->assertForbidden();
     }
 
@@ -102,6 +103,7 @@ class TournamentRoutesTest extends TestCase
         $this->get('/admin/tournament/scorers')->assertOk()->assertSee('Scorer accounts');
         $this->get('/scorer/dashboard')->assertForbidden();
         $this->get('/scorer/groups')->assertForbidden();
+        $this->get('/scorer/knockouts')->assertForbidden();
     }
 
     public function test_representative_and_pending_accounts_cannot_open_tournament_tools(): void
@@ -109,7 +111,7 @@ class TournamentRoutesTest extends TestCase
         $this->registerTournamentRoutes();
         foreach ([Company::factory()->create()->id, null] as $companyId) {
             $this->signedIn(User::factory()->create(['company_id' => $companyId, 'is_admin' => false]));
-            foreach (['/scorer/dashboard', '/scorer/groups', '/admin/tournament/scorers'] as $url) {
+            foreach (['/scorer/dashboard', '/scorer/groups', '/scorer/knockouts', '/admin/tournament/scorers'] as $url) {
                 $this->get($url)->assertForbidden();
             }
         }

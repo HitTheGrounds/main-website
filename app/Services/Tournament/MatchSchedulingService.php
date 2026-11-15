@@ -3,6 +3,7 @@
 namespace App\Services\Tournament;
 
 use App\Helpers\CompanyAuth;
+use App\Models\GroupTeam;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
@@ -21,6 +22,8 @@ class MatchSchedulingService
         private TournamentWriteService $writes,
         private MatchStructureValidator $structure,
         private MatchTransitionGuard $transitions,
+        private MatchSummaryService $summaries,
+        private KnockoutEligibility $eligibility,
     ) {}
 
     public function listing(int $year, array $filters = []): LengthAwarePaginator
@@ -70,18 +73,30 @@ class MatchSchedulingService
             ->with(['team1:id,team_name', 'team2:id,team_name', 'group:id,name']);
     }
 
-    public function create(int $year, int $groupVersion, array $structure, array $schedule = []): TournamentMatch
+    public function create(int $year, int $groupVersion, array $structure, array $schedule = [], ?string $knockoutRevision = null): TournamentMatch
     {
-        return $this->mutate($year, function (User $actor) use ($year, $groupVersion, $structure, $schedule) {
+        return $this->mutate($year, function (User $actor) use ($year, $groupVersion, $structure, $schedule, $knockoutRevision) {
             $data = $this->structure->validate($year, $structure);
-            $group = TournamentGroup::whereKey($data['group_id'])->where('tournament_year', $year)->lockForUpdate()->first();
-            if (! $group || $group->version !== $groupVersion) {
-                $this->reject('tournament', 'This group changed while you were choosing teams. Reload before saving.');
+            if ($data['stage'] === 'G') {
+                $group = TournamentGroup::whereKey($data['group_id'])->where('tournament_year', $year)->lockForUpdate()->first();
+                if (! $group || $group->version !== $groupVersion) {
+                    $this->reject('tournament', 'This group changed while you were choosing teams. Reload before saving.');
+                }
+            } else {
+                TournamentMatch::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
             }
             // Roster deletion locks teams without the year lock. Lock both in ID
             // order and revalidate membership/approval after any wait.
             Team::whereIn('id', [$data['team1_id'], $data['team2_id']])->orderBy('id')->lockForUpdate()->get();
             $data = $this->structure->validate($year, $structure);
+            if ($data['stage'] !== 'G') {
+                GroupTeam::where('tournament_year', $year)->whereIn('team_id', [$data['team1_id'], $data['team2_id']])
+                    ->orderBy('id')->lockForUpdate()->get();
+                $current = $this->knockoutSnapshot($year, $data['stage']);
+                if ($knockoutRevision === null || ! hash_equals($current['revision'], $knockoutRevision)) {
+                    $this->reject('tournament', 'Knockout selection changed. Reload the round before saving.');
+                }
+            }
             $details = $this->schedule($schedule, [$data['team1_id'], $data['team2_id']]);
 
             $match = new TournamentMatch;
@@ -107,24 +122,38 @@ class MatchSchedulingService
             if (! $reference) {
                 $this->reject('tournament', 'Select an existing match in this tournament year.');
             }
-            if ($reference->group_id !== null) {
-                TournamentGroup::whereKey($reference->group_id)->lockForUpdate()->first();
+            $group = $reference->group_id === null ? null : TournamentGroup::whereKey($reference->group_id)
+                ->where('tournament_year', $year)->lockForUpdate()->first();
+            if ($reference->stage === 'G' && ! $group) {
+                $this->reject('tournament', 'The match group is no longer available.');
             }
-            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->lockForUpdate()->first();
+            $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
+            $match = $matches->firstWhere('id', $matchId);
             if (! $match || $match->version !== $version) {
                 $this->reject('tournament', 'This match changed while you were editing. Reload before saving.');
             }
-            if ($match->stage !== 'G') {
-                $this->reject('stage', 'Knockout scheduling is not available until eligibility checks are ready.');
+            $details = $this->schedule($schedule, [$match->team1_id, $match->team2_id], true);
+            $statusChanged = isset($details['status']) && $details['status'] !== $match->status;
+            $assignments = collect();
+            if ($statusChanged) {
+                $query = GroupTeam::where('tournament_year', $year);
+                $group ? $query->where('group_id', $group->id) : $query->whereIn('team_id', [$match->team1_id, $match->team2_id]);
+                $teams = Team::whereIn('id', (clone $query)->pluck('team_id'))->orderBy('id')->lockForUpdate()->get();
+                $assignments = $query->orderBy('id')->lockForUpdate()->get();
+                foreach ([$match->team1_id, $match->team2_id] as $teamId) {
+                    if (! $assignments->contains('team_id', $teamId) || ! $teams->firstWhere('id', $teamId)?->approved) {
+                        $this->reject('tournament', 'Both participants must still be approved and assigned to this edition.');
+                    }
+                }
+                $this->transitions->assertParticipants($match, $teams, $assignments, $matches);
             }
-            $details = $this->schedule($schedule, [$match->team1_id, $match->team2_id]);
             if (array_key_exists('batting_first_id', $details)
                 && $details['batting_first_id'] !== $match->batting_first_id
                 && ($match->structure_locked_at !== null || $match->result_published_at !== null)) {
                 $this->reject('batting_first_id', 'The batting-first team is locked after result publication.');
             }
             if (isset($details['status'])) {
-                $this->transitions->assertScheduleStatusChange($match, $details['status']);
+                $this->transitions->assertScheduleStatusChange($match, $details['status'], $matches);
             }
             foreach ($details as $field => $value) {
                 $match->$field = $value;
@@ -135,8 +164,44 @@ class MatchSchedulingService
                 $match->save();
             }
 
+            if ($statusChanged && $match->result_published_at !== null) {
+                $this->summaries->recalculate($match, $group, $matches, $assignments);
+            }
+
             return $match->refresh();
         });
+    }
+
+    public function knockoutOptions(int $year, string $stage): array
+    {
+        $this->readQuery($year); // Existing feature and scorer checks.
+
+        return $this->writes->run($year, function () use ($year, $stage) {
+            abort_unless(User::whereKey(CompanyAuth::user()?->id)->sharedLock()->first()?->is_scorer, 403);
+
+            return $this->knockoutSnapshot($year, $stage);
+        });
+    }
+
+    private function knockoutSnapshot(int $year, string $stage): array
+    {
+        $assignments = GroupTeam::where('tournament_year', $year)->orderBy('id')->get();
+        $teams = Team::whereIn('id', $assignments->pluck('team_id'))->orderBy('id')->get();
+        $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->get();
+        $candidates = $this->eligibility->candidates($year, $stage, $teams, $assignments, $matches);
+        $positions = $this->eligibility->round($year, $stage, $teams, $assignments, $matches);
+        $revision = hash('sha256', json_encode([$year, $stage,
+            $assignments->map->only(['id', 'version', 'team_id', 'group_id', 'qualified'])->all(),
+            $teams->map->only(['id', 'approved'])->all(),
+            $matches->map->only(['id', 'version', 'stage', 'status', 'bracket_position', 'team1_id', 'team2_id', 'winner_id', 'result_type', 'result_published_at'])->all(),
+        ], JSON_THROW_ON_ERROR));
+
+        $fixtures = $matches->where('stage', $stage)->map(fn ($match) => [
+            ...$match->only(['id', 'version', 'bracket_position', 'status', 'winner_id']),
+            'published' => $match->result_published_at !== null,
+        ])->values()->all();
+
+        return compact('candidates', 'positions', 'revision', 'fixtures');
     }
 
     private function mutate(int $year, callable $write): TournamentMatch
@@ -154,7 +219,7 @@ class MatchSchedulingService
     }
 
     /** Partial schedule edits never accept result, structural or actor fields. */
-    private function schedule(array $input, array $teamIds): array
+    private function schedule(array $input, array $teamIds, bool $allowFinished = false): array
     {
         if (array_diff(array_keys($input), ['status', 'scheduled_at', 'venue', 'display_number', 'batting_first_id'])) {
             $this->reject('tournament', 'Scheduling contains unsupported fields. Reload and try again.');
@@ -166,7 +231,7 @@ class MatchSchedulingService
             }
         }
         $data = Validator::make($input, [
-            'status' => ['sometimes', 'required', Rule::in(['upcoming', 'live'])],
+            'status' => ['sometimes', 'required', Rule::in($allowFinished ? ['upcoming', 'live', 'finished'] : ['upcoming', 'live'])],
             // datetime-local input is explicitly interpreted in tournament time.
             'scheduled_at' => ['sometimes', 'nullable', 'date_format:Y-m-d\TH:i'],
             'venue' => ['sometimes', 'nullable', 'string', 'max:255'],

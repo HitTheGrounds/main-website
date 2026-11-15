@@ -142,7 +142,7 @@ new class extends Component {
 <div class="space-y-6">
     <header class="space-y-2 text-center">
         <h1 class="text-2xl font-bold sm:text-3xl">Match result</h1>
-        <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name }}</p>
+        <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name ?? ['QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'][$match->stage] }}</p>
         <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Eleven wickets</p>
         <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
         <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
@@ -172,7 +172,7 @@ new class extends Component {
             <h2 id="result-draft-heading" class="text-center text-xl font-bold">Result draft</h2>
             <p class="text-center text-sm">Save incomplete details at any time. Blank means unknown; enter 0 for a known zero. Team results do not need player figures.</p>
             <div class="grid gap-4 sm:grid-cols-2">
-                <label><span class="label">Result</span><select wire:model.live="form.result_type" class="select w-full"><option value="">Choose result</option><option value="win">Win</option><option value="tie">Tie</option><option value="no_result">No result</option><option value="abandoned">Abandoned</option></select></label>
+                <label><span class="label">Result</span><select wire:model.live="form.result_type" class="select w-full"><option value="">Choose result</option><option value="win">Win</option>@if($match->stage === 'G')<option value="tie">Tie</option><option value="no_result">No result</option><option value="abandoned">Abandoned</option>@endif</select></label>
                 @if(($form['result_type'] ?? null) === 'win')
                     <label><span class="label">Deciding method</span><select wire:model.live="form.result_method" class="select w-full"><option value="">Choose method</option><option value="normal">Normal play</option><option value="super_over">Super Over</option><option value="coin_toss">Coin toss</option><option value="official_decision">Official decision</option><option value="revised_target">Revised target</option></select></label>
                     <label><span class="label">Winner</span><select wire:model="form.winner_id" class="select w-full"><option value="">Choose winner</option><option value="{{ $match->team1_id }}">{{ $match->team1->team_name }}</option><option value="{{ $match->team2_id }}">{{ $match->team2->team_name }}</option></select></label>

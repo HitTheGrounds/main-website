@@ -4,7 +4,6 @@ namespace App\Services\Tournament;
 
 use App\Helpers\CompanyAuth;
 use App\Models\GroupTeam;
-use App\Models\PlayerMatchStat;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
@@ -18,10 +17,9 @@ class MatchResultService
     public function __construct(
         private TournamentWriteService $writes,
         private MatchResultValidator $validator,
-        private GroupStandingsCalculator $standings,
+        private MatchSummaryService $summaries,
         private MatchResultDescription $descriptions,
         private MatchTransitionGuard $transitions,
-        private PlayerTotalsService $playerTotals,
     ) {}
 
     public function editor(int $year, int $matchId): array
@@ -29,9 +27,9 @@ class MatchResultService
         $match = $this->read($year, $matchId);
 
         return ['match_id' => $match->id, 'version' => $match->version,
-            'form' => $match->draft_result ?? $this->officialForm($match),
+            'form' => $match->draft_result ?? $this->validator->officialForm($match),
             'has_draft' => $match->draft_result !== null,
-            'official' => $match->result_published_at === null ? null : $this->officialForm($match)];
+            'official' => $match->result_published_at === null ? null : $this->validator->officialForm($match)];
     }
 
     /** A versioned full replacement draft, never a merge into official columns. */
@@ -79,19 +77,21 @@ class MatchResultService
             if (! is_array($match->draft_result) || ! hash_equals($this->digest($match->draft_result), $draftHash)) {
                 $this->reject('The saved result differs from your review. Review the latest draft before publishing.');
             }
-            $this->transitions->assertResultPublication($match);
             $result = $this->validator->validate($match, $match->draft_result);
             $this->description($match, $result); // Reject inconsistent descriptions before changing official data.
 
-            $teamIds = GroupTeam::where('group_id', $group->id)->where('tournament_year', $year)->pluck('team_id');
+            $assignmentQuery = GroupTeam::where('tournament_year', $year);
+            $group ? $assignmentQuery->where('group_id', $group->id) : $assignmentQuery->whereIn('team_id', [$match->team1_id, $match->team2_id]);
+            $teamIds = (clone $assignmentQuery)->pluck('team_id');
             $teams = Team::whereIn('id', $teamIds)->orderBy('id')->lockForUpdate()->get();
-            $assignments = GroupTeam::where('group_id', $group->id)->where('tournament_year', $year)
-                ->orderBy('id')->lockForUpdate()->get();
+            $assignments = $assignmentQuery->orderBy('id')->lockForUpdate()->get();
             foreach ([$match->team1_id, $match->team2_id] as $teamId) {
                 if (! $assignments->contains('team_id', $teamId) || ! $teams->firstWhere('id', $teamId)?->approved) {
-                    $this->reject('Both participants must still be approved teams in this group.');
+                    $this->reject('Both participants must still be approved and assigned to this match edition.');
                 }
             }
+            $this->transitions->assertParticipants($match, $teams, $assignments, $matches);
+            $before = clone $match;
             foreach ($result as $field => $value) {
                 $match->$field = $value;
             }
@@ -100,30 +100,11 @@ class MatchResultService
             $match->result_published_at = now();
             $match->published_by = $actor->id;
             $match->draft_result = null;
+            $this->transitions->assertResultPublication($before, $match, $matches);
             $this->save($match, $actor);
 
-            // $match is the same locked model instance inside $matches. Its new
-            // official values are included; all other drafts remain ignored.
-            $calculated = $this->standings->calculate($group, $assignments, $matches);
-            foreach ($assignments as $assignment) {
-                foreach ($calculated['rows'][$assignment->team_id] as $field => $value) {
-                    $assignment->$field = $value;
-                }
-                if ($assignment->isDirty()) {
-                    $assignment->version++;
-                    $assignment->save();
-                }
-            }
-            $group->version++;
-            $group->save();
-
-            // Official performances survive eligibility changes. Never promote
-            // corrections/withdrawals from the separate player draft workflow.
-            // Source rows precede summary rows in the shared lock order.
-            $playerIds = PlayerMatchStat::where('match_id', $match->id)
-                ->where('record_state', 'published')->orderBy('id')->lockForUpdate()
-                ->get(['id', 'team_member_id'])->pluck('team_member_id')->unique()->values()->all();
-            $this->playerTotals->recalculate($year, $playerIds);
+            // The collection contains this same model instance with its new values.
+            $this->summaries->recalculate($match, $group, $matches, $assignments);
 
             return $match->refresh();
         }, true);
@@ -139,11 +120,13 @@ class MatchResultService
         return $this->writes->run($year, function () use ($year, $matchId, $version, $write, $publication) {
             $actor = $this->authorize(true);
             $reference = $this->find($year, $matchId);
-            $group = TournamentGroup::whereKey($reference->group_id)->where('tournament_year', $year)->lockForUpdate()->first();
-            if (! $group) {
+            $group = $reference->group_id === null ? null : TournamentGroup::whereKey($reference->group_id)
+                ->where('tournament_year', $year)->lockForUpdate()->first();
+            if ($reference->stage === 'G' && ! $group) {
                 $this->reject('The match group is no longer available in this tournament year.');
             }
-            $query = TournamentMatch::where('tournament_year', $year)->where('group_id', $group->id);
+            // Publication must see every actual downstream fixture in this year.
+            $query = TournamentMatch::where('tournament_year', $year);
             if (! $publication) {
                 $query->whereKey($matchId);
             }
@@ -181,8 +164,8 @@ class MatchResultService
     private function find(int $year, int $matchId): TournamentMatch
     {
         $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->first();
-        if (! $match || $match->stage !== 'G') {
-            $this->reject('Select an existing group match in this tournament year. Knockout scoring is not available yet.');
+        if (! $match || ! in_array($match->stage, ['G', 'QF', 'SF', 'F'], true)) {
+            $this->reject('Select an existing match in this tournament year.');
         }
 
         return $match;
@@ -219,30 +202,6 @@ class MatchResultService
         };
 
         return hash('sha256', json_encode($sort($draft), JSON_THROW_ON_ERROR));
-    }
-
-    private function officialForm(TournamentMatch $match): array
-    {
-        $form = $match->only(['result_type', 'result_method', 'winner_id', 'batting_first_id', 'result_note', 'revised_target', 'nrr_inputs']);
-        foreach (['team1', 'team2'] as $team) {
-            $count = $match->{$team.'_deliveries'};
-            $form[$team.'_runs'] = $match->{$team.'_runs'};
-            $form[$team.'_wickets'] = $match->{$team.'_wickets'};
-            $form[$team.'_overs'] = $count === null ? null : intdiv($count, $match->balls_per_over);
-            $form[$team.'_balls'] = $count === null ? null : $count % $match->balls_per_over;
-        }
-        if (is_array($form['nrr_inputs'])) {
-            foreach (['team1', 'team2'] as $team) {
-                if (isset($form['nrr_inputs'][$team]['deliveries'])) {
-                    $count = $form['nrr_inputs'][$team]['deliveries'];
-                    $form['nrr_inputs'][$team]['overs'] = intdiv($count, $match->balls_per_over);
-                    $form['nrr_inputs'][$team]['balls'] = $count % $match->balls_per_over;
-                    unset($form['nrr_inputs'][$team]['deliveries']);
-                }
-            }
-        }
-
-        return $form;
     }
 
     private function reject(string $message): never

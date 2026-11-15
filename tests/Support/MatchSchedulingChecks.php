@@ -162,7 +162,6 @@ trait MatchSchedulingChecks
         $match->save();
         $before = $match->fresh()->getAttributes();
         $service = app(MatchSchedulingService::class);
-        $this->rejected('status', fn () => $service->updateSchedule(2026, $match->id, 1, ['status' => 'upcoming']));
         $this->rejected('batting_first_id', fn () => $service->updateSchedule(2026, $match->id, 1, ['batting_first_id' => $input['team1_id']]));
         $this->assertSame($before, $match->fresh()->getAttributes());
         $updated = $service->updateSchedule(2026, $match->id, 1, ['venue' => 'Corrected venue']);
@@ -239,7 +238,7 @@ trait MatchSchedulingChecks
         $this->assertSame(2, $updated->version);
     }
 
-    public function test_knockout_schedule_edits_stay_disabled_until_eligibility_is_ready(): void
+    public function test_unqualified_knockout_status_edits_are_rejected(): void
     {
         $input = $this->fixture();
         $match = $this->create($input);
@@ -248,7 +247,7 @@ trait MatchSchedulingChecks
         $match->group_id = null;
         $match->bracket_position = 1;
         $match->save();
-        $this->rejected('stage', fn () => app(MatchSchedulingService::class)->updateSchedule(2026, $match->id, 1, ['status' => 'live']));
+        $this->rejected('tournament', fn () => app(MatchSchedulingService::class)->updateSchedule(2026, $match->id, 1, ['status' => 'live']));
         $this->assertSame('upcoming', $match->fresh()->status);
         $this->assertSame(1, $match->fresh()->version);
     }

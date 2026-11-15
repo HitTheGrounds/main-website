@@ -59,7 +59,7 @@ new class extends Component {
     <header class="text-center space-y-2">
         <h1 class="text-2xl font-bold sm:text-3xl">Group standings</h1>
         <p class="text-sm">Published team results only. Ordered by points, then NRR. Equal values remain tied; display order does not decide qualification.</p>
-        <p class="text-sm">Player figures are entered separately. Qualification selection is not available yet.</p>
+        <p class="text-sm">Player figures are entered separately. Confirm advancing teams in <a href="{{ route('scorer.knockouts') }}" class="link">Qualification &amp; bracket</a>.</p>
         <button type="button" wire:click="$refresh" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Refresh standings</button>
     </header>
     <div aria-live="polite">

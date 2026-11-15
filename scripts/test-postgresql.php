@@ -108,7 +108,9 @@ try {
         'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'MAIL_MAILER' => 'array', 'QUEUE_CONNECTION' => 'sync',
     ];
     $tests = new Process([PHP_BINARY, 'vendor/phpunit/phpunit/phpunit', '--configuration', 'phpunit.postgresql.xml', '--do-not-cache-result', ...$arguments], null, $environment);
-    $tests->setTimeout(300);
+    // The full integration suite now includes scorer screens and process races.
+    // Keep a bounded limit while allowing it to finish on slower local machines.
+    $tests->setTimeout(900);
     $exitCode = $tests->run(function ($type, $output) use ($password): void {
         echo str_replace($password, '[redacted]', $output);
     });

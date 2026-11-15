@@ -32,6 +32,8 @@ new class extends Component {
     #[Locked]
     public bool $battingEditable = false;
     #[Locked]
+    public bool $publishedResult = false;
+    #[Locked]
     public array $filters = [];
 
     public function with(): array
@@ -106,10 +108,11 @@ new class extends Component {
         $this->notice = '';
         $this->editingId = $match->id;
         $this->editingVersion = $match->version;
-        $this->statusEditable = $match->stage === 'G' && $match->status !== 'finished'
+        $this->statusEditable = $match->status !== 'finished'
             && $match->structure_locked_at === null && $match->result_published_at === null
             && $match->player_stats_published_at === null && $match->result_type === null && $match->winner_id === null;
-        $this->battingEditable = $match->stage === 'G' && $match->structure_locked_at === null && $match->result_published_at === null;
+        $this->publishedResult = $match->result_published_at !== null;
+        $this->battingEditable = $match->structure_locked_at === null && $match->result_published_at === null;
         $this->schedule = [
             'status' => $match->status, 'venue' => $match->venue ?? '',
             'scheduled_at' => $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('Y-m-d\TH:i') ?? '',
@@ -134,6 +137,21 @@ new class extends Component {
         $match = app(MatchSchedulingService::class)->updateSchedule($this->year(), $this->editingId, $this->editingVersion, $input);
         $this->openMatch($match->id);
         $this->notice = 'Match schedule saved.';
+    }
+
+    public function changeResultStatus(string $status): void
+    {
+        $this->resetErrorBag();
+        $this->notice = '';
+        if ($this->editingId === null || $this->editingVersion === null || ! $this->publishedResult) {
+            throw ValidationException::withMessages(['tournament' => 'Open a published result before changing its result status.']);
+        }
+        $match = app(MatchSchedulingService::class)->updateSchedule($this->year(), $this->editingId,
+            $this->editingVersion, ['status' => $status]);
+        $this->openMatch($match->id);
+        $this->notice = $status === 'finished'
+            ? 'Stored official result restored. Standings and player totals updated; pending drafts were not published.'
+            : 'Match reopened. Its contributions were removed from standings and player totals; saved figures and drafts are preserved.';
     }
 
     public function reloadMatch(): void
@@ -173,7 +191,7 @@ new class extends Component {
     <div class="space-y-2 text-center">
         <h1 class="text-2xl font-bold sm:text-3xl">Scorer dashboard</h1>
         <p class="text-sm text-base-content/70">Tournament {{ $year }}: create matches and manage their schedules.</p>
-        <p class="text-sm text-base-content/70">Enter team results below. Knockout scheduling and player entry are not available yet.</p>
+        <p class="text-sm text-base-content/70">Enter team results and player figures below. Choose knockout fixtures in Qualification &amp; bracket.</p>
         <p wire:loading role="status" class="text-sm">Loading match details...</p>
     </div>
     <div aria-live="polite">
@@ -241,9 +259,9 @@ new class extends Component {
                         <p><span class="badge badge-outline">{{ ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'][$match->status] }}</span></p>
                         <p class="text-sm">{{ $match->balls_per_over }} balls per over | {{ $match->overs_per_innings }} overs | {{ $match->max_wickets }} wickets</p>
                         <p class="text-sm">{{ $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('d M Y, H:i') ?? 'Time not set' }} | {{ $match->venue ?? 'Venue not set' }}</p>
-                        @if($match->stage === 'G')<button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>
+                        <button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>
                             <a href="{{ route('scorer.matches.result', ['matchId' => $match->id]) }}" class="btn btn-primary btn-sm">Enter / review result</a>
-                            <a href="{{ route('scorer.matches.players', ['matchId' => $match->id]) }}" class="btn btn-outline btn-sm">Player figures</a>@endif
+                            <a href="{{ route('scorer.matches.players', ['matchId' => $match->id]) }}" class="btn btn-outline btn-sm">Player figures</a>
                     </article>
                 @empty
                     <p class="text-center md:col-span-2">No matches found for these filters. Create a group match above or change the filters.</p>
@@ -258,8 +276,18 @@ new class extends Component {
             <div class="card-body space-y-4">
                 <h2 id="edit-schedule-heading" class="text-center text-xl font-bold">Edit schedule: {{ $editing->team1->team_name }} vs {{ $editing->team2->team_name }}</h2>
                 <p class="text-center text-sm">Teams, group and match format cannot be changed in this schedule form.</p>
-                @if(!$statusEditable)<p class="text-center text-sm">Result status is locked. Only schedule details can be corrected here.</p>@endif
+                @if(!$statusEditable)<p class="text-center text-sm">Result status is locked in the schedule form.</p>@endif
                 @if(!$battingEditable)<p class="text-center text-sm">Batting-first team is locked after result publication.</p>@endif
+                @if($publishedResult)
+                    <div class="rounded-lg border border-base-300 p-4 text-center space-y-3">
+                        <p class="text-sm">Reopening removes this match from standings and player totals. Saved official figures and pending drafts remain. A dependent later-round fixture can block the change.</p>
+                        @if($editing->status === 'finished')
+                            <button type="button" wire:click="changeResultStatus('live')" wire:confirm="Reopen this match as in progress and remove its contributions from standings and player totals? Official figures and drafts are retained. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline">Reopen match</button>
+                        @else
+                            <button type="button" wire:click="changeResultStatus('finished')" wire:confirm="Restore the stored official result and its summary contributions? Pending drafts will not be published. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline">Restore official result</button>
+                        @endif
+                    </div>
+                @endif
                 <button type="button" wire:click="reloadMatch" wire:confirm="Discard unsaved schedule changes and load the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost btn-sm">Reload this match</button>
                 <form wire:submit="saveSchedule" class="space-y-4">
                     <div class="grid gap-4 sm:grid-cols-2">

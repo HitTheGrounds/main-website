@@ -24,6 +24,8 @@
                    class="btn btn-sm {{ request()->routeIs('scorer.groups.*') ? 'btn-primary' : 'btn-ghost' }}">Group setup</a>
                 <a href="{{ route('scorer.standings') }}" @if(request()->routeIs('scorer.standings')) aria-current="page" @endif
                    class="btn btn-sm {{ request()->routeIs('scorer.standings') ? 'btn-primary' : 'btn-ghost' }}">Group standings</a>
+                <a href="{{ route('scorer.knockouts') }}" @if(request()->routeIs('scorer.knockouts')) aria-current="page" @endif
+                   class="btn btn-sm {{ request()->routeIs('scorer.knockouts') ? 'btn-primary' : 'btn-ghost' }}">Qualification &amp; bracket</a>
             </nav>
         </header>
         <main class="w-full p-4 sm:p-6">

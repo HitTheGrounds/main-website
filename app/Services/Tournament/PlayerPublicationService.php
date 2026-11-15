@@ -22,6 +22,7 @@ class PlayerPublicationService
         private RosterProtectionService $rosters,
         private PlayerStatsValidator $validator,
         private PlayerTotalsService $totals,
+        private MatchTransitionGuard $transitions,
     ) {}
 
     public function review(int $year, int $matchId): array
@@ -91,22 +92,31 @@ class PlayerPublicationService
         return $this->writes->run($year, function () use ($year, $matchId, $callback) {
             $actor = $this->authorize(true);
             $reference = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->first();
-            if (! $reference || $reference->stage !== 'G') {
-                $this->reject('Select a group match in this tournament year. Knockout scoring is not available yet.');
+            if (! $reference || ! in_array($reference->stage, ['G', 'QF', 'SF', 'F'], true)) {
+                $this->reject('Select a match in this tournament year.');
             }
-            $group = TournamentGroup::whereKey($reference->group_id)->where('tournament_year', $year)->lockForUpdate()->first();
-            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->lockForUpdate()->first();
-            if (! $group || ! $match || $match->group_id !== $group->id || $match->stage !== 'G'
+            $group = $reference->group_id === null ? null : TournamentGroup::whereKey($reference->group_id)->where('tournament_year', $year)->lockForUpdate()->first();
+            $query = TournamentMatch::where('tournament_year', $year);
+            if ($reference->stage === 'G') {
+                $query->whereKey($matchId);
+            }
+            $matches = $query->orderBy('id')->lockForUpdate()->get();
+            $match = $matches->firstWhere('id', $matchId);
+            if (! $match || ($match->stage === 'G' && ! $group)
                 || $match->status !== 'finished' || $match->result_published_at === null || ! in_array($match->result_type, ['win', 'tie'], true)) {
-                $this->reject('Player publication requires an eligible published finished group result.');
+                $this->reject('Player publication requires an eligible published finished result.');
             }
             $teamIds = [$match->team1_id, $match->team2_id];
             $teams = Team::whereIn('id', $teamIds)->orderBy('id')->lockForUpdate()->get();
-            $assignments = GroupTeam::where('group_id', $group->id)->where('tournament_year', $year)
-                ->whereIn('team_id', $teamIds)->orderBy('id')->lockForUpdate()->get();
-            if ($teams->count() !== 2 || $teams->contains(fn ($team) => ! $team->approved) || $assignments->count() !== 2) {
-                $this->reject('Both participating teams must still be approved and assigned to the match group.');
+            $query = GroupTeam::where('tournament_year', $year)->whereIn('team_id', $teamIds);
+            if ($group) {
+                $query->where('group_id', $group->id);
             }
+            $assignments = $query->orderBy('id')->lockForUpdate()->get();
+            if ($teams->count() !== 2 || $teams->contains(fn ($team) => ! $team->approved) || $assignments->count() !== 2) {
+                $this->reject('Both participating teams must still be approved and assigned to this match edition.');
+            }
+            $this->transitions->assertParticipants($match, $teams, $assignments, $matches);
             $pending = PlayerMatchStat::where('match_id', $match->id)->where('record_state', 'draft')->get();
             foreach ($pending as $draft) {
                 if (! in_array($draft->team_id, $teamIds, true)) {

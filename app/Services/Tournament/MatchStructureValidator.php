@@ -12,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class MatchStructureValidator
 {
+    public function __construct(private KnockoutEligibility $eligibility, private KnockoutIntegrity $integrity) {}
+
     /**
      * Validate a proposed new fixture; this method never writes or grants access.
      * The scheduling service must authorize and run this inside the common year
@@ -52,8 +54,15 @@ class MatchStructureValidator
             if ($data['bracket_position'] > $slots) {
                 $this->reject('bracket_position', 'Select a valid position for this knockout round.');
             }
-            // Fail closed until task 7 supplies qualification and prior-round checks.
-            $this->reject('stage', 'Knockout scheduling is not available until eligibility checks are ready.');
+            $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->get();
+            $teams = Team::whereIn('id', [$data['team1_id'], $data['team2_id']])->orderBy('id')->get();
+            $assignments = GroupTeam::where('tournament_year', $year)->orderBy('id')->get();
+            $this->eligibility->pair($year, $data['stage'], (int) $data['team1_id'], (int) $data['team2_id'], $teams, $assignments, $matches);
+            $this->integrity->assertFixture($year, $data['stage'], (int) $data['bracket_position'], (int) $data['team1_id'], (int) $data['team2_id'], $matches);
+
+            return ['stage' => $data['stage'], 'group_id' => null, 'bracket_position' => (int) $data['bracket_position'],
+                'team1_id' => (int) $data['team1_id'], 'team2_id' => (int) $data['team2_id'],
+                'balls_per_over' => (int) $data['balls_per_over'], 'overs_per_innings' => 5, 'max_wickets' => 11];
         }
         if (($data['bracket_position'] ?? null) !== null) {
             $this->reject('bracket_position', 'Group matches do not have a bracket position.');

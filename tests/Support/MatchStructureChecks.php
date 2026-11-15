@@ -123,10 +123,10 @@ trait MatchStructureChecks
     }
 
     #[DataProvider('knockoutStages')]
-    public function test_knockout_shape_is_checked_but_creation_stays_unavailable(string $stage, int $slots): void
+    public function test_knockout_shape_and_current_eligibility_are_checked(string $stage, int $slots): void
     {
         $input = array_replace($this->fixture(), ['stage' => $stage, 'group_id' => null, 'bracket_position' => $slots]);
-        $this->rejected($input, 'stage');
+        $this->rejected($input, 'tournament');
         $this->rejected(array_replace($input, ['bracket_position' => $slots + 1]), 'bracket_position');
         $this->rejected(array_replace($input, ['bracket_position' => null]), 'bracket_position');
         $this->rejected(array_replace($input, ['group_id' => 1]), 'group_id');

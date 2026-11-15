@@ -10,7 +10,7 @@ use JsonException;
 
 class MatchResultValidator
 {
-    public function __construct(private DeliveryCount $deliveries) {}
+    public function __construct(private DeliveryCount $deliveries, private KnockoutIntegrity $knockouts) {}
 
     /** Validate a replacement form draft, allowing incomplete result details. */
     public function validateDraft(TournamentMatch $match, array $input): array
@@ -155,7 +155,33 @@ class MatchResultValidator
             $result['nrr_inputs'] = $this->nrr($match, $data['nrr_inputs'] ?? []);
         }
 
+        $this->knockouts->assertFinishedResult($match, $result);
+
         return $result;
+    }
+
+    public function officialForm(TournamentMatch $match): array
+    {
+        $form = $match->only(['result_type', 'result_method', 'winner_id', 'batting_first_id', 'result_note', 'revised_target', 'nrr_inputs']);
+        foreach (['team1', 'team2'] as $team) {
+            $count = $match->{$team.'_deliveries'};
+            $form[$team.'_runs'] = $match->{$team.'_runs'};
+            $form[$team.'_wickets'] = $match->{$team.'_wickets'};
+            $form[$team.'_overs'] = $count === null ? null : intdiv($count, $match->balls_per_over);
+            $form[$team.'_balls'] = $count === null ? null : $count % $match->balls_per_over;
+        }
+        if (is_array($form['nrr_inputs'])) {
+            foreach (['team1', 'team2'] as $team) {
+                if (isset($form['nrr_inputs'][$team]['deliveries'])) {
+                    $count = $form['nrr_inputs'][$team]['deliveries'];
+                    $form['nrr_inputs'][$team]['overs'] = intdiv($count, $match->balls_per_over);
+                    $form['nrr_inputs'][$team]['balls'] = $count % $match->balls_per_over;
+                    unset($form['nrr_inputs'][$team]['deliveries']);
+                }
+            }
+        }
+
+        return $form;
     }
 
     private function validatedInput(TournamentMatch $match, array $input, bool $complete): array

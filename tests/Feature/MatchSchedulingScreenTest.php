@@ -59,7 +59,7 @@ class MatchSchedulingScreenTest extends TestCase
         $actor = $this->scorer();
         $this->signedIn($actor)->get('/scorer/dashboard')->assertOk()
             ->assertSee('Scorer dashboard')->assertSee('No groups are available')
-            ->assertSee('Group setup')->assertSee('Enter team results below. Knockout scheduling and player entry are not available yet.')
+            ->assertSee('Group setup')->assertSee('Enter team results and player figures below. Choose knockout fixtures in Qualification &amp; bracket.', false)
             ->assertDontSee('wire:poll', false);
         $this->assertDatabaseCount('matches', 0);
     }

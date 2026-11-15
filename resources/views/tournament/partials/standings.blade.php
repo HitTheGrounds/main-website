@@ -3,13 +3,13 @@
 @else
     <nav aria-label="Choose a group" class="my-6 flex flex-wrap justify-center gap-2">
         @foreach ($tableData['groups'] as $group)
-            <a class="btn btn-outline" href="#group-{{ $group['id'] }}">{{ $group['name'] }}</a>
+            <a class="btn btn-outline h-auto min-h-10 max-w-full whitespace-normal py-2" href="#group-{{ $group['id'] }}"><span class="min-w-0 break-words">{{ $group['name'] }}</span></a>
         @endforeach
     </nav>
     <p class="mb-6 text-center text-sm text-base-content/80">Positions use points, then net run rate (NRR). Equal records share a position. Qualification is confirmed separately by the committee.</p>
     <div class="space-y-8">
         @foreach ($tableData['groups'] as $group)
-            <section id="group-{{ $group['id'] }}" aria-labelledby="group-{{ $group['id'] }}-heading" class="min-w-0 scroll-mt-24 rounded-box border border-base-300 p-4 sm:p-6">
+            <section id="group-{{ $group['id'] }}" tabindex="-1" aria-labelledby="group-{{ $group['id'] }}-heading" class="min-w-0 scroll-mt-24 rounded-box border border-base-300 p-4 sm:p-6">
                 <h3 id="group-{{ $group['id'] }}-heading" class="break-words text-center font-heading text-3xl">{{ $group['name'] }}</h3>
                 @if ($group['teams'] === [])
                     <p class="mt-4 text-center">Teams have not been assigned to this group yet.</p>

@@ -39,7 +39,10 @@
 <meta name="twitter:image:alt" content="{{ $pageImageAlt }}">
 
 <!-- Additional SEO -->
-@php $robots = request()->routeIs(config('seo.indexable')) ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'; @endphp
+@php
+    $indexableTournament = request()->routeIs('tournament.index') && config('tournament.enabled') === true;
+    $robots = request()->routeIs(config('seo.indexable')) || $indexableTournament ? 'index, follow, max-image-preview:large' : 'noindex, nofollow';
+@endphp
 <meta name="robots" content="{{ $robots }}">
 <meta name="googlebot" content="{{ $robots }}">
 <meta name="theme-color" content="#F4F1EA">

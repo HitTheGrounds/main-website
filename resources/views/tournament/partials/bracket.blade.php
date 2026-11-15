@@ -18,13 +18,13 @@
 <p class="mb-6 text-center text-sm text-base-content/80">Matchups are confirmed by the scorers. Connections below show published wins from the preceding round.</p>
 <div class="space-y-8">
     @foreach ($bracketData['rounds'] as $stage => $positions)
-        <section id="round-{{ $stage }}" aria-labelledby="round-{{ $stage }}-heading" class="min-w-0 scroll-mt-24">
+        <section id="round-{{ $stage }}" tabindex="-1" aria-labelledby="round-{{ $stage }}-heading" class="min-w-0 scroll-mt-24">
             <h3 id="round-{{ $stage }}-heading" class="mb-4 text-center font-heading text-3xl">{{ $stages[$stage] }}</h3>
             <div class="grid gap-6 lg:grid-cols-2">
                 @foreach ($positions as $position)
                     <div class="min-w-0">
                         @if ($position['match'] !== null)
-                            @include('tournament.partials.match-card', ['match' => $position['match']])
+                            @include('tournament.partials.match-card', ['match' => $position['match'], 'bracketCard' => true])
                             @if ($stage !== 'QF')
                                 <ul aria-label="{{ $stages[$stage] }} {{ $position['position'] }} connections" class="mt-3 space-y-2 text-center text-sm">
                                     @foreach (['team1', 'team2'] as $side)

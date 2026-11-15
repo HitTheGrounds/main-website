@@ -1,3 +1,4 @@
+@php $headingTag = ($bracketCard ?? false) ? 'h4' : 'h3'; @endphp
 <article aria-labelledby="match-{{ $match['id'] }}-heading" class="min-w-0 rounded-box border border-base-300 p-6 text-center">
     <div class="mb-3 flex flex-wrap justify-center gap-2 text-sm">
         <span class="badge badge-outline">{{ $statuses[$match['status']] }}</span>
@@ -9,7 +10,7 @@
             <span>Position {{ $match['bracket_position'] }}</span>
         @endif
     </div>
-    <h3 id="match-{{ $match['id'] }}-heading" class="break-words font-heading text-2xl">{{ $match['team1']['name'] }} <span class="text-base-content/70">vs</span> {{ $match['team2']['name'] }}</h3>
+    <{{ $headingTag }} id="match-{{ $match['id'] }}-heading" tabindex="-1" class="scroll-mt-24 break-words font-heading text-2xl">{{ $match['team1']['name'] }} <span class="text-base-content/70">vs</span> {{ $match['team2']['name'] }}</{{ $headingTag }}>
     <p class="mt-3 text-sm text-base-content/80">{{ $match['overs_per_innings'] }} overs per innings · {{ $match['balls_per_over'] }} balls per over</p>
     <p class="mt-2 text-sm text-base-content/80">
         @if ($match['scheduled_at'] !== null)

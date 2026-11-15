@@ -98,6 +98,9 @@
                                 </x-mary-menu-item>
                             @endif
                         </x-mary-menu>
+                        @if (config('tournament.enabled') === true && Route::has('tournament.index'))
+                            <a href="{{ route('tournament.index') }}" class="btn btn-outline btn-sm mx-4 my-2">Public results</a>
+                        @endif
                     </div>
 
                     <!-- Desktop User Menu -->

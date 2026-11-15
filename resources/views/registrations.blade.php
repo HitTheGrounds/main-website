@@ -52,7 +52,7 @@
                                 </svg>
                                 <div>
                                     <p class="font-semibold text-lg">Team Limit</p>
-                                    <p class="text-base-content/80">A <span class="font-bold">maximum of two teams</span> per company can participate.</p>
+                                    <p class="text-base-content/80">A <span class="font-bold">maximum of two teams</span> per registered organization can participate.</p>
                                 </div>
                             </div>
 
@@ -94,7 +94,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-xl mb-2">Complete the Registration</h3>
-                                    <p class="text-base-content/80">Fill out all the required information in the registration page accurately. This includes team name, company details, team contact person email and phone, and other requested details.</p>
+                                    <p class="text-base-content/80">Fill out all the required information in the registration page accurately. This includes team name, company or university details, team contact person email and phone, and other requested details.</p>
                                     <p class="text-sm text-base-content/60 mt-2 italic">(Filling in the team players' details is optional)</p>
                                 </div>
                             </div>
@@ -149,7 +149,7 @@
                 <div class="card bg-primary text-primary-content shadow-sm">
                     <div class="card-body items-center text-center">
                         <h2 class="card-title text-2xl mb-2 font-title">Ready to Participate?</h2>
-                        <p class="mb-6">Register your company and start building your team today</p>
+                        <p class="mb-6">Register your company or university and start building your team today</p>
                         @php
                             $user = App\Helpers\CompanyAuth::user();
                             $isAdmin = $user?->is_admin === true;
@@ -178,7 +178,7 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                                     </svg>
-                                    Register Your Company
+                                    Register Your Organization
                                 </a>
                             @else
                                 <button onclick="registration_closed_modal.showModal()" class="btn btn-lg">
@@ -212,7 +212,7 @@
                 </svg>
                 <h3 class="font-bold text-2xl">Registrations Closed</h3>
                 <p class="text-center text-base-content/80">
-                    Company registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route('about') }}#committee">Contact Us</a>.
+                    Organization registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route('about') }}#committee">Contact Us</a>.
                 </p>
             </div>
             <div class="modal-action">

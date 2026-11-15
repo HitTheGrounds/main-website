@@ -39,7 +39,7 @@ class PublicTournamentHubTest extends TestCase
         $response = $this->get('/tournament')->assertOk()->assertViewIs('tournament.index')
             ->assertViewHas('tab', 'matches')->assertViewHas('year', 2026)
             ->assertSee('Tournament sections')->assertSee('aria-current="page"', false)
-            ->assertSee('Refresh the page')->assertSee('noindex, nofollow');
+            ->assertSee('Refresh the page')->assertSee('index, follow, max-image-preview:large');
 
         foreach (['matches', 'table', 'bracket', 'stats'] as $tab) {
             $response->assertSee('href="'.route('tournament.index', ['tab' => $tab]).'"', false);

@@ -16,6 +16,9 @@
                 </form>
             </div>
             <nav aria-label="Scorer navigation" class="mt-4 flex flex-wrap justify-center gap-2">
+                @if (config('tournament.enabled') === true && Route::has('tournament.index'))
+                    <a href="{{ route('tournament.index') }}" class="btn btn-outline btn-sm">Public results</a>
+                @endif
                 <a href="{{ route('scorer.dashboard') }}"
                    @if(request()->routeIs('scorer.dashboard')) aria-current="page" @endif
                    class="btn btn-sm {{ request()->routeIs('scorer.dashboard') ? 'btn-primary' : 'btn-ghost' }}">Dashboard</a>

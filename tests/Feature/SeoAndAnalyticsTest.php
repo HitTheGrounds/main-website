@@ -18,7 +18,7 @@ class SeoAndAnalyticsTest extends TestCase
             '/timeline' => 'Event Timeline | Hit the Grounds 2026',
             '/memories' => 'Memories | Hit the Grounds 2026',
             '/teams/industry' => 'Industry Teams | Hit the Grounds 2026',
-            '/login' => 'Company Login | Hit the Grounds 2026',
+            '/login' => 'Sign in | Hit the Grounds 2026',
         ];
 
         foreach ($titles as $path => $title) {

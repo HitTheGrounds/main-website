@@ -38,6 +38,8 @@
         </x-PageContainer>
     </section>
 
+    <x-TeamsSection variant="mobile" />
+
     <section id="past-seasons" class="bg-base-200">
         <x-PageContainer class="!pb-8">
             <div class="mb-6 text-center" data-aos="fade-up">

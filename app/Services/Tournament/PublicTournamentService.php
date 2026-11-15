@@ -8,6 +8,7 @@ use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -22,6 +23,13 @@ class PublicTournamentService
     private const MAX_TEAMS = 2048;
 
     private const MAX_FIXTURES = 8192;
+
+    private const MAX_RANKING_ROWS = 8192;
+
+    private const RANKING_METRICS = [
+        'runs' => 'runs_scored', 'wickets' => 'wickets_taken', 'sixes' => 'sixes',
+        'fours' => 'fours', 'dot_balls' => 'dot_balls', 'highest_innings' => 'highest_score',
+    ];
 
     private const MATCH_FIELDS = ['id', 'tournament_year', 'group_id', 'stage', 'bracket_position',
         'team1_id', 'team2_id', 'balls_per_over', 'overs_per_innings', 'max_wickets',
@@ -63,6 +71,7 @@ class PublicTournamentService
                 }
             }
             $total = (clone $query)->count();
+            $latestResult = (clone $query)->where('status', 'finished')->max('result_published_at');
             if ($filters['sort'] === 'schedule') {
                 $query->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')->orderBy('scheduled_at')->orderBy('id');
             } else {
@@ -73,6 +82,7 @@ class PublicTournamentService
 
             return ['year' => $year, 'groups' => $groups->map->only(['id', 'name'])->all(), 'filters' => $filters,
                 'matches' => $matches->map(fn ($match) => $this->presentMatch($match, $teams, $groups))->all(),
+                'latest_result_published_at' => $this->publicationTime($latestResult),
                 'pagination' => ['page' => $filters['page'], 'per_page' => self::PAGE_SIZE, 'total' => $total,
                     'last_page' => max(1, (int) ceil($total / self::PAGE_SIZE))]];
         });
@@ -114,7 +124,64 @@ class PublicTournamentService
                 }
             }
 
-            return ['year' => $year, 'groups' => $result, 'unequal_groups' => $unequal, 'runner_up_guidance' => $this->rank($runners)];
+            return ['year' => $year, 'groups' => $result, 'unequal_groups' => $unequal, 'runner_up_guidance' => $this->rank($runners),
+                'latest_result_published_at' => $this->publicationTime($matches->where('status', 'finished')->max('result_published_at'))];
+        });
+    }
+
+    /** Read derived published totals only. Never join source performances or rosters. */
+    public function rankings(int $year, array $filters = []): array
+    {
+        $this->validateYear($year);
+        if (array_diff(array_keys($filters), ['category', 'gender'])) {
+            throw ValidationException::withMessages(['tournament' => 'Select valid ranking filters.']);
+        }
+        $filters = Validator::make($filters, [
+            'category' => ['sometimes', 'required', 'string', Rule::in(array_keys(self::RANKING_METRICS))],
+            'gender' => ['sometimes', 'required', 'string', Rule::in(['All', 'Male', 'Female'])],
+        ])->validate();
+        $category = $filters['category'] ?? 'runs';
+        $gender = $filters['gender'] ?? 'All';
+        // Column names come exclusively from this fixed map, never from a request.
+        $metric = self::RANKING_METRICS[$category];
+        $count = $metric === 'highest_score' ? 'runs_scored_recorded_count' : $metric.'_recorded_count';
+
+        return $this->snapshots->run(function () use ($year, $category, $gender, $metric, $count) {
+            $population = DB::table('player_tournament_stats as pts')->where('pts.tournament_year', $year);
+            if ($gender !== 'All') {
+                $population->where('pts.player_gender', $gender);
+            }
+            $eligible = (clone $population)->whereNotNull('pts.'.$metric)->where('pts.'.$count, '>', 0);
+            $recordedPlayers = (clone $eligible)->count();
+            $top = (clone $eligible)->orderByDesc('pts.'.$metric)->orderBy('pts.team_member_id')
+                ->limit(5)->pluck('pts.'.$metric);
+            $entries = [];
+            if ($top->isNotEmpty()) {
+                $rows = (clone $eligible)->leftJoin('teams as t', 't.id', '=', 'pts.team_id')
+                    ->where('pts.'.$metric, '>=', $top->last())->orderByDesc('pts.'.$metric)->orderBy('pts.team_member_id')
+                    ->limit(self::MAX_RANKING_ROWS + 1)->get(['pts.team_member_id', 'pts.team_id', 'pts.player_name',
+                        't.team_name', 'pts.'.$metric.' as figure', 'pts.'.$count.' as recorded_count']);
+                abort_if($rows->count() > self::MAX_RANKING_ROWS, 503, 'Tournament data is temporarily unavailable.');
+                foreach ($rows as $index => $row) {
+                    $figure = (int) $row->figure;
+                    $entries[] = ['rank' => $index > 0 && $entries[$index - 1]['value'] === $figure ? $entries[$index - 1]['rank'] : $index + 1,
+                        'player_id' => (int) $row->team_member_id, 'player_name' => $row->player_name,
+                        'team_id' => (int) $row->team_id, 'team_name' => $row->team_name ?? 'Team unavailable',
+                        'value' => $figure, 'recorded_count' => (int) $row->recorded_count];
+                }
+            }
+
+            // Tournament-wide clocks, not the request time or mutable summary updated_at.
+            // Match-result publication can also change player-award eligibility.
+            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F']);
+
+            return ['year' => $year, 'category' => $category, 'gender' => $gender, 'entries' => $entries,
+                'publication_times' => [
+                    'player_stats' => $this->publicationTime((clone $publications)->max('player_stats_published_at')),
+                    'match_results' => $this->publicationTime((clone $publications)->where('status', 'finished')->max('result_published_at')),
+                ],
+                'leader_ids' => array_column(array_filter($entries, fn ($entry) => $entry['rank'] === 1 && $entry['value'] > 0), 'player_id'),
+                'coverage' => ['players_with_published_entries' => (clone $population)->count(), 'players_with_recorded_metric' => $recordedPlayers]];
         });
     }
 
@@ -144,7 +211,8 @@ class PublicTournamentService
                 }, $this->eligibility->round($year, $stage, $teams, $rows, $matches));
             }
 
-            return ['year' => $year, 'rounds' => $rounds];
+            return ['year' => $year, 'rounds' => $rounds,
+                'latest_result_published_at' => $this->publicationTime($matches->where('status', 'finished')->max('result_published_at'))];
         });
     }
 
@@ -174,6 +242,11 @@ class PublicTournamentService
             'overs_per_innings' => $match->overs_per_innings, 'max_wickets' => $match->max_wickets,
             'scheduled_at' => $match->scheduled_at?->toIso8601String(), 'venue' => $match->venue,
             'display_number' => $match->display_number, 'result' => $result];
+    }
+
+    private function publicationTime(string|\DateTimeInterface|null $value): ?string
+    {
+        return $value === null ? null : \Carbon\CarbonImmutable::parse($value)->toIso8601String();
     }
 
     private function visibleMatches(int $year): Builder

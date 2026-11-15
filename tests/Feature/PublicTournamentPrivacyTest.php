@@ -73,14 +73,14 @@ class PublicTournamentPrivacyTest extends TestCase
                 $this->assertContains(strtolower($form->getAttribute('method')), ['', 'get']);
             }
             $data = $response->viewData(match ($tab) {
-                'matches' => 'matchData', 'table' => 'tableData', 'bracket' => 'bracketData', 'stats' => 'matchData',
+                'matches' => 'matchData', 'table' => 'tableData', 'bracket' => 'bracketData', 'stats' => 'rankingData',
             });
             $this->assertStringNotContainsString('PRIVATE-', json_encode($data, JSON_THROW_ON_ERROR));
         }
         $queries = strtolower(implode("\n", array_column(DB::getQueryLog(), 'query')));
         DB::disableQueryLog();
         foreach (['insert ', 'update ', 'delete ', 'for update', 'advisory', 'draft_result', 'result_note', 'nrr_inputs',
-            'point_adjustments', 'captain_email', 'team_members', 'player_match_stats', 'player_tournament_stats'] as $privateOrWrite) {
+            'point_adjustments', 'captain_email', 'team_members', 'player_match_stats'] as $privateOrWrite) {
             $this->assertStringNotContainsString($privateOrWrite, $queries);
         }
         $this->assertSame($before, $this->sourceState());

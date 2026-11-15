@@ -55,6 +55,15 @@ abstract class TestCase extends BaseTestCase
             throw new \RuntimeException('Unsafe test setup: secondary database connections are not allowed before database-refresh traits.');
         }
 
+        // DatabaseMigrations drops its schema at teardown. Do not restore an old
+        // cached SQLite PDO when RefreshDatabase next needs to migrate afresh:
+        // its cache would otherwise keep a different, now-empty connection.
+        if ($this->app['config']->get('database.default') === 'sqlite'
+            && $this->app['config']->get('database.connections.sqlite.database') === ':memory:'
+            && ! \Illuminate\Foundation\Testing\RefreshDatabaseState::$migrated) {
+            \Illuminate\Foundation\Testing\RefreshDatabaseState::$inMemoryConnections = [];
+        }
+
         return parent::setUpTraits();
     }
 

@@ -26,6 +26,18 @@
             @include('tournament.partials.standings')
         @elseif ($tab === 'bracket')
             @include('tournament.partials.bracket')
+        @elseif ($tab === 'stats')
+            @include('tournament.partials.stats')
+        @endif
+        @if (! $filterErrors)
+            @if ($tab === 'stats')
+                @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest player stats publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['player_stats']])
+                @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest match result publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['match_results']])
+            @else
+                @php $pageData = match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData }; @endphp
+                @include('tournament.partials.publication-time', ['publicationLabel' => $tab === 'matches' ? 'Latest match result publication for these filters' : 'Latest match result publication in this view', 'publicationTime' => $pageData['latest_result_published_at']])
+            @endif
+            <p class="mt-3 text-center text-sm text-base-content/80">Refresh this page for the latest published results. Changes appear when you refresh or open another page.</p>
         @endif
     </x-PageContainer>
 </x-layouts.public>

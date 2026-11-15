@@ -26,11 +26,20 @@ class PublicTournamentController extends Controller
         $matchData = null;
         $tableData = null;
         $bracketData = null;
+        $rankingData = null;
         $filterErrors = [];
         if ($tab === 'matches') {
             try {
                 $matchData = $tournament->matches($year, array_intersect_key($request->query(),
                     array_flip(['stage', 'status', 'group_id', 'sort', 'page'])));
+            } catch (ValidationException $exception) {
+                $filterErrors = $exception->errors();
+            }
+        }
+
+        if ($tab === 'stats') {
+            try {
+                $rankingData = $tournament->rankings($year, array_intersect_key($request->query(), array_flip(['category', 'gender'])));
             } catch (ValidationException $exception) {
                 $filterErrors = $exception->errors();
             }
@@ -48,6 +57,6 @@ class PublicTournamentController extends Controller
             }
         }
 
-        return response()->view('tournament.index', compact('tabs', 'tab', 'year', 'matchData', 'tableData', 'bracketData', 'filterErrors'), $filterErrors ? 422 : 200);
+        return response()->view('tournament.index', compact('tabs', 'tab', 'year', 'matchData', 'tableData', 'bracketData', 'rankingData', 'filterErrors'), $filterErrors ? 422 : 200);
     }
 }

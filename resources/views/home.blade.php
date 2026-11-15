@@ -14,7 +14,6 @@
     <div class="hidden lg:block">
         <x-CommitteeSection />
     </div>
-    <x-RegisterCta />
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',

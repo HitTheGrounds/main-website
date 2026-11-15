@@ -99,23 +99,6 @@
         </x-PageContainer>
     </section>
 
-    {{-- Call to action --}}
-    <section class="bg-base-100">
-        <x-PageContainer class="!pt-10">
-            <div class="relative flex flex-col items-center justify-center gap-7 overflow-hidden rounded-[2.25rem] bg-[#17120E] px-7 py-12 text-center text-base-100 sm:px-12" data-aos="fade-up">
-                <div class="aw-glow pointer-events-none absolute -right-20 -top-28 size-[480px] rounded-full" aria-hidden="true"
-                     style="background: radial-gradient(closest-side, rgb(255 106 19 / .55), transparent)"></div>
-                <h2 class="relative font-heading text-[clamp(2.2rem,5vw,3.6rem)]">Your name could be next</h2>
-                <a href="{{ route('register') }}"
-                   class="relative inline-flex shrink-0 items-center gap-3.5 rounded-full bg-primary py-2 pl-7 pr-2 text-[17px] font-bold text-secondary transition hover:-translate-y-0.5 hover:bg-[#ff7a2b]">
-                    Register Your Team
-                    <span class="grid size-11 place-items-center rounded-full bg-secondary text-secondary-content">
-                        <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                    </span>
-                </a>
-            </div>
-        </x-PageContainer>
-    </section>
 
     <script>
         (() => {

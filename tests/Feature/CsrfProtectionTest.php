@@ -145,4 +145,50 @@ class CsrfProtectionTest extends TestCase
         $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
         $this->assertFalse($scorer->fresh()->is_scorer);
     }
+
+    public function test_real_match_creation_and_schedule_changes_require_csrf(): void
+    {
+        $this->enforceCsrf();
+        config(['tournament.enabled' => true, 'tournament.year' => 2026]);
+        \Illuminate\Support\Facades\Route::middleware('web')->group(base_path('routes/tournament.php'));
+        \Illuminate\Support\Facades\Route::getRoutes()->refreshNameLookups();
+        $scorer = User::factory()->create(['company_id' => null, 'is_admin' => false]);
+        $scorer->is_scorer = true;
+        $scorer->save();
+        $groupId = \Illuminate\Support\Facades\DB::table('tournament_groups')->insertGetId(['name' => 'CSRF group', 'tournament_year' => 2026]);
+        $teams = Team::factory()->count(2)->create(['approved' => true]);
+        foreach ($teams as $team) {
+            \Illuminate\Support\Facades\DB::table('group_teams')->insert(['group_id' => $groupId, 'tournament_year' => 2026, 'team_id' => $team->id]);
+        }
+        $this->signedIn($scorer)->withSession(['_token' => 'test-csrf-token']);
+        $html = $this->get('/scorer/dashboard')->assertOk()->getContent();
+        preg_match('/wire:snapshot="([^"]+)"/', $html, $matches);
+        $snapshot = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $payload = ['_token' => 'test-csrf-token', 'components' => [[
+            'snapshot' => $snapshot, 'updates' => ['groupChoice' => (string) $groupId],
+            'calls' => [['path' => '', 'method' => 'chooseGroup', 'params' => []]],
+        ]]];
+        $response = $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $payload = ['components' => [[
+            'snapshot' => $response->json('components.0.snapshot'),
+            'updates' => ['newStructure.team1_id' => (string) $teams[0]->id, 'newStructure.team2_id' => (string) $teams[1]->id],
+            'calls' => [['path' => '', 'method' => 'createMatch', 'params' => []]],
+        ]]];
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertStatus(419);
+        $this->assertDatabaseCount('matches', 0);
+        $payload['_token'] = 'test-csrf-token';
+        $response = $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $match = \App\Models\TournamentMatch::firstOrFail();
+        $this->assertNull($match->team1_runs);
+        $payload = ['components' => [[
+            'snapshot' => $response->json('components.0.snapshot'), 'updates' => ['schedule.venue' => 'CSRF venue'],
+            'calls' => [['path' => '', 'method' => 'saveSchedule', 'params' => []]],
+        ]]];
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertStatus(419);
+        $this->assertNull($match->fresh()->venue);
+        $payload['_token'] = 'test-csrf-token';
+        $this->withCredentials()->postJson('/livewire/update', $payload, ['X-Livewire' => 'true'])->assertOk();
+        $this->assertSame('CSRF venue', $match->fresh()->venue);
+        $this->assertSame(2, $match->fresh()->version);
+    }
 }

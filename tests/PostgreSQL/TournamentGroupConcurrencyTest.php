@@ -130,8 +130,8 @@ PHP;
         foreach ($teams as $team) {
             $service->assign(2026, $group->id, $group->fresh()->version, $team->id);
         }
-        // Match scheduling does not exist yet. This test-only insert exercises
-        // the common-lock contract that its future service must follow.
+        // Original 4.4 helper-contract check. The actual match-service races
+        // are also covered by MatchSchedulingConcurrencyTest from 5.4 onward.
         $result = $this->compete($actor, 'remove', $group->id, 3, $teams[0]->id,
             fn () => DB::table('matches')->insert([
                 'tournament_year' => 2026, 'group_id' => $group->id, 'stage' => 'G',

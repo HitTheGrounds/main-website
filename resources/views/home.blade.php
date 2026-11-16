@@ -1,11 +1,7 @@
 <x-layouts.public>
     <x-HeroSection />
-    {{-- Mobile: sponsors sit between the hero and the timeline --}}
-    <div class="lg:hidden">
-        <x-SponsorsSection />
-    </div>
+    <x-SponsorsSection />
     <div class="hidden lg:block">
-        <x-SponsorsSection />
         <x-AboutSection />
         <x-TeamsSection variant="desktop" />
     </div>

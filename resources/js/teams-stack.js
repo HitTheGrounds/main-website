@@ -14,7 +14,6 @@ const mm = gsap.matchMedia();
 mm.add(
     {
         desktop: '(min-width: 1024px)',
-        mobile: '(max-width: 1023.98px)',
         reduce: '(prefers-reduced-motion: reduce)',
     },
     (ctx) => {

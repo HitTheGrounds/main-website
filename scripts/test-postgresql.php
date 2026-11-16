@@ -107,10 +107,11 @@ try {
         'PGOPTIONS' => false, 'PGSERVICE' => false, 'PGSERVICEFILE' => false, 'PGHOSTADDR' => false,
         'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'MAIL_MAILER' => 'array', 'QUEUE_CONNECTION' => 'sync',
     ];
-    $tests = new Process([PHP_BINARY, 'vendor/phpunit/phpunit/phpunit', '--configuration', 'phpunit.postgresql.xml', '--do-not-cache-result', ...$arguments], null, $environment);
+    $tests = new Process([PHP_BINARY, '-d', 'memory_limit=512M', 'vendor/phpunit/phpunit/phpunit', '--configuration', 'phpunit.postgresql.xml', '--do-not-cache-result', ...$arguments], null, $environment);
     // The full integration suite now includes scorer screens and process races.
-    // Keep a bounded limit while allowing it to finish on slower local machines.
-    $tests->setTimeout(900);
+    // The expanded full suite exceeded 15 minutes on a verified local run.
+    // Bound test resources explicitly, without changing application PHP settings.
+    $tests->setTimeout(1800);
     $exitCode = $tests->run(function ($type, $output) use ($password): void {
         echo str_replace($password, '[redacted]', $output);
     });

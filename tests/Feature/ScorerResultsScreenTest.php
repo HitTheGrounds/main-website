@@ -27,6 +27,16 @@ class ScorerResultsScreenTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function signedIn(User $user): static
+    {
+        parent::signedIn($user);
+        // HTTP login replaces the stored token. The Livewire test client must
+        // use that same session, not the token retained by the fixture.
+        Livewire::withCookie('company_token', $user->fresh()->jwt_token);
+
+        return $this;
+    }
+
     private function fixture(): array
     {
         config(['tournament.enabled' => true, 'tournament.year' => 2026, 'tournament.writes_per_minute' => 1000]);
@@ -133,7 +143,13 @@ class ScorerResultsScreenTest extends TestCase
     public function test_standings_adjustment_requires_reason_and_keeps_correction_history(): void
     {
         [$actor, $match] = $this->fixture();
+        $previousToken = $actor->fresh()->jwt_token;
+        $ttl = config('app.jwt_ttl');
+        // Ensure a different valid token even when both logins share a second.
+        config(['app.jwt_ttl' => $ttl + 1]);
         $this->signedIn($actor)->get('/scorer/standings')->assertOk()->assertSee('Group standings');
+        config(['app.jwt_ttl' => $ttl]);
+        $this->assertNotSame($previousToken, $actor->fresh()->jwt_token);
         $component = Volt::test('scorer.standings-manager')->assertSee('Group A')
             ->call('openAdjustment', $match->group_id, $match->team1_id)
             ->set('points', '-1')->set('reason', '   ')->call('saveAdjustment')->assertHasErrors('reason')

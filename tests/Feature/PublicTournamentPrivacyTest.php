@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\TournamentMatch;
 use App\Models\User;
+use App\Services\JWTService;
 use App\Services\Tournament\MatchResultService;
 use App\Services\Tournament\PublicTournamentService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -157,5 +158,50 @@ class PublicTournamentPrivacyTest extends TestCase
         $this->mock(PublicTournamentService::class)->shouldReceive($method)->once()->with(2026)
             ->andThrow(ValidationException::withMessages(['tournament' => 'PRIVATE-SCORER-VALIDATION']));
         $this->get('/tournament?tab='.$tab)->assertStatus(503)->assertSee('Service Unavailable')->assertDontSee('PRIVATE-');
+    }
+
+    public function test_rankings_and_public_errors_do_not_embed_full_stats_unlisted_players_or_account_tokens(): void
+    {
+        $this->fixture();
+        $account = User::factory()->create(['email' => 'PRIVATE-ACCOUNT@example.test']);
+        $token = (new JWTService)->generateToken($account);
+        $names = [];
+        foreach (range(1, 7) as $index) {
+            $member = TeamMember::factory()->create(['name' => 'PRIVATE-REGISTERED-PLAYER-'.$index]);
+            $names[] = 'Published player '.$index;
+            DB::table('player_tournament_stats')->insert([
+                'tournament_year' => 2026, 'team_id' => $member->team_id, 'team_member_id' => $member->id,
+                'player_name' => $names[$index - 1], 'player_gender' => 'Male',
+                'runs_scored' => 100 - $index, 'runs_scored_recorded_count' => 1,
+                'highest_score' => 100 - $index,
+                'balls_faced' => 987654321, 'balls_faced_recorded_count' => 1,
+                'runs_conceded' => 987654322, 'runs_conceded_recorded_count' => 1,
+                'dot_balls' => 987654323, 'dot_balls_recorded_count' => 1,
+            ]);
+        }
+        $before = $this->sourceState();
+        foreach (['matches', 'table', 'bracket', 'stats'] as $tab) {
+            $response = $this->get('/tournament?tab='.$tab)->assertOk()->assertDontSee('PRIVATE-')->assertDontSee($token);
+            foreach (['987654321', '987654322', '987654323', 'jwt_token', 'jwt_expires_at', 'captain_phone', 'wire:snapshot'] as $private) {
+                $response->assertDontSee($private, false);
+            }
+        }
+        $response = $this->get('/tournament?tab=stats&category=runs')->assertOk();
+        $entries = $response->viewData('rankingData')['entries'];
+        $this->assertSame(array_slice($names, 0, 5), array_column($entries, 'player_name'));
+        $this->assertSame([99, 98, 97, 96, 95], array_column($entries, 'value'));
+        foreach ($entries as $entry) {
+            $this->assertSame(['rank', 'player_id', 'player_name', 'team_id', 'team_name', 'value', 'recorded_count'], array_keys($entry));
+        }
+        foreach (array_slice($names, 5) as $unlisted) {
+            $response->assertDontSee($unlisted);
+            $this->assertStringNotContainsString($unlisted, json_encode($response->viewData('rankingData'), JSON_THROW_ON_ERROR));
+        }
+        foreach (['/tournament?tab=stats&category[]=PRIVATE-FILTER', '/tournament?stage[]=PRIVATE-FILTER', '/tournament?tab=PRIVATE-TAB'] as $url) {
+            $response = $this->get($url);
+            $this->assertContains($response->status(), [404, 422]);
+            $response->assertDontSee('PRIVATE-')->assertDontSee($token)->assertDontSee('987654321');
+        }
+        $this->assertSame($before, $this->sourceState());
     }
 }

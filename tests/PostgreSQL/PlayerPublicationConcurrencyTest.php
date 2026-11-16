@@ -46,7 +46,13 @@ try {
     \Illuminate\Support\Facades\DB::selectOne("SELECT set_config('application_name', ?, false)", [$argv[4]]);
     request()->attributes->set('user', \App\Models\User::findOrFail((int) $argv[1]));
     $args = json_decode($argv[3], true, flags: JSON_THROW_ON_ERROR);
-    app(\App\Services\Tournament\PlayerPublicationService::class)->publish(2026, $args['match_id'], $args['version'], $args['player_stats_revision'], $args['receipt']);
+    if ($argv[2] === 'save') {
+        app(\App\Services\Tournament\PlayerStatsService::class)->saveDraft(2026, $args['match_id'], $args['team_id'], $args['member_id'], $args['expected'], $args['figures']);
+    } elseif ($argv[2] === 'publish') {
+        app(\App\Services\Tournament\PlayerPublicationService::class)->publish(2026, $args['match_id'], $args['version'], $args['player_stats_revision'], $args['receipt']);
+    } else {
+        throw new \LogicException('Unknown test action');
+    }
     echo 'WROTE';
 } catch (\Illuminate\Validation\ValidationException $exception) {
     echo 'REJECTED:'.array_key_first($exception->errors());
@@ -214,5 +220,86 @@ PHP;
             fn () => DB::table('users')->where('id', $actor->id)->update(['is_scorer' => false])));
         $this->assertDatabaseCount('player_tournament_stats', 0);
         $this->assertSame(0, PlayerMatchStat::where('record_state', 'published')->count());
+    }
+
+    public function test_waiting_draft_save_cannot_overwrite_another_scorers_saved_figures(): void
+    {
+        [, $matches, $member] = $this->fixture();
+        $match = $matches[0];
+        $draft = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $expected = ['draft' => ['id' => $draft->id, 'version' => $draft->version], 'published' => null];
+        $revision = $match->player_stats_revision;
+        $args = ['match_id' => $match->id, 'team_id' => $member->team_id, 'member_id' => $member->id,
+            'expected' => $expected, 'figures' => ['runs_scored' => 99]];
+        $this->assertSame('REJECTED:player', $this->compete($this->scorer(false), 'save', $args,
+            fn () => app(PlayerStatsService::class)->saveDraft(2026, $match->id, $member->team_id, $member->id,
+                $expected, ['runs_scored' => 15])));
+        $this->assertSame(15, $draft->fresh()->runs_scored);
+        $this->assertSame($draft->version + 1, $draft->fresh()->version);
+        $this->assertSame($revision + 1, $match->fresh()->player_stats_revision);
+        $this->assertDatabaseCount('player_tournament_stats', 0);
+    }
+
+    public function test_waiting_first_draft_save_cannot_replace_a_newly_created_entry(): void
+    {
+        [, $matches, $member] = $this->fixture();
+        $match = $matches[0];
+        $service = app(PlayerStatsService::class);
+        $draft = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $service->discardDraft(2026, $match->id, $member->team_id, $member->id,
+            ['draft' => ['id' => $draft->id, 'version' => $draft->version], 'published' => null]);
+        $expected = ['draft' => null, 'published' => null];
+        $args = ['match_id' => $match->id, 'team_id' => $member->team_id, 'member_id' => $member->id,
+            'expected' => $expected, 'figures' => ['runs_scored' => 99]];
+        $this->assertSame('REJECTED:player', $this->compete($this->scorer(false), 'save', $args,
+            fn () => $service->saveDraft(2026, $match->id, $member->team_id, $member->id, $expected, ['runs_scored' => 15])));
+        $rows = PlayerMatchStat::where('match_id', $match->id)->get();
+        $this->assertCount(1, $rows);
+        $this->assertSame(15, $rows->first()->runs_scored);
+        $this->assertSame(1, $rows->first()->version);
+        $this->assertDatabaseCount('player_tournament_stats', 0);
+    }
+
+    public function test_waiting_save_rejects_recreated_draft_even_when_version_and_figures_match(): void
+    {
+        [, $matches, $member] = $this->fixture();
+        $match = $matches[0];
+        $draft = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $expected = ['draft' => ['id' => $draft->id, 'version' => $draft->version], 'published' => null];
+        $args = ['match_id' => $match->id, 'team_id' => $member->team_id, 'member_id' => $member->id,
+            'expected' => $expected, 'figures' => ['runs_scored' => 99]];
+        $this->assertSame('REJECTED:player', $this->compete($this->scorer(false), 'save', $args,
+            fn () => $this->recreateDraft($match, $member, $draft)));
+        $replacement = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $this->assertNotSame($draft->id, $replacement->id);
+        $this->assertSame($draft->version, $replacement->version);
+        $this->assertSame(10, $replacement->runs_scored);
+        $this->assertSame($match->player_stats_revision + 2, $match->fresh()->player_stats_revision);
+        $this->assertDatabaseCount('player_tournament_stats', 0);
+    }
+
+    public function test_waiting_publication_rejects_an_identical_recreated_draft(): void
+    {
+        [, $matches, $member] = $this->fixture();
+        $match = $matches[0];
+        $review = $this->review($match);
+        $draft = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $this->assertSame('REJECTED:player', $this->compete($this->scorer(false), 'publish', $review,
+            fn () => $this->recreateDraft($match, $member, $draft)));
+        $replacement = PlayerMatchStat::where('match_id', $match->id)->firstOrFail();
+        $this->assertNotSame($draft->id, $replacement->id);
+        $this->assertSame($draft->version, $replacement->version);
+        $this->assertSame(10, $replacement->runs_scored);
+        $this->assertDatabaseCount('player_tournament_stats', 0);
+        $this->assertSame(0, PlayerMatchStat::where('record_state', 'published')->count());
+    }
+
+    private function recreateDraft(TournamentMatch $match, TeamMember $member, PlayerMatchStat $draft): void
+    {
+        $service = app(PlayerStatsService::class);
+        $service->discardDraft(2026, $match->id, $member->team_id, $member->id,
+            ['draft' => ['id' => $draft->id, 'version' => $draft->version], 'published' => null]);
+        $service->saveDraft(2026, $match->id, $member->team_id, $member->id,
+            ['draft' => null, 'published' => null], ['runs_scored' => 10]);
     }
 }

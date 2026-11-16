@@ -136,9 +136,11 @@ PHP;
         $other = $this->other();
         $other->beginTransaction();
         $other->query('SELECT id FROM tournament_groups WHERE id = '.(int) $id.' FOR UPDATE');
+        $calls = 0;
         try {
             try {
-                app(TournamentWriteService::class)->run(2026, function () use ($id) {
+                app(TournamentWriteService::class)->run(2026, function () use ($id, &$calls) {
+                    $calls++;
                     DB::table('tournament_groups')->insert(['tournament_year' => 2026, 'name' => 'Must roll back']);
                     DB::table('tournament_groups')->where('id', $id)->update(['name' => 'Changed']);
                 });
@@ -149,6 +151,7 @@ PHP;
         } finally {
             $other->rollBack();
         }
+        $this->assertSame(1, $calls, 'A timed-out update must not be silently replayed.');
         $this->assertDatabaseCount('tournament_groups', 1);
         $this->assertDatabaseHas('tournament_groups', ['id' => $id, 'name' => 'Locked']);
         $this->assertTrue($this->tryLock($other, 2026));

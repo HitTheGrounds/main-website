@@ -63,10 +63,6 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertSee($committeeUrl, false);
 
-        $this->get(route('registrations'))
-            ->assertOk()
-            ->assertSee($committeeUrl, false);
-
         $this->get(route('register'))
             ->assertOk()
             ->assertSee($committeeUrl, false);

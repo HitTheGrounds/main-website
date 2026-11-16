@@ -1,8 +1,9 @@
 <x-layouts.public>
     <x-HeroSection />
+    <x-SponsorsSection />
     <div class="hidden lg:block">
-        <x-MoreThanGameSection />
         <x-AboutSection />
+        <x-TeamsSection variant="desktop" />
     </div>
     <x-MobileHighlights />
     {{-- <x-ContendersSection /> --}}
@@ -10,7 +11,6 @@
     <div class="hidden lg:block">
         <x-CommitteeSection />
     </div>
-    <x-RegisterCta />
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',
@@ -28,5 +28,5 @@
             'organizer' => ['@type' => 'CollegeOrUniversity', 'name' => 'Department of Computer Science and Engineering, University of Moratuwa'],
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}
     </script>
-    @vite(['resources/js/awards-podium.js', 'resources/js/past-seasons-3d.js'])
+    @vite(['resources/js/awards-podium.js', 'resources/js/past-seasons-3d.js', 'resources/js/teams-stack.js'])
 </x-layouts.public>

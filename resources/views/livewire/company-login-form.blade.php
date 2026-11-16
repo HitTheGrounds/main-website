@@ -161,12 +161,6 @@ new class extends Component {
             </div>
         </form>
 
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-base-content/70">
-            <span>{{ __("Don't have an account?") }}</span>
-            <a href="{{ route('register') }}" wire:navigate class="link-primary btn-link">
-                {{ __('Register here') }}
-            </a>
-        </div>
     @else
         <!-- Verification Form -->
         <div class="text-center">

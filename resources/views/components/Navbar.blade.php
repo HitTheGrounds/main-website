@@ -10,7 +10,7 @@
 
       <!-- Logo -->
       <a href="/" class="px-1 sm:px-4 flex items-center gap-2 cursor-pointer">
-        <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 object-contain block">
+        <img src="{{ asset('images/htg-logo-horizontal-orange.webp') }}" alt="HIT THE GROUNDS 2026, powered by GTN" width="900" height="481" class="h-9 w-auto sm:h-11 md:h-12 object-contain block">
       </a>
     </div>
 

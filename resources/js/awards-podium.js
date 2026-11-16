@@ -3,6 +3,8 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 const mount = document.getElementById('awards-podium');
+// Phones/tablets: no MSAA, lower pixel ratio, no shadow maps or clearcoat, fewer particles, ~30fps.
+const LITE = matchMedia('(max-width: 1023.98px), (pointer: coarse)').matches;
 
 // Podium blocks: x position, height, label. The trophy images are pre-rendered, so each one is a
 // camera-facing card that stands on its block while the blocks turn underneath.
@@ -67,12 +69,12 @@ async function init() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     try { await document.fonts.load('800 200px "Plus Jakarta Sans"'); } catch (e) { /* fall back to system font */ }
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: !LITE, alpha: true, powerPreference: LITE ? 'default' : 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, LITE ? 1.5 : 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = !LITE; // the contact-shadow planes still ground the blocks
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setClearColor(0x000000, 0);
     const canvas = renderer.domElement;
@@ -136,10 +138,10 @@ async function init() {
     // ---- turntable podium ----
     const podium = new THREE.Group();
     scene.add(podium);
-    const stone = new THREE.MeshPhysicalMaterial({ color: STONE, roughness: 0.22, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.12, envMapIntensity: 0.9 });
+    const stone = new THREE.MeshPhysicalMaterial({ color: STONE, roughness: 0.22, metalness: 0.2, clearcoat: LITE ? 0 : 1, clearcoatRoughness: 0.12, envMapIntensity: 0.9 });
     const gold = new THREE.MeshStandardMaterial({ color: GOLD, metalness: 1, roughness: 0.26, envMapIntensity: 1.3 });
     const goldBright = new THREE.MeshStandardMaterial({ color: 0xf5c542, metalness: 1, roughness: 0.16, envMapIntensity: 1.4 });
-    const slab = new THREE.MeshPhysicalMaterial({ color: 0x0f0c0a, roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 0.8 });
+    const slab = new THREE.MeshPhysicalMaterial({ color: 0x0f0c0a, roughness: 0.16, metalness: 0.35, clearcoat: LITE ? 0 : 1, clearcoatRoughness: 0.06, envMapIntensity: 0.8 });
     const shadowTex = radialTexture([[0, 'rgba(0,0,0,0.65)'], [0.6, 'rgba(0,0,0,0.25)'], [1, 'rgba(0,0,0,0)']]);
 
     const loader = new THREE.TextureLoader();
@@ -239,7 +241,7 @@ async function init() {
     scene.add(cone);
 
     // ---- floating gold dust ----
-    const N = 150;
+    const N = LITE ? 60 : 150;
     const pos = new Float32Array(N * 3);
     const seed = new Float32Array(N);
     for (let i = 0; i < N; i++) {
@@ -293,9 +295,14 @@ async function init() {
 
     const tmp = new THREE.Vector3();
     const clock = new THREE.Clock();
-    let visible = true, raf = 0;
+    let visible = true, raf = 0, lastDraw = 0;
 
     function frame() {
+        if (LITE && !reduceMotion && performance.now() - lastDraw < 30) {
+            raf = visible && !document.hidden ? requestAnimationFrame(frame) : 0;
+            return;
+        }
+        lastDraw = performance.now();
         const dt = Math.min(clock.getDelta(), 0.05);
         const t = clock.elapsedTime;
         if (!reduceMotion && !dragging) {

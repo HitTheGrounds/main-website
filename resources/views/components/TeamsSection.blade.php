@@ -1,30 +1,29 @@
 @props(['variant' => 'desktop'])
 @php
-    // From the exported team list; companies with several teams appear once.
-    // Order is deliberate: CSE batches are spread between the company logos.
+    // Final team list: [name, logo file]. A null logo means a CSE batch, drawn as a "CSE | 21" lockup.
+    // Order is deliberate: the CSE teams are spread between the company logos.
     $teams = [
         ['99x', '99x.webp'],
-        ['CSE Batch 18', 'cse-18.svg'],
+        ['CSE 18', null],
         ['Aayu Technologies', 'aayu.svg'],
-        ['Cut + Dry', 'cut-and-dry.svg'],
-        ['CSE Batch 21', 'cse-21.svg'],
+        ['Axonect', 'axonect.webp'],
         ['Creative Software', 'creative-software.webp'],
+        ['CSE 21', null],
         ['Enlear', 'enlear.svg'],
         ['DirectFN', 'directfn.webp'],
-        ['CSE Batch 22', 'cse-22.svg'],
-        ['GTN Technologies', 'gtn.webp'],
+        ['GTN', 'gtn.webp'],
+        ['CSE 22', null],
         ['IronOne Technologies', 'ironone.webp'],
-        ['Jaseci Labs', 'jaseci.webp'],
-        ['CSE Batch 23', 'cse-23.svg'],
         ['PickMe', 'pickme.webp'],
+        ['CSE 23', null],
         ['SenzMate', 'senzmate.webp'],
         ['Short Circuit', 'short-circuit.svg'],
-        ['CSE Batch 24', 'cse-24.svg'],
         ['Synopsys', 'synopsys.webp'],
+        ['CSE 24', null],
         ['Thomson Reuters', 'thomson-reuters.webp'],
         ['WSO2', 'wso2.webp'],
-        ['CSE Batch 25', 'cse-25.svg'],
         ['Xitricon', 'xitricon.webp'],
+        ['CSE 25', null],
         ['Yaala Labs', 'yaala.webp'],
     ];
 @endphp
@@ -47,8 +46,16 @@
         @foreach ($teams as [$name, $logo])
           <li data-team
               class="group flex h-[clamp(3.25rem,8dvh,4.75rem)] w-[calc((100%-1rem)/3)] items-center justify-center rounded-xl bg-white p-2 shadow-[0_1px_0_rgb(31_27_22/.06),0_4px_8px_-4px_rgb(31_27_22/.22)] sm:w-[calc((100%-2.25rem)/4)] sm:p-3 lg:h-[clamp(4rem,11dvh,7rem)] lg:w-[calc((100%-5rem)/6)] lg:p-4">
-            <img src="/images/teams/{{ $logo }}" alt="{{ $name }}" decoding="async" fetchpriority="low"
-                 class="max-h-full max-w-full object-contain transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+            @if ($logo)
+              <img src="/images/teams/{{ $logo }}" alt="{{ $name }}" decoding="async" fetchpriority="low"
+                   class="max-h-full max-w-full object-contain transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100">
+            @else
+              <span role="img" aria-label="{{ $name }}" class="flex items-center gap-[0.3em] font-heading text-[1.1rem] leading-none transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 sm:text-2xl lg:text-[clamp(1.5rem,2.7vw,2.25rem)]">
+                <span class="text-base-content">CSE</span>
+                <span class="h-[0.95em] w-[0.09em] rounded-full bg-primary"></span>
+                <span class="text-primary">{{ substr($name, 4) }}</span>
+              </span>
+            @endif
           </li>
         @endforeach
       </ul>

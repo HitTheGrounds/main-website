@@ -17,7 +17,7 @@
         ['PickMe', 'pickme.webp'],
         ['CSE 23', null],
         ['SenzMate', 'senzmate.webp'],
-        ['Short Circuit', 'short-circuit.svg'],
+        ['Short Circuit', 'short-circuit.webp'],
         ['Synopsys', 'synopsys.webp'],
         ['CSE 24', null],
         ['Thomson Reuters', 'thomson-reuters.webp'],

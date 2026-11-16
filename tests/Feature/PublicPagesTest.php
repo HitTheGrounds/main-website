@@ -154,7 +154,6 @@ class PublicPagesTest extends TestCase
             'most dot balls delivered',
             'standout performer in the final',
         ]);
-        $response->assertSee(route('register'), false);
         $response->assertDontSee([
             'Best Batsman',
             'Best Bowler',

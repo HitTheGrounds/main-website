@@ -83,7 +83,7 @@ new class extends Component {
         }
         app(MatchResultService::class)->publish($this->year(), $this->matchId, $this->review['version'], $this->review['draft_hash']);
         $this->loadSaved();
-        $this->notice = 'Team result published and group standings updated. Player figures can be entered separately later.';
+        $this->notice = 'Team result published and group standings updated. Open Player figures, then review and publish player updates to update public Stats.';
     }
 
     public function discardDraft(): void
@@ -184,14 +184,14 @@ new class extends Component {
                 @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
                     <fieldset class="rounded-lg border border-base-300 p-4 space-y-3"><legend class="px-2 font-bold">{{ $name }}: normal innings</legend>
                         <div class="grid grid-cols-2 gap-3">
-                            @foreach(['runs' => ['Runs', 2147483647], 'wickets' => ['Wickets', 11], 'overs' => ['Complete overs', 5], 'balls' => ['Remaining balls', $match->balls_per_over - 1]] as $field => [$label, $maximum])
+                            @foreach(['runs' => ['Runs', 2147483647], 'wickets' => ['Wickets', 11], 'overs' => ['Complete overs', 5], 'balls' => ['Balls in current over', $match->balls_per_over - 1]] as $field => [$label, $maximum])
                                 <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $maximum }}" step="1" wire:model="form.{{ $side }}_{{ $field }}" class="input w-full" /></label>
                             @endforeach
                         </div>
                     </fieldset>
                 @endforeach
             </div>
-            <p class="text-sm text-center">Enter actual innings totals. Enter complete overs and remaining balls separately. Super Over figures are excluded.</p>
+            <p class="text-sm text-center">Enter actual innings totals. For 4 overs and 3 balls, enter 4 in Complete overs and 3 in Balls in current over. Count balls already bowled after the complete overs. Super Over figures are excluded.</p>
             <label><span class="label">Official explanation (required for an exceptional decision)</span><textarea wire:model="form.result_note" maxlength="2000" rows="3" class="textarea w-full"></textarea></label>
             @if(($form['result_method'] ?? null) === 'revised_target')
                 <fieldset class="rounded-lg border border-base-300 p-4 space-y-4"><legend class="px-2 font-bold">Official revised-target figures</legend>
@@ -201,7 +201,7 @@ new class extends Component {
                     @if(in_array($form['nrr_inputs']['included'] ?? null, [true, 1, '1'], true))
                         @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
                             <fieldset class="grid gap-3 sm:grid-cols-3"><legend class="font-semibold">{{ $name }}: official NRR inputs</legend>
-                                @foreach(['runs' => 'Runs', 'overs' => 'Complete overs', 'balls' => 'Remaining balls'] as $field => $label)<label><span class="label">{{ $label }}</span><input type="number" min="0" step="1" wire:model="form.nrr_inputs.{{ $side }}.{{ $field }}" class="input w-full" /></label>@endforeach
+                                @foreach(['runs' => 'Runs', 'overs' => 'Complete overs', 'balls' => 'Balls in current over'] as $field => $label)<label><span class="label">{{ $label }}</span><input type="number" min="0" step="1" wire:model="form.nrr_inputs.{{ $side }}.{{ $field }}" class="input w-full" /></label>@endforeach
                             </fieldset>
                         @endforeach
                     @endif

@@ -283,6 +283,7 @@ new class extends Component {
             @endforeach
             <p class="text-sm">These counts do not identify the playing XI or confirm that all figures are complete.</p>
             @if(collect($data['rows'])->contains('record_state', 'draft'))
+                <p class="text-sm">Saved player figures remain private until you review and publish player updates. Publishing the team result does not publish these drafts.</p>
                 <button type="button" wire:click="reviewPlayerUpdates" wire:loading.attr="disabled" @disabled(!$data['eligible']) class="btn btn-primary mx-auto">Review player updates</button>
             @else<p>No pending player updates to publish.</p>@endif
         </div></section>

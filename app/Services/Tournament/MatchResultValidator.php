@@ -125,7 +125,7 @@ class MatchResultValidator
             $overs = $data[$team.'_overs'] ?? null;
             $balls = $data[$team.'_balls'] ?? null;
             if (($overs === null) !== ($balls === null)) {
-                $this->reject($team.'_overs', 'Enter both complete overs and remaining balls, or leave both unknown.');
+                $this->reject($team.'_overs', 'Enter both complete overs and balls in the current over, or leave both unknown.');
             }
             $result[$team.'_deliveries'] = $overs === null ? null : $this->count($match, $overs, $balls, $team.'_');
         }

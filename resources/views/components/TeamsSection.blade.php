@@ -14,6 +14,7 @@
         ['GTN', 'gtn.webp'],
         ['CSE 22', null],
         ['IronOne Technologies', 'ironone.webp'],
+        ['JAC', 'jac-logo.svg'],
         ['PickMe', 'pickme.webp'],
         ['CSE 23', null],
         ['SenzMate', 'senzmate.webp'],

@@ -207,47 +207,47 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6">
-    <header class="space-y-2 text-center">
+<div class="scorer-screen space-y-5">
+    <header class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Player figures</h1>
         <p>{{ $data['teams'][0]['team_name'] }} vs {{ $data['teams'][1]['team_name'] }}</p>
-        <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
-        <a href="{{ route('scorer.matches.result', ['matchId' => $matchId]) }}" class="link ml-3">Team result</a>
+        <nav class="scorer-actions" aria-label="Match tools">
+            <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
+            <a href="{{ route('scorer.matches.result', ['matchId' => $matchId]) }}" class="link ml-3">Team result</a>
+        </nav>
         <p class="text-sm">Enter normal innings only. Exclude Super Over figures. You can skip players and leave fields blank.</p>
         @unless($data['eligible'])<p class="text-sm">Drafts can be saved now. Publishing requires a finished, published win or tie.</p>@endunless
     </header>
-    <div aria-live="polite">
+    <div class="scorer-feedback" aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
         @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
-        <p wire:loading role="status" class="text-center text-sm">Updating player figures...</p>
+        <p wire:loading role="status" class="text-sm">Updating player figures...</p>
     </div>
-    <div class="flex flex-wrap justify-center gap-3">
-        @foreach($data['teams'] as $team)
-            <button type="button" wire:click="selectTeam({{ $team['id'] }})" @if($memberId) wire:confirm="Leave this editor? Unsaved changes will be lost." @endif
-                wire:loading.attr="disabled" class="btn {{ $teamId === $team['id'] ? 'btn-primary' : 'btn-outline' }}" aria-pressed="{{ $teamId === $team['id'] ? 'true' : 'false' }}">{{ $team['team_name'] }}</button>
-        @endforeach
-    </div>
+    <ol class="scorer-steps" aria-label="Player figures workflow">
+        <li @if($review === null) aria-current="step" @endif>1. Enter figures</li>
+        <li @if($review !== null) aria-current="step" @endif>2. Review and publish</li>
+    </ol>
     @if($review !== null)
-        <section class="card border border-base-300 bg-base-100" aria-labelledby="player-review-heading"><div class="card-body space-y-4">
-            <h2 id="player-review-heading" class="text-center text-xl font-bold">Review player updates</h2>
+        <section class="card border border-base-300 bg-base-100" aria-labelledby="player-review-heading" wire:key="player-review" x-data x-init="$nextTick(() => $refs.playerHeading.focus())"><div class="card-body space-y-4">
+            <h2 id="player-review-heading" x-ref="playerHeading" tabindex="-1" class="text-xl font-bold">Review player updates</h2>
             <p class="text-center">{{ count($review['changes']) }} pending player updates across this match. Only the saved changes below will be published.</p>
-            <p class="text-center text-sm">Not recorded means unknown, not zero. Partial figures are allowed. Unentered players stay unchanged.</p>
+            <p class="text-sm">Not recorded means unknown, not zero. Partial figures are allowed. Unentered players stay unchanged.</p>
             @foreach($data['teams'] as $team)
                 <section class="space-y-3" aria-labelledby="review-team-{{ $team['id'] }}">
-                    <h3 id="review-team-{{ $team['id'] }}" class="text-center text-lg font-bold">{{ $team['team_name'] }}</h3>
+                    <h3 id="review-team-{{ $team['id'] }}" class="text-lg font-bold">{{ $team['team_name'] }}</h3>
                     @forelse(collect($review['changes'])->where('draft.team_id', $team['id']) as $change)
                         @php
                             $withdraw = $change['draft']['pending_action'] === 'withdraw';
                             $action = $withdraw ? 'Withdraw official performance' : ($change['published'] === null ? 'Add performance' : 'Correct performance');
                         @endphp
                         <article wire:key="review-draft-{{ $change['draft']['id'] }}" class="rounded-lg border border-base-300 p-3 space-y-2">
-                            <h4 class="text-center font-bold break-words">{{ $change['draft']['player_name'] }}</h4>
-                            <p class="text-center text-sm">{{ $action }} | Recorded gender: {{ $change['draft']['player_gender'] }}</p>
+                            <h4 class="font-bold break-words">{{ $change['draft']['player_name'] }}</h4>
+                            <p class="text-sm">{{ $action }} | Recorded gender: {{ $change['draft']['player_gender'] }}</p>
                             @if(!$withdraw && count($change['missing_metrics']))
-                                <p class="text-center text-sm">Incomplete figures: {{ count($change['missing_metrics']) }} of {{ count($metrics) }} numeric fields are not recorded. You can still publish.</p>
+                                <p class="text-sm">Incomplete figures: {{ count($change['missing_metrics']) }} of {{ count($metrics) }} numeric fields are not recorded. You can still publish.</p>
                             @endif
-                            @if($withdraw)<p class="text-center text-sm">This removes the official performance from tournament totals. The registered player stays unchanged.</p>@endif
-                            <div class="overflow-x-auto"><table class="table w-full">
+                            @if($withdraw)<p class="text-sm">This removes the official performance from tournament totals. The registered player stays unchanged.</p>@endif
+                            <div class="scorer-scroll overflow-x-auto" tabindex="0" role="region" aria-label="Scrollable figures"><table class="table w-full">
                                 <caption class="sr-only">Reviewed figures for {{ $change['draft']['player_name'] }}</caption>
                                 <thead><tr><th scope="col">Figure</th><th scope="col">Current official</th><th scope="col">After publication</th></tr></thead>
                                 <tbody>
@@ -260,20 +260,48 @@ new class extends Component {
                                 </tbody>
                             </table></div>
                         </article>
-                    @empty<p class="text-center text-sm">No pending updates for this team.</p>@endforelse
+                    @empty<p class="text-sm">No pending updates for this team.</p>@endforelse
                 </section>
             @endforeach
-            <p class="text-center text-sm">If another scorer changes this match or its player entries, publication will be rejected. Review again to load the latest saved changes.</p>
-            <p class="text-center text-sm">Public viewers will see published updates when they load or refresh the page.</p>
-            <div class="flex flex-wrap justify-center gap-3">
+            <p class="text-sm">If another scorer changes this match or its player entries, publication will be rejected. Review again to load the latest saved changes.</p>
+            <p class="text-sm">Public viewers will see published updates when they load or refresh the page.</p>
+            <div class="scorer-actions flex flex-wrap gap-3">
                 <button type="button" wire:click="publishPlayerUpdates" wire:confirm="Publish all reviewed player updates for both teams, including withdrawals?" wire:loading.attr="disabled" class="btn btn-primary">Publish player updates</button>
                 <button type="button" wire:click="reviewPlayerUpdates" wire:loading.attr="disabled" class="btn btn-outline">Review latest saved changes</button>
                 <button type="button" wire:click="cancelReview" wire:loading.attr="disabled" class="btn btn-ghost">Back to player list</button>
             </div>
         </div></section>
     @elseif($memberId === null)
-        <section class="card border border-base-300 bg-base-100"><div class="card-body text-center space-y-3">
-            <h2 class="text-xl font-bold">Match player updates</h2>
+        <div class="scorer-review-bar">
+            @if(collect($data['rows'])->contains('record_state', 'draft'))
+
+                <button type="button" wire:click="reviewPlayerUpdates" wire:loading.attr="disabled" @disabled(!$data['eligible']) class="btn btn-primary mx-auto">Review player updates</button>
+            @else<p>No pending player updates to publish.</p>@endif
+        </div>
+    <div class="scorer-team-picker" role="group" aria-label="Choose team">
+        @foreach($data['teams'] as $team)
+            <button type="button" wire:click="selectTeam({{ $team['id'] }})" @if($memberId) wire:confirm="Leave this editor? Unsaved changes will be lost." @endif
+                wire:loading.attr="disabled" class="btn {{ $teamId === $team['id'] ? 'btn-primary' : 'btn-outline' }}" aria-pressed="{{ $teamId === $team['id'] ? 'true' : 'false' }}">{{ $team['team_name'] }}</button>
+        @endforeach
+    </div>
+        <section class="card border border-base-300 bg-base-100"><div class="card-body space-y-3">
+            <h2 class="text-xl font-bold">Select a player</h2>
+            @forelse(collect($data['players'])->where('team_id', $teamId) as $player)
+                @php
+                    $entries = collect($data['rows'])->where('team_member_id', $player['id'])->where('team_id', $teamId);
+                    $draft = $entries->firstWhere('record_state', 'draft');
+                    $published = $entries->firstWhere('record_state', 'published');
+                @endphp
+                <div wire:key="player-{{ $player['id'] }}" class="scorer-player-row">
+                    <div class="min-w-0 break-words"><span class="font-semibold">{{ $player['name'] }}</span>
+                        <span @class(['scorer-player-state', 'is-draft' => $draft !== null])>{{ $draft ? 'Draft changes' : ($published ? 'Published' : 'No figures') }}</span>
+                        @if(($draft['pending_action'] ?? null) === 'withdraw')<span class="text-sm">Withdrawal pending</span>@endif
+                    </div>
+                    <button type="button" wire:click="selectPlayer({{ $player['id'] }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit figures</button>
+                </div>
+            @empty<p class="text-center">No players are registered for this team.</p>@endforelse
+        </div></section>
+        <details class="scorer-disclosure"><summary>Saved entries by team</summary><div class="card-body space-y-3">
             @foreach($data['teams'] as $team)
                 @php
                     $registered = collect($data['players'])->where('team_id', $team['id'])->count();
@@ -282,42 +310,38 @@ new class extends Component {
                 <p>{{ $team['team_name'] }}: {{ $recorded }} players with saved entries (draft or official), {{ $registered }} registered.</p>
             @endforeach
             <p class="text-sm">These counts do not identify the playing XI or confirm that all figures are complete.</p>
-            @if(collect($data['rows'])->contains('record_state', 'draft'))
-                <p class="text-sm">Saved player figures remain private until you review and publish player updates. Publishing the team result does not publish these drafts.</p>
-                <button type="button" wire:click="reviewPlayerUpdates" wire:loading.attr="disabled" @disabled(!$data['eligible']) class="btn btn-primary mx-auto">Review player updates</button>
-            @else<p>No pending player updates to publish.</p>@endif
-        </div></section>
-        <section class="card border border-base-300 bg-base-100"><div class="card-body space-y-3">
-            <h2 class="text-center text-xl font-bold">Select a player</h2>
-            @forelse(collect($data['players'])->where('team_id', $teamId) as $player)
-                @php
-                    $entries = collect($data['rows'])->where('team_member_id', $player['id'])->where('team_id', $teamId);
-                    $draft = $entries->firstWhere('record_state', 'draft');
-                    $published = $entries->firstWhere('record_state', 'published');
-                @endphp
-                <div wire:key="player-{{ $player['id'] }}" class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-base-300 p-3">
-                    <div class="min-w-0 break-words"><span class="font-semibold">{{ $player['name'] }}</span>
-                        <span class="badge badge-outline">{{ $draft ? 'Draft changes' : ($published ? 'Published' : 'No figures') }}</span>
-                        @if(($draft['pending_action'] ?? null) === 'withdraw')<span class="text-sm">Withdrawal pending</span>@endif
-                    </div>
-                    <button type="button" wire:click="selectPlayer({{ $player['id'] }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Enter / edit figures</button>
-                </div>
-            @empty<p class="text-center">No players are registered for this team.</p>@endforelse
-        </div></section>
+        </div></details>
     @else
-        <section class="card border border-base-300 bg-base-100"><form wire:submit="savePlayer" class="card-body space-y-4">
-            <h2 class="text-center text-xl font-bold">{{ collect($data['players'])->firstWhere('id', $memberId)['name'] ?? 'Player no longer available' }}</h2>
-            <p class="text-center text-sm">Blank means unknown. Enter 0 for a known zero. Saving creates a draft for later review.</p>
-            <p wire:dirty wire:target="form" class="text-center text-sm">You have unsaved changes.</p>
+    <div class="scorer-team-picker" role="group" aria-label="Choose team">
+        @foreach($data['teams'] as $team)
+            <button type="button" wire:click="selectTeam({{ $team['id'] }})" @if($memberId) wire:confirm="Leave this editor? Unsaved changes will be lost." @endif
+                wire:loading.attr="disabled" class="btn {{ $teamId === $team['id'] ? 'btn-primary' : 'btn-outline' }}" aria-pressed="{{ $teamId === $team['id'] ? 'true' : 'false' }}">{{ $team['team_name'] }}</button>
+        @endforeach
+    </div>
+        <section class="card border border-base-300 bg-base-100" wire:key="player-entry-{{ $memberId }}" x-data x-init="$nextTick(() => $refs.playerHeading.focus())"><form wire:submit="savePlayer" class="card-body space-y-4">
+            <h2 class="text-xl font-bold" x-ref="playerHeading" tabindex="-1">{{ collect($data['players'])->firstWhere('id', $memberId)['name'] ?? 'Player no longer available' }}</h2>
+            <p class="text-sm">Blank means unknown. Enter 0 for a known zero. Saving creates a draft for later review.</p>
+            <p wire:dirty wire:target="form" class="text-sm">You have unsaved changes.</p>
             @if($pendingAction === 'withdraw')<p class="alert alert-warning">Withdrawal pending. Saving this form replaces the withdrawal with a correction draft.</p>@endif
-            <div class="grid gap-4 sm:grid-cols-2">
-                @foreach($metrics as $field => $label)
-                    <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $field === 'wickets_taken' ? 11 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
-                @endforeach
+            <div class="grid gap-4 lg:grid-cols-2">
+                @foreach(['Batting' => array_slice($metrics, 0, 4, true), 'Bowling' => array_slice($metrics, 4, null, true)] as $discipline => $fields)
+                    <fieldset class="rounded-lg border border-base-300 p-3">
+                        <legend class="px-2 font-bold">{{ $discipline }}</legend>
+                        <div class="grid grid-cols-2 gap-3">
+                            @foreach($fields as $field => $label)
+                                <label><span class="label">{{ $label }}</span><input type="number" inputmode="numeric" min="0" max="{{ $field === 'wickets_taken' ? 11 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
+                            @endforeach
+                        </div>
+                        @if($discipline === 'Batting')
+                            <div class="mt-3">
                 <label><span class="label">Batting status (optional)</span><select wire:model="form.batting_status" class="select w-full">
                     <option value="">Unknown</option>
                     @foreach(['out' => 'Out', 'not_out' => 'Not out', 'did_not_bat' => 'Did not bat', 'retired_hurt' => 'Retired hurt', 'retired_out' => 'Retired out'] as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
                 </select></label>
+                            </div>
+                        @endif
+                    </fieldset>
+                @endforeach
             </div>
             @if($official !== null)
                 <details class="rounded-lg border border-base-300 p-3"><summary class="cursor-pointer font-semibold">Current official figures</summary>
@@ -325,7 +349,7 @@ new class extends Component {
                         <div><dt>Batting status</dt><dd>{{ str_replace('_', ' ', $official['batting_status'] ?? 'Unknown') }}</dd></div></dl>
                 </details>
             @endif
-            <div class="flex flex-wrap justify-center gap-3">
+            <div class="scorer-actions flex flex-wrap gap-3">
                 <button type="submit" wire:loading.attr="disabled" class="btn btn-primary">Save and return</button>
                 <button type="button" wire:click="savePlayer(true)" wire:loading.attr="disabled" class="btn btn-outline">Save and next player</button>
                 <button type="button" wire:click="returnToList" wire:confirm="Return to the player list? Unsaved changes will be lost." wire:loading.attr="disabled" class="btn btn-ghost">Back to player list</button>

@@ -115,7 +115,7 @@ class ScorerKnockoutsScreenTest extends TestCase
         $input = $this->fixtureInput($teams[0]->id, $teams[1]->id, 4);
         $component->set('fixture', $input)->call('createMatch')->assertHasErrors('tournament')->assertSet('fixture', $input)
             ->call('reloadRound')->assertHasNoErrors()->set('fixture', $input)->call('createMatch')->assertHasNoErrors()
-            ->assertSee('Knockout match #')->assertSee('QF 4');
+            ->assertSee('Knockout match #')->assertSee('Quarter-final 4');
         $match = TournamentMatch::firstOrFail();
         $this->assertSame(4, $match->bracket_position);
         $this->assertNull($match->team1_runs);

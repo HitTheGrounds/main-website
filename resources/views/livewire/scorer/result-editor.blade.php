@@ -94,6 +94,12 @@ new class extends Component {
         $this->notice = 'Draft discarded. Published results have not changed.';
     }
 
+    public function returnToDraft(): void
+    {
+        $this->review = null;
+        $this->resetErrorBag();
+    }
+
     public function reloadResult(): void
     {
         $this->loadSaved();
@@ -139,22 +145,24 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6">
-    <header class="space-y-2 text-center">
+<div class="scorer-screen space-y-5">
+    <header class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Match result</h1>
         <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name ?? ['QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'][$match->stage] }}</p>
         <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Eleven wickets</p>
-        <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
-        <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
+        <nav class="scorer-actions" aria-label="Match tools">
+            <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
+            <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
+        </nav>
     </header>
-    <div aria-live="polite">
+    <div class="scorer-feedback" aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
         @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
-        <p wire:loading role="status" class="text-center text-sm">Updating result...</p>
+        <p wire:loading role="status" class="text-sm">Updating result...</p>
     </div>
-    <section class="card border border-base-300 bg-base-100" aria-labelledby="official-result-heading">
-        <div class="card-body text-center">
-            <h2 id="official-result-heading" class="text-xl font-bold">Published result</h2>
+    <details class="scorer-disclosure">
+        <summary id="official-result-heading">{{ $official ? 'Published result' : 'No published result' }}@if($hasDraft) <span class="scorer-draft-marker">Saved draft exists</span>@endif</summary>
+        <div class="card-body">
             @if($official)
                 <p>{{ str_replace('_', ' ', $official['result_type']) }} @if($official['result_method']) ({{ str_replace('_', ' ', $official['result_method']) }}) @endif
                     @if($official['winner_id']) | Winner: {{ $official['winner_id'] === $match->team1_id ? $match->team1->team_name : $match->team2->team_name }} @endif</p>
@@ -164,13 +172,17 @@ new class extends Component {
                 @endforeach
                 @if($official['result_note'])<p class="whitespace-pre-wrap break-words">{{ $official['result_note'] }}</p>@endif
             @else<p>No team result has been published.</p>@endif
-            @if($hasDraft)<p class="badge badge-outline mx-auto">Saved draft exists</p>@endif
         </div>
-    </section>
+    </details>
+    <ol class="scorer-steps" aria-label="Team result workflow">
+        <li @if(!$review) aria-current="step" @endif>1. Enter figures</li>
+        <li @if($review) aria-current="step" @endif>2. Review and publish</li>
+    </ol>
+    @if(!$review)
     <section class="card border border-base-300 bg-base-100" aria-labelledby="result-draft-heading">
         <form wire:submit="saveDraft" class="card-body space-y-4">
-            <h2 id="result-draft-heading" class="text-center text-xl font-bold">Result draft</h2>
-            <p class="text-center text-sm">Save incomplete details at any time. Blank means unknown; enter 0 for a known zero. Team results do not need player figures.</p>
+            <h2 id="result-draft-heading" class="text-xl font-bold">Result draft</h2>
+            <p class="text-sm">Save incomplete details at any time. Blank means unknown; enter 0 for a known zero. Team results do not need player figures.</p>
             <div class="grid gap-4 sm:grid-cols-2">
                 <label><span class="label">Result</span><select wire:model.live="form.result_type" class="select w-full"><option value="">Choose result</option><option value="win">Win</option>@if($match->stage === 'G')<option value="tie">Tie</option><option value="no_result">No result</option><option value="abandoned">Abandoned</option>@endif</select></label>
                 @if(($form['result_type'] ?? null) === 'win')
@@ -180,6 +192,7 @@ new class extends Component {
                 <label><span class="label">Batting first</span><select wire:model="form.batting_first_id" @disabled($match->structure_locked_at !== null || $match->result_published_at !== null) class="select w-full"><option value="">Unknown</option><option value="{{ $match->team1_id }}">{{ $match->team1->team_name }}</option><option value="{{ $match->team2_id }}">{{ $match->team2->team_name }}</option></select></label>
             </div>
             @if($match->structure_locked_at !== null || $match->result_published_at !== null)<p class="text-sm">Batting order and match format are locked after publication.</p>@endif
+            <div class="scorer-instruction">For 4 overs and 3 balls, enter 4 complete overs and 3 balls in the current over. Use normal innings totals.</div>
             <div class="grid gap-4 md:grid-cols-2">
                 @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
                     <fieldset class="rounded-lg border border-base-300 p-4 space-y-3"><legend class="px-2 font-bold">{{ $name }}: normal innings</legend>
@@ -191,7 +204,7 @@ new class extends Component {
                     </fieldset>
                 @endforeach
             </div>
-            <p class="text-sm text-center">Enter actual innings totals. For 4 overs and 3 balls, enter 4 in Complete overs and 3 in Balls in current over. Count balls already bowled after the complete overs. Super Over figures are excluded.</p>
+            <p class="text-sm">Super Over figures are excluded.</p>
             <label><span class="label">Official explanation (required for an exceptional decision)</span><textarea wire:model="form.result_note" maxlength="2000" rows="3" class="textarea w-full"></textarea></label>
             @if(($form['result_method'] ?? null) === 'revised_target')
                 <fieldset class="rounded-lg border border-base-300 p-4 space-y-4"><legend class="px-2 font-bold">Official revised-target figures</legend>
@@ -207,7 +220,7 @@ new class extends Component {
                     @endif
                 </fieldset>
             @endif
-            <div class="flex flex-wrap justify-center gap-3">
+            <div class="scorer-actions flex flex-wrap gap-3">
                 <button type="submit" wire:loading.attr="disabled" class="btn btn-outline">Save draft</button>
                 <button type="button" wire:click="reviewResult" wire:loading.attr="disabled" class="btn btn-primary">Review result</button>
                 <button type="button" wire:click="reloadResult" wire:confirm="Replace unsaved changes with the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost">Reload saved details</button>
@@ -215,9 +228,9 @@ new class extends Component {
             </div>
         </form>
     </section>
-    @if($review)
-        <section class="card border border-primary bg-base-100" aria-labelledby="review-result-heading"><div class="card-body text-center space-y-3">
-            <h2 id="review-result-heading" class="text-xl font-bold">Review before publishing</h2>
+    @else
+        <section class="card border border-primary bg-base-100" aria-labelledby="review-result-heading" wire:key="result-review" x-data x-init="$nextTick(() => $refs.reviewHeading.focus())"><div class="card-body space-y-3">
+            <h2 id="review-result-heading" x-ref="reviewHeading" tabindex="-1" class="text-xl font-bold">Review before publishing</h2>
             <p class="font-semibold">{{ $review['description'] }}</p>
             @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
                 @php($deliveries = $review['result'][$side.'_deliveries'])
@@ -237,7 +250,10 @@ new class extends Component {
                 @endif
             @endif
             <p class="text-sm">Publishing updates the official team result and group standings. Any earlier published result remains official until this succeeds.</p>
+            <div class="scorer-actions">
             <button type="button" wire:click="publishResult" wire:confirm="Publish this reviewed team result and update standings?" wire:loading.attr="disabled" class="btn btn-primary">Publish team result</button>
+            <button type="button" wire:click="returnToDraft" wire:loading.attr="disabled" class="btn btn-outline">Back to draft</button>
+            </div>
         </div></section>
     @endif
 </div>

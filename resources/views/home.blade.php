@@ -1,13 +1,18 @@
 <x-layouts.public>
     <x-HeroSection />
-    <x-SponsorsSection />
     <div class="hidden lg:block">
         <x-AboutSection />
+    </div>
+    <x-SponsorsSection />
+    <div class="lg:hidden">
+        <x-TeamsSection variant="mobile" />
+    </div>
+    <div class="hidden lg:block">
         <x-TeamsSection variant="desktop" />
     </div>
     <x-MobileHighlights />
     {{-- <x-ContendersSection /> --}}
-    {{-- On phones the committee (and the two sections above) live on the About page --}}
+    {{-- On phones the committee and description live on the About page. --}}
     <div class="hidden lg:block">
         <x-CommitteeSection />
     </div>

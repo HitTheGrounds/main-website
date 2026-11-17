@@ -21,7 +21,7 @@
         ['Synopsys', 'synopsys.webp'],
         ['CSE 24', null],
         ['Thomson Reuters', 'thomson-reuters.webp'],
-        ['WSO2', 'wso2.webp'],
+        ['Choreo Labs', 'choreo-labs-stacked-navy.svg'],
         ['Xitricon', 'xitricon.webp'],
         ['CSE 25', null],
         ['Yaala Labs', 'yaala.webp'],

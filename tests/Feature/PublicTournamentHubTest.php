@@ -39,7 +39,7 @@ class PublicTournamentHubTest extends TestCase
         $response = $this->get('/tournament')->assertOk()->assertViewIs('tournament.index')
             ->assertViewHas('tab', 'matches')->assertViewHas('year', 2026)
             ->assertSee('Tournament sections')->assertSee('aria-current="page"', false)
-            ->assertSee('Refresh the page')->assertSee('index, follow, max-image-preview:large');
+            ->assertSee('aria-label="Refresh matches"', false)->assertSee('index, follow, max-image-preview:large');
 
         foreach (['matches', 'table', 'bracket', 'stats'] as $tab) {
             $response->assertSee('href="'.route('tournament.index', ['tab' => $tab]).'"', false);
@@ -62,7 +62,7 @@ class PublicTournamentHubTest extends TestCase
     {
         $this->registerTournamentRoutes();
         $this->get('/tournament?tab='.$tab)->assertOk()->assertViewHas('tab', $tab)
-            ->assertSee('<h2 id="tournament-section-heading" class="font-heading text-3xl sm:text-4xl">'.$label.'</h2>', false);
+            ->assertSee('<h2 id="tournament-section-heading">'.$label.'</h2>', false);
     }
 
     public static function invalidSections(): array

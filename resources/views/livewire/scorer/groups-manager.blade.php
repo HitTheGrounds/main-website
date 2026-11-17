@@ -137,8 +137,8 @@ new class extends Component {
     }
 }; ?>
 
-<div class="space-y-6">
-    <div class="space-y-2 text-center">
+<div class="scorer-screen space-y-5">
+    <div class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Group setup</h1>
         <p class="text-sm text-base-content/70">Tournament {{ $year }} · Assign existing approved teams to groups.</p>
         @if($year === 2026)
@@ -148,7 +148,7 @@ new class extends Component {
         <p wire:loading role="status" class="text-sm text-base-content/70">Updating group setup…</p>
     </div>
 
-    <div aria-live="polite">
+    <div class="scorer-feedback" aria-live="polite">
         @if($notice)
             <p role="status" class="alert alert-success">{{ $notice }}</p>
         @endif
@@ -159,36 +159,12 @@ new class extends Component {
         @endforeach
     </div>
 
-    <dl class="grid grid-cols-2 gap-3 text-center lg:grid-cols-4">
-        @foreach([
-            'Groups' => $setup['groups']->count(),
-            'Assigned teams' => $setup['groups']->sum('team_count'),
-            'Approved unassigned teams' => $setup['unassigned_teams']->count(),
-            'Expected group matches' => $setup['expected_matches'],
-        ] as $label => $value)
-            <div class="rounded-xl border border-base-300 bg-base-100 p-4">
-                <dt class="text-sm text-base-content/70">{{ $label }}</dt>
-                <dd class="mt-1 text-2xl font-bold">{{ $value }}</dd>
-            </div>
-        @endforeach
-    </dl>
+
 
     <div class="grid gap-6 lg:grid-cols-2">
-        <section class="card border border-base-300 bg-base-100 shadow-xs" aria-labelledby="create-group-heading">
-            <div class="card-body">
-                <h2 id="create-group-heading" class="text-xl font-bold text-center">Create a group</h2>
-                <form wire:submit="createGroup" class="space-y-3">
-                    <label class="block text-sm font-semibold" for="new-group-name">Group name</label>
-                    <input id="new-group-name" wire:model="newGroupName" type="text" maxlength="100" required class="input input-bordered w-full" placeholder="For example, Group A" aria-describedby="new-group-error">
-                    <p id="new-group-error" class="text-sm text-error">@error('newGroupName'){{ $message }}@enderror</p>
-                    <button type="submit" wire:loading.attr="disabled" class="btn btn-primary w-full">Create group</button>
-                </form>
-            </div>
-        </section>
-
         <section class="card border border-base-300 bg-base-100 shadow-xs" aria-labelledby="manage-group-heading">
             <div class="card-body space-y-3">
-                <h2 id="manage-group-heading" class="text-xl font-bold text-center">Manage a group</h2>
+                <h2 id="manage-group-heading" class="text-xl font-bold">Manage a group</h2>
                 <label for="group-choice" class="text-sm font-semibold">Choose a group</label>
                 <select id="group-choice" wire:change="openGroup($event.target.value)" wire:loading.attr="disabled" class="select select-bordered w-full">
                     <option value="" disabled @selected($editingGroupId === null)>Choose a group</option>
@@ -197,12 +173,6 @@ new class extends Component {
                     @endforeach
                 </select>
                 @if($selectedGroup)
-                    <form wire:submit="renameGroup" class="space-y-3">
-                        <label for="edit-group-name" class="block text-sm font-semibold">Group name</label>
-                        <input id="edit-group-name" wire:model="groupName" type="text" maxlength="100" required class="input input-bordered w-full" aria-describedby="group-name-error">
-                        <p id="group-name-error" class="text-sm text-error">@error('groupName'){{ $message }}@enderror</p>
-                        <button type="submit" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Save name</button>
-                    </form>
                     <form wire:submit="assignTeam" class="space-y-3">
                         <label for="team-choice" class="block text-sm font-semibold">Approved unassigned team</label>
                         <select id="team-choice" wire:model="selectedTeamId" class="select select-bordered w-full" required aria-describedby="team-choice-error">
@@ -217,7 +187,7 @@ new class extends Component {
                         @endif
                         <button type="submit" wire:loading.attr="disabled" @disabled($setup['unassigned_teams']->isEmpty()) class="btn btn-primary btn-sm">Assign team</button>
                     </form>
-                    <h3 class="text-base font-semibold text-center">Teams in {{ $selectedGroup['name'] }}</h3>
+                    <h3 class="text-base font-semibold">Teams in {{ $selectedGroup['name'] }}</h3>
                     <ul class="divide-y divide-base-300">
                         @forelse($selectedGroup['teams'] as $team)
                             <li wire:key="selected-team-{{ $selectedGroup['id'] }}-{{ $team['id'] }}" class="flex flex-wrap items-center justify-between gap-2 py-2">
@@ -225,25 +195,60 @@ new class extends Component {
                                 <button type="button" wire:click="removeTeam({{ $team['id'] }})" wire:confirm="Remove this unused assignment? The registered team and players will be kept." wire:loading.attr="disabled" class="btn btn-ghost btn-sm text-error" aria-label="Remove {{ $team['name'] }} from {{ $selectedGroup['name'] }}">Remove</button>
                             </li>
                         @empty
-                            <li class="py-2 text-sm text-base-content/70 text-center">No teams assigned yet.</li>
+                            <li class="py-2 text-sm text-base-content/70">No teams assigned yet.</li>
                         @endforelse
                     </ul>
-                    <p class="text-sm text-base-content/70">Assignments cannot change once fixtures, saved figures or confirmed qualification depend on them. To move an unused team, remove its assignment here, then select the other group.</p>
-                    <button type="button" wire:click="deleteGroup" wire:confirm="Delete this empty group?" wire:loading.attr="disabled" @disabled($selectedGroup['team_count'] > 0) class="btn btn-outline btn-error btn-sm">Delete empty group</button>
+                    <details class="scorer-disclosure" @if($errors->has('groupName')) open @endif>
+                        <summary>Group settings</summary>
+                        <div class="card-body space-y-3">
+                            <form wire:submit="renameGroup" class="space-y-3">
+                                <label for="edit-group-name" class="block text-sm font-semibold">Group name</label>
+                                <input id="edit-group-name" wire:model="groupName" type="text" maxlength="100" required class="input input-bordered w-full" aria-describedby="group-name-error">
+                                <p id="group-name-error" class="text-sm text-error">@error('groupName'){{ $message }}@enderror</p>
+                                <button type="submit" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Save name</button>
+                            </form>
+                            <p class="text-sm text-base-content/70">Assignments cannot change once fixtures, saved figures or confirmed qualification depend on them. To move an unused team, remove its assignment here, then select the other group.</p>
+                            <button type="button" wire:click="deleteGroup" wire:confirm="Delete this empty group?" wire:loading.attr="disabled" @disabled($selectedGroup['team_count'] > 0) class="btn btn-outline btn-error btn-sm">Delete empty group</button>
+                        </div>
+                    </details>
                 @else
-                    <p class="text-sm text-base-content/70 text-center">Create or choose a group to manage its teams.</p>
+                    <p class="text-sm text-base-content/70">Create or choose a group to manage its teams.</p>
                 @endif
             </div>
         </section>
+        <details class="scorer-disclosure self-start" @if($setup['groups']->isEmpty() || $errors->has('newGroupName')) open @endif>
+            <summary id="create-group-heading">Create a group</summary>
+            <div class="card-body">
+                <form wire:submit="createGroup" class="space-y-3">
+                    <label class="block text-sm font-semibold" for="new-group-name">Group name</label>
+                    <input id="new-group-name" wire:model="newGroupName" type="text" maxlength="100" required class="input input-bordered w-full" placeholder="For example, Group A" aria-describedby="new-group-error">
+                    <p id="new-group-error" class="text-sm text-error">@error('newGroupName'){{ $message }}@enderror</p>
+                    <button type="submit" wire:loading.attr="disabled" class="btn btn-primary w-full">Create group</button>
+                </form>
+            </div>
+        </details>
     </div>
 
+    <dl class="scorer-group-counts">
+        @foreach([
+            'Groups' => $setup['groups']->count(),
+            'Assigned teams' => $setup['groups']->sum('team_count'),
+            'Approved unassigned teams' => $setup['unassigned_teams']->count(),
+            'Expected group matches' => $setup['expected_matches'],
+        ] as $label => $value)
+            <div class="rounded-xl border border-base-300 bg-base-100 p-4">
+                <dt class="text-sm text-base-content/70">{{ $label }}</dt>
+                <dd class="mt-1 text-2xl font-bold">{{ $value }}</dd>
+            </div>
+        @endforeach
+    </dl>
     <section aria-labelledby="all-groups-heading" class="space-y-4">
-        <h2 id="all-groups-heading" class="text-xl font-bold text-center">All groups</h2>
+        <h2 id="all-groups-heading" class="text-xl font-bold">Group overview</h2>
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @forelse($setup['groups'] as $group)
                 <article wire:key="group-summary-{{ $group['id'] }}" class="card border border-base-300 bg-base-100 shadow-xs">
-                    <div class="card-body text-center">
-                        <h3 class="card-title justify-center break-words">{{ $group['name'] }}</h3>
+                    <div class="card-body">
+                        <h3 class="card-title break-words">{{ $group['name'] }}</h3>
                         <p class="text-sm text-base-content/70">{{ $group['team_count'] }} teams · {{ $group['expected_matches'] }} expected group matches</p>
                         <ul class="space-y-1 text-sm">
                             @forelse($group['teams'] as $team)
@@ -255,7 +260,7 @@ new class extends Component {
                     </div>
                 </article>
             @empty
-                <p class="text-center text-base-content/70 sm:col-span-2 xl:col-span-3">No groups have been created for this tournament yet.</p>
+                <p class="text-base-content/70 sm:col-span-2 xl:col-span-3">No groups have been created for this tournament yet.</p>
             @endforelse
         </div>
     </section>

@@ -1,24 +1,46 @@
 <x-layouts.public title="Tournament" description="Match results, group standings, knockout bracket and player leaders for Hit the Grounds.">
-    <x-PageContainer>
-        <header class="mb-10 text-center md:mb-14">
-            <p class="mb-3 text-sm font-semibold uppercase tracking-widest text-base-content/70">Hit the Grounds {{ $year }}</p>
-            <h1 class="font-heading text-[clamp(2.75rem,8vw,5.5rem)]"><span class="text-primary">Tournament</span> centre</h1>
-            <p class="mx-auto mt-4 max-w-[56ch] text-base-content/80">Follow the matches, group standings and player leaders. Refresh the page to see newly published results.</p>
+    <div class="tc">
+        <div class="tc-masthead">
+        <header class="tc-hero">
+            <p class="tc-eyebrow">Hit the Grounds {{ $year }}</p>
+            <h1>Tournament <span>centre.</span></h1>
         </header>
 
-        <nav aria-label="Tournament sections" class="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <nav aria-label="Tournament sections" class="tc-nav">
             @foreach ($tabs as $key => $section)
-                <a href="{{ route('tournament.index', ['tab' => $key]) }}"
-                   @if ($tab === $key) aria-current="page" @endif
-                   @class(['btn w-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary', 'btn-primary' => $tab === $key, 'btn-outline' => $tab !== $key])>
+                <a href="{{ route('tournament.index', ['tab' => $key]) }}" @if ($tab === $key) aria-current="page" @endif>
+                    <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        @if ($key === 'matches')
+                            <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-13 5h2m4 0h2"/>
+                        @elseif ($key === 'table')
+                            <path d="M4 5h16M4 12h16M4 19h16M8 5v14m8-14v14"/>
+                        @elseif ($key === 'bracket')
+                            <path d="M3 3v6h5V6h8v3h5V3M3 15v6h5v-3h8v3h5v-6M12 6v12"/>
+                        @else
+                            <path d="M5 20v-6h4v6m2 0V9h4v11m2 0V4h4v16M3 20h19"/>
+                        @endif
+                    </svg>
                     {{ $section['label'] }}
                 </a>
             @endforeach
         </nav>
+        </div>
 
-        <section aria-labelledby="tournament-section-heading" class="rounded-box border border-base-300 bg-base-100 p-6 text-center sm:p-8">
-            <h2 id="tournament-section-heading" class="font-heading text-3xl sm:text-4xl">{{ $tabs[$tab]['label'] }}</h2>
-            <p class="mx-auto mt-3 max-w-[56ch] text-base-content/80">{{ $tabs[$tab]['description'] }}</p>
+        <section aria-labelledby="tournament-section-heading" class="tc-section-head">
+            <h2 id="tournament-section-heading">{{ $tabs[$tab]['label'] }}</h2>
+            @php
+                $refreshParameters = ['tab' => $tab];
+                if (! $filterErrors && $tab === 'matches') {
+                    $refreshParameters += $matchData['filters'];
+                } elseif (! $filterErrors && $tab === 'stats') {
+                    $refreshParameters += ['category' => $rankingData['category'], 'gender' => $rankingData['gender']];
+                }
+            @endphp
+            <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">
+                <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17"/></svg>
+                Refresh
+            </a>
+            <p class="sr-only">{{ $tabs[$tab]['description'] }}</p>
         </section>
         @if ($tab === 'matches')
             @include('tournament.partials.matches')
@@ -30,14 +52,19 @@
             @include('tournament.partials.stats')
         @endif
         @if (! $filterErrors)
-            @if ($tab === 'stats')
-                @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest player stats publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['player_stats']])
-                @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest match result publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['match_results']])
-            @else
-                @php $pageData = match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData }; @endphp
-                @include('tournament.partials.publication-time', ['publicationLabel' => $tab === 'matches' ? 'Latest match result publication for these filters' : 'Latest match result publication in this view', 'publicationTime' => $pageData['latest_result_published_at']])
-            @endif
-            <p class="mt-3 text-center text-sm text-base-content/80">Refresh this page for the latest published results. Changes appear when you refresh or open another page.</p>
+            <footer class="tc-publication">
+                <p>Refresh this page for the latest published results.</p>
+                <details>
+                    <summary>Publication details</summary>
+                    @if ($tab === 'stats')
+                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest player stats publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['player_stats']])
+                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest match result publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['match_results']])
+                    @else
+                        @php $pageData = match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData }; @endphp
+                        @include('tournament.partials.publication-time', ['publicationLabel' => $tab === 'matches' ? 'Latest match result publication for these filters' : 'Latest match result publication in this view', 'publicationTime' => $pageData['latest_result_published_at']])
+                    @endif
+                </details>
+            </footer>
         @endif
-    </x-PageContainer>
+    </div>
 </x-layouts.public>

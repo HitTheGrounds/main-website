@@ -4,7 +4,7 @@
         <x-AboutSection />
     </div>
     <x-SponsorsSection />
-    <div class="lg:hidden" data-mobile-only>
+    <div class="lg:hidden">
         <x-TeamsSection variant="mobile" />
     </div>
     <div class="hidden lg:block">

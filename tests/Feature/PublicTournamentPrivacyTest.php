@@ -96,7 +96,7 @@ class PublicTournamentPrivacyTest extends TestCase
         $results = app(MatchResultService::class);
         $input = ['result_type' => 'win', 'result_method' => 'normal', 'winner_id' => $match['team1_id'],
             'batting_first_id' => $match['team1_id'], 'team1_runs' => 100, 'team1_wickets' => 3, 'team1_overs' => 5,
-            'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 11, 'team2_overs' => 3, 'team2_balls' => 0];
+            'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 7, 'team2_overs' => 3, 'team2_balls' => 0];
         request()->attributes->set('user', $actor);
         $results->saveDraft(2026, $match['id'], 1, $input);
         request()->attributes->remove('user');

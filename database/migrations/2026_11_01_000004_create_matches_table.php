@@ -24,7 +24,7 @@ return new class extends Migration
             // The scorer supplies the selected format; stage defaults live in config.
             $table->unsignedTinyInteger('balls_per_over');
             $table->unsignedTinyInteger('overs_per_innings')->default(5);
-            $table->unsignedTinyInteger('max_wickets')->default(11);
+            $table->unsignedTinyInteger('max_wickets')->default(7);
             $table->enum('status', ['upcoming', 'live', 'finished'])->default('upcoming');
             $table->timestampTz('scheduled_at')->nullable();
             $table->string('venue')->nullable();

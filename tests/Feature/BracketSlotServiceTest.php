@@ -41,7 +41,7 @@ class BracketSlotServiceTest extends TestCase
                 'team1_id' => $a, 'team2_id' => $b, 'batting_first_id' => $a, 'balls_per_over' => 4,
                 'status' => 'finished', 'result_type' => 'win', 'winner_id' => $a, 'result_method' => 'normal',
                 'team1_runs' => 100, 'team1_wickets' => 3, 'team1_deliveries' => 20,
-                'team2_runs' => 90, 'team2_wickets' => 11, 'team2_deliveries' => 12,
+                'team2_runs' => 90, 'team2_wickets' => 7, 'team2_deliveries' => 12,
                 'result_published_at' => now(), 'structure_locked_at' => now(), 'published_by' => $actor->id,
                 'draft_result' => json_encode(['team1_runs' => 101])]);
             $matches[] = TournamentMatch::findOrFail($id);

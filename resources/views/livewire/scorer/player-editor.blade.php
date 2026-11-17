@@ -312,7 +312,7 @@ new class extends Component {
             @if($pendingAction === 'withdraw')<p class="alert alert-warning">Withdrawal pending. Saving this form replaces the withdrawal with a correction draft.</p>@endif
             <div class="grid gap-4 sm:grid-cols-2">
                 @foreach($metrics as $field => $label)
-                    <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $field === 'wickets_taken' ? 11 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
+                    <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $field === 'wickets_taken' ? 7 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
                 @endforeach
                 <label><span class="label">Batting status (optional)</span><select wire:model="form.batting_status" class="select w-full">
                     <option value="">Unknown</option>

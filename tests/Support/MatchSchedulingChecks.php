@@ -63,7 +63,7 @@ trait MatchSchedulingChecks
         $this->assertSame($this->actor->id, $match->updated_by);
         $this->assertSame(4, $match->balls_per_over);
         $this->assertSame(5, $match->overs_per_innings);
-        $this->assertSame(11, $match->max_wickets);
+        $this->assertSame(7, $match->max_wickets);
         foreach (['team1_runs', 'team1_wickets', 'team1_deliveries', 'team2_runs', 'team2_wickets',
             'team2_deliveries', 'winner_id', 'result_type', 'result_method', 'result_published_at',
             'draft_result', 'nrr_inputs', 'structure_locked_at', 'player_stats_published_at', 'published_by'] as $field) {

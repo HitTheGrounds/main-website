@@ -41,7 +41,7 @@ class PublicPublicationTimesTest extends TestCase
         $results->saveDraft(2026, $id, 1, ['result_type' => 'win', 'result_method' => 'normal',
             'winner_id' => $teams[0]->id, 'batting_first_id' => $teams[0]->id,
             'team1_runs' => 100, 'team1_wickets' => 3, 'team1_overs' => 5, 'team1_balls' => 0,
-            'team2_runs' => 90, 'team2_wickets' => 11, 'team2_overs' => 3, 'team2_balls' => 0]);
+            'team2_runs' => 90, 'team2_wickets' => 7, 'team2_overs' => 3, 'team2_balls' => 0]);
         $review = $results->review(2026, $id);
         $results->publish(2026, $id, $review['version'], $review['draft_hash']);
         $this->travelTo(CarbonImmutable::parse('2026-11-16 12:00:00 UTC'));

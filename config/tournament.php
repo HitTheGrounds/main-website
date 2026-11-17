@@ -23,7 +23,7 @@ return [
 
     'allowed_balls_per_over' => [4, 6],
     'overs_per_innings' => 5,
-    'max_wickets' => 11,
+    'max_wickets' => 7,
 
     'points' => [
         'win' => 2,

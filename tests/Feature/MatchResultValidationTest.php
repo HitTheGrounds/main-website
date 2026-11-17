@@ -15,7 +15,7 @@ class MatchResultValidationTest extends TestCase
     {
         $match = new TournamentMatch;
         $match->forceFill(['stage' => $stage, 'team1_id' => 10, 'team2_id' => 20, 'batting_first_id' => 10,
-            'balls_per_over' => $balls, 'overs_per_innings' => 5, 'max_wickets' => 11]);
+            'balls_per_over' => $balls, 'overs_per_innings' => 5, 'max_wickets' => 7]);
 
         return $match;
     }
@@ -24,7 +24,7 @@ class MatchResultValidationTest extends TestCase
     {
         return ['result_type' => 'win', 'result_method' => 'normal', 'winner_id' => '10',
             'team1_runs' => '100', 'team1_wickets' => '5', 'team1_overs' => '5', 'team1_balls' => '0',
-            'team2_runs' => '90', 'team2_wickets' => '11', 'team2_overs' => '4', 'team2_balls' => '3'];
+            'team2_runs' => '90', 'team2_wickets' => '7', 'team2_overs' => '4', 'team2_balls' => '3'];
     }
 
     private function rejected(array $input, string $field, ?TournamentMatch $match = null): void
@@ -80,7 +80,7 @@ class MatchResultValidationTest extends TestCase
         return [
             [['winner_id' => 20], 'winner_id'], [['winner_id' => 30], 'winner_id'], [['winner_id' => null], 'winner_id'],
             [['team1_runs' => 90], 'winner_id'], [['team1_runs' => -1], 'team1_runs'],
-            [['team1_runs' => 2147483648], 'team1_runs'], [['team1_wickets' => 12], 'team1_wickets'],
+            [['team1_runs' => 2147483648], 'team1_runs'], [['team1_wickets' => 8], 'team1_wickets'],
             [['team1_runs' => null], 'team1_runs'], [['team1_overs' => 3.2], 'team1_overs'],
             [['team1_overs' => 5, 'team1_balls' => 1], 'team1_balls'],
             [['team1_balls' => 4], 'team1_balls'], [['result_method' => null], 'result_method'],
@@ -101,9 +101,9 @@ class MatchResultValidationTest extends TestCase
 
     public function test_successful_chase_and_optional_unknown_batting_order(): void
     {
-        $input = array_replace($this->ordinary(), ['winner_id' => 20, 'team2_runs' => 101, 'team2_wickets' => 10]);
+        $input = array_replace($this->ordinary(), ['winner_id' => 20, 'team2_runs' => 101, 'team2_wickets' => 6]);
         $this->assertSame(20, app(MatchResultValidator::class)->validate($this->match(), $input)['winner_id']);
-        $this->rejected(array_replace($input, ['team2_wickets' => 11]), 'team2_wickets');
+        $this->rejected(array_replace($input, ['team2_wickets' => 7]), 'team2_wickets');
         $match = $this->match();
         $match->batting_first_id = null;
         $this->assertNull(app(MatchResultValidator::class)->validate($match, $this->ordinary())['batting_first_id']);

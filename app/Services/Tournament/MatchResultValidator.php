@@ -206,7 +206,7 @@ class MatchResultValidator
         Validator::make($match->only(['stage', 'team1_id', 'team2_id', 'balls_per_over', 'overs_per_innings', 'max_wickets']), [
             'stage' => ['required', Rule::in(['G', 'QF', 'SF', 'F'])],
             'team1_id' => ['required', 'integer', 'min:1'], 'team2_id' => ['required', 'integer', 'min:1', 'different:team1_id'],
-            'balls_per_over' => ['required', Rule::in([4, 6])], 'overs_per_innings' => ['required', Rule::in([5])], 'max_wickets' => ['required', Rule::in([11])],
+            'balls_per_over' => ['required', Rule::in([4, 6])], 'overs_per_innings' => ['required', Rule::in([5])], 'max_wickets' => ['required', Rule::in([7])],
         ])->validate();
         $rules = [
             'result_type' => [$complete ? 'required' : 'nullable', Rule::in(['win', 'tie', 'no_result', 'abandoned'])],
@@ -219,7 +219,7 @@ class MatchResultValidator
         ];
         foreach (['team1', 'team2'] as $team) {
             $rules[$team.'_runs'] = ['nullable', 'integer', 'between:0,2147483647'];
-            $rules[$team.'_wickets'] = ['nullable', 'integer', 'between:0,11'];
+            $rules[$team.'_wickets'] = ['nullable', 'integer', 'between:0,7'];
             $rules[$team.'_overs'] = ['nullable', 'integer', 'between:0,5'];
             $rules[$team.'_balls'] = ['nullable', 'integer', 'min:0', 'max:'.($match->balls_per_over - 1)];
         }

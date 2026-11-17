@@ -29,7 +29,7 @@ class MatchStructureValidator
         }
 
         Validator::make(['year' => $year], ['year' => ['required', 'integer', 'between:1,9999']])->validate();
-        $data = Validator::make($input + ['overs_per_innings' => 5, 'max_wickets' => 11], [
+        $data = Validator::make($input + ['overs_per_innings' => 5, 'max_wickets' => 7], [
             'stage' => ['required', Rule::in(['G', 'QF', 'SF', 'F'])],
             'group_id' => ['required_if:stage,G', 'nullable', 'integer', 'min:1'],
             'bracket_position' => ['required_unless:stage,G', 'nullable', 'integer', 'min:1'],
@@ -37,7 +37,7 @@ class MatchStructureValidator
             'team2_id' => ['required', 'integer', 'min:1', 'different:team1_id'],
             'balls_per_over' => ['required', 'integer', Rule::in([4, 6])],
             'overs_per_innings' => ['required', 'integer', Rule::in([5])],
-            'max_wickets' => ['required', 'integer', Rule::in([11])],
+            'max_wickets' => ['required', 'integer', Rule::in([7])],
         ])->validate();
 
         // Browser controls submit strings; compare canonical IDs as well as
@@ -62,7 +62,7 @@ class MatchStructureValidator
 
             return ['stage' => $data['stage'], 'group_id' => null, 'bracket_position' => (int) $data['bracket_position'],
                 'team1_id' => (int) $data['team1_id'], 'team2_id' => (int) $data['team2_id'],
-                'balls_per_over' => (int) $data['balls_per_over'], 'overs_per_innings' => 5, 'max_wickets' => 11];
+                'balls_per_over' => (int) $data['balls_per_over'], 'overs_per_innings' => 5, 'max_wickets' => 7];
         }
         if (($data['bracket_position'] ?? null) !== null) {
             $this->reject('bracket_position', 'Group matches do not have a bracket position.');
@@ -99,7 +99,7 @@ class MatchStructureValidator
             'stage' => 'G', 'group_id' => $groupId, 'bracket_position' => null,
             'team1_id' => $teamIds[0], 'team2_id' => $teamIds[1],
             'balls_per_over' => (int) $data['balls_per_over'],
-            'overs_per_innings' => 5, 'max_wickets' => 11,
+            'overs_per_innings' => 5, 'max_wickets' => 7,
         ];
     }
 

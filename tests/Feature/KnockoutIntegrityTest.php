@@ -16,7 +16,7 @@ class KnockoutIntegrityTest extends TestCase
     {
         return (new TournamentMatch)->forceFill(array_replace(['id' => 41, 'tournament_year' => 2026, 'stage' => 'QF',
             'group_id' => null, 'bracket_position' => 1, 'team1_id' => 1, 'team2_id' => 2, 'batting_first_id' => 1,
-            'status' => 'upcoming', 'balls_per_over' => 4, 'overs_per_innings' => 5, 'max_wickets' => 11], $changes));
+            'status' => 'upcoming', 'balls_per_over' => 4, 'overs_per_innings' => 5, 'max_wickets' => 7], $changes));
     }
 
     private function rejected(callable $action): void
@@ -122,7 +122,7 @@ class KnockoutIntegrityTest extends TestCase
         $this->assertSame(0, $draft['team1_runs']);
         $input = ['result_type' => 'win', 'result_method' => 'normal', 'winner_id' => 1,
             'team1_runs' => 100, 'team1_wickets' => 3, 'team1_overs' => 5, 'team1_balls' => 0,
-            'team2_runs' => 90, 'team2_wickets' => 11, 'team2_overs' => 3, 'team2_balls' => 0];
+            'team2_runs' => 90, 'team2_wickets' => 7, 'team2_overs' => 3, 'team2_balls' => 0];
         $this->assertSame(1, $validator->validate($match, $input)['winner_id']);
         $input['result_method'] = 'super_over';
         $input['team2_runs'] = 100;

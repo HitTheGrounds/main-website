@@ -1,21 +1,25 @@
 @if ($tableData['groups'] === [])
     <p class="mt-6 rounded-box border border-base-300 p-6 text-center">Groups have not been announced yet.</p>
 @else
-    <nav aria-label="Choose a group" class="my-6 flex flex-wrap justify-center gap-2">
+    <nav aria-label="Choose a group" class="tc-jump">
         @foreach ($tableData['groups'] as $group)
             <a class="btn btn-outline h-auto min-h-10 max-w-full whitespace-normal py-2" href="#group-{{ $group['id'] }}"><span class="min-w-0 break-words">{{ $group['name'] }}</span></a>
         @endforeach
+        <a class="btn btn-outline" href="#runner-comparison">Runner-ups</a>
     </nav>
-    <p class="mb-6 text-center text-sm text-base-content/80">Positions use points, then net run rate (NRR). Equal records share a position. Qualification is confirmed separately by the committee.</p>
-    <div class="space-y-8">
+    <details class="tc-standings-guide">
+        <summary>How standings are ranked</summary>
+        <p>Positions use points, then net run rate (NRR). Equal records share a position. Qualification is confirmed separately by the committee.</p>
+    </details>
+    <div class="tc-groups">
         @foreach ($tableData['groups'] as $group)
-            <section id="group-{{ $group['id'] }}" tabindex="-1" aria-labelledby="group-{{ $group['id'] }}-heading" class="min-w-0 scroll-mt-24 rounded-box border border-base-300 p-4 sm:p-6">
+            <section id="group-{{ $group['id'] }}" tabindex="-1" aria-labelledby="group-{{ $group['id'] }}-heading" class="tc-panel">
                 <h3 id="group-{{ $group['id'] }}-heading" class="break-words text-center font-heading text-3xl">{{ $group['name'] }}</h3>
                 @if ($group['teams'] === [])
                     <p class="mt-4 text-center">Teams have not been assigned to this group yet.</p>
                 @else
-                    <div role="region" aria-label="{{ $group['name'] }} standings, scroll for more columns" tabindex="0" class="mt-4 overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary">
-                        <table class="table text-center">
+                    <div role="region" aria-label="{{ $group['name'] }} standings" tabindex="0" class="mt-4 overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary">
+                        <table class="tc-table tc-standings">
                             <caption class="sr-only">{{ $group['name'] }} standings</caption>
                             <thead>
                                 <tr>
@@ -30,8 +34,15 @@
                                         <td>{{ $team['rank'] }}</td>
                                         <th scope="row" class="min-w-40 max-w-72 break-words">
                                             {{ $team['name'] }}
+                                            <span class="tc-small-record">
+                                                <span><abbr title="Played">P</abbr> {{ $team['played'] }}</span>
+                                                <span><abbr title="Wins">W</abbr> {{ $team['wins'] }}</span>
+                                                <span><abbr title="Losses">L</abbr> {{ $team['losses'] }}</span>
+                                                <span><abbr title="Ties">T</abbr> {{ $team['ties'] }}</span>
+                                                <span><abbr title="No results">NR</abbr> {{ $team['no_results'] }}</span>
+                                            </span>
                                             @if ($team['qualified'])
-                                                <span class="badge badge-outline mt-1 h-auto whitespace-normal py-1 text-xs font-normal">Qualification confirmed</span>
+                                                <span class="tc-qualification">Qualification confirmed</span>
                                             @endif
                                         </th>
                                         <td>{{ $team['played'] }}</td><td>{{ $team['wins'] }}</td><td>{{ $team['losses'] }}</td>
@@ -43,6 +54,8 @@
                         </table>
                     </div>
                 @endif
+                <details class="tc-notes">
+                    <summary>Results & qualification details</summary>
                 <p class="mt-4 text-center text-sm">{{ $group['coverage']['published'] }} of {{ $group['coverage']['expected'] }} possible group fixtures have published results.</p>
                 @if (! $group['coverage']['complete'])
                     <p class="mt-2 text-center text-sm text-base-content/80">Group results are incomplete. {{ $group['coverage']['missing'] }} fixtures not scheduled; {{ $group['coverage']['unpublished'] }} scheduled fixtures without published results.</p>
@@ -53,11 +66,12 @@
                 @if ($group['tied'])
                     <p class="mt-2 text-center text-sm text-base-content/80">Some teams share a position. Remaining qualification ties are decided by the committee.</p>
                 @endif
+                </details>
             </section>
         @endforeach
     </div>
 
-    <section aria-labelledby="runner-guidance-heading" class="mt-8 rounded-box border border-base-300 p-4 sm:p-6">
+    <section id="runner-comparison" tabindex="-1" aria-labelledby="runner-guidance-heading" class="tc-panel mt-8">
         <h3 id="runner-guidance-heading" class="text-center font-heading text-3xl">Runner-up comparison</h3>
         <p class="mx-auto mt-3 max-w-[56ch] text-center text-base-content/80">This comparison uses points, then NRR. It does not confirm qualification. Teams sharing the second position, including joint leaders, are included.</p>
         @if ($tableData['unequal_groups'])
@@ -66,14 +80,21 @@
         @if ($tableData['runner_up_guidance'] === [])
             <p class="mt-4 text-center">No runner-up comparison is available yet.</p>
         @else
-            <div role="region" aria-label="Runner-up comparison, scroll for more columns" tabindex="0" class="mt-4 overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary">
-                <table class="table text-center">
+            <div role="region" aria-label="Runner-up comparison" tabindex="0" class="mt-4 overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary">
+                <table class="tc-table tc-runners">
                     <caption class="sr-only">Runner-up candidates, not confirmed qualification</caption>
                     <thead><tr><th scope="col">Position</th><th scope="col">Team</th><th scope="col">Group</th><th scope="col">Played</th><th scope="col">Points</th><th scope="col">NRR</th><th scope="col">Comparison</th></tr></thead>
                     <tbody>
                         @foreach ($tableData['runner_up_guidance'] as $team)
                             <tr>
-                                <td>{{ $team['rank'] }}</td><th scope="row" class="min-w-40 max-w-72 break-words">{{ $team['name'] }}</th>
+                                <td>{{ $team['rank'] }}</td><th scope="row" class="min-w-40 max-w-72 break-words">
+                                    {{ $team['name'] }}
+                                    <span class="tc-small-record">
+                                        <span>{{ $team['group_name'] }}</span>
+                                        <span>Played {{ $team['played'] }}</span>
+                                        <span>{{ $team['provisional'] ? 'Provisional' : 'Group results complete' }}</span>
+                                    </span>
+                                </th>
                                 <td class="break-words">{{ $team['group_name'] }}</td><td>{{ $team['played'] }}</td><td>{{ $team['points'] }}</td>
                                 <td>{{ $team['nrr'] ?? 'Not available' }}</td><td>{{ $team['provisional'] ? 'Provisional' : 'Group results complete' }}</td>
                             </tr>

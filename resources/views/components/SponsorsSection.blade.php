@@ -16,7 +16,7 @@
 @endphp
 
 <section class="relative overflow-hidden bg-base-200">
-  <x-PageContainer>
+  <x-PageContainer :floating-squares="false">
     <div class="reveal text-center mb-12 md:mb-16">
       <h2 class="font-heading text-[clamp(2.25rem,6vw,4rem)] text-base-content">
         Our <span class="text-primary">sponsors.</span>

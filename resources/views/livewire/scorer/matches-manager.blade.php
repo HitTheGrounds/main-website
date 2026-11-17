@@ -232,7 +232,7 @@ new class extends Component {
                                 @foreach($teams as $team)@if(in_array((string) $team['id'], [(string) ($newStructure['team1_id'] ?? ''), (string) ($newStructure['team2_id'] ?? '')], true))<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endif @endforeach
                             </select></label>
                         </div>
-                        <p class="text-sm">Five overs per innings. Eleven wickets. No scores are added at creation.</p>
+                        <p class="text-sm">Five overs per innings. Seven wickets. No scores are added at creation.</p>
                         <button type="submit" wire:loading.attr="disabled" @disabled($teams->count() < 2) class="btn btn-primary w-full sm:w-auto">Create match</button>
                     </form>
                 @endif

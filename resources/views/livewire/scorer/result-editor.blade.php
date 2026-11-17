@@ -149,7 +149,7 @@ new class extends Component {
     <header class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Match result</h1>
         <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name ?? ['QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'][$match->stage] }}</p>
-        <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Eleven wickets</p>
+        <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Seven wickets</p>
         <nav class="scorer-actions" aria-label="Match tools">
             <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
             <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
@@ -197,7 +197,7 @@ new class extends Component {
                 @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
                     <fieldset class="rounded-lg border border-base-300 p-4 space-y-3"><legend class="px-2 font-bold">{{ $name }}: normal innings</legend>
                         <div class="grid grid-cols-2 gap-3">
-                            @foreach(['runs' => ['Runs', 2147483647], 'wickets' => ['Wickets', 11], 'overs' => ['Complete overs', 5], 'balls' => ['Balls in current over', $match->balls_per_over - 1]] as $field => [$label, $maximum])
+                            @foreach(['runs' => ['Runs', 2147483647], 'wickets' => ['Wickets', $match->max_wickets], 'overs' => ['Complete overs', 5], 'balls' => ['Balls in current over', $match->balls_per_over - 1]] as $field => [$label, $maximum])
                                 <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $maximum }}" step="1" wire:model="form.{{ $side }}_{{ $field }}" class="input w-full" /></label>
                             @endforeach
                         </div>

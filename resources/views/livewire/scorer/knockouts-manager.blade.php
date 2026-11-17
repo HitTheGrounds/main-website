@@ -263,7 +263,7 @@ new class extends Component {
                     <label><span class="label">Bracket position</span><select wire:model="fixture.bracket_position" class="select w-full"><option value="">Choose a position</option>@foreach($round['positions'] as $position)@if($position['match_id'] === null)<option value="{{ $position['position'] }}">{{ $stage }} {{ $position['position'] }}</option>@endif @endforeach</select></label>
                     <label><span class="label">Balls per over</span><select wire:model="fixture.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
                 </div>
-                <p class="text-sm">Five overs per innings. Eleven wickets. Creates an upcoming match without scores. Schedule and batting-first details can be entered on the dashboard.</p>
+                <p class="text-sm">Five overs per innings. Seven wickets. Creates an upcoming match without scores. Schedule and batting-first details can be entered on the dashboard.</p>
                 <button type="submit" wire:loading.attr="disabled" @disabled($available->count() < 2) class="btn btn-primary">Create knockout match</button>
             </form>
         @else<p class="text-center">All positions in this round are filled.</p>@endif

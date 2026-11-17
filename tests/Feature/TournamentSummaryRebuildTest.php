@@ -57,7 +57,7 @@ class TournamentSummaryRebuildTest extends TestCase
             'team1_id' => $teams[0]->id, 'team2_id' => $teams[1]->id, 'batting_first_id' => $teams[0]->id, 'balls_per_over' => 4,
             'status' => 'finished', 'result_type' => 'win', 'result_method' => 'normal', 'winner_id' => $teams[0]->id,
             'result_published_at' => now(), 'team1_runs' => 100, 'team1_wickets' => 3, 'team1_deliveries' => 20,
-            'team2_runs' => 90, 'team2_wickets' => 11, 'team2_deliveries' => 12,
+            'team2_runs' => 90, 'team2_wickets' => 7, 'team2_deliveries' => 12,
             'draft_result' => json_encode(['team1_runs' => 999])]);
         DB::table('player_match_stats')->insert(['match_id' => $match, 'team_id' => $member->team_id,
             'team_member_id' => $member->id, 'record_state' => 'published', 'pending_action' => null,
@@ -131,7 +131,7 @@ class TournamentSummaryRebuildTest extends TestCase
         $results->saveDraft(2026, $matchId, $match->version, ['result_type' => 'win', 'result_method' => 'normal',
             'winner_id' => $match->team1_id, 'batting_first_id' => $match->team1_id,
             'team1_runs' => 100, 'team1_wickets' => 3, 'team1_overs' => 5, 'team1_balls' => 0,
-            'team2_runs' => 90, 'team2_wickets' => 11, 'team2_overs' => 3, 'team2_balls' => 0]);
+            'team2_runs' => 90, 'team2_wickets' => 7, 'team2_overs' => 3, 'team2_balls' => 0]);
         $review = $results->review(2026, $matchId);
         $results->publish(2026, $matchId, $review['version'], $review['draft_hash']);
         $expected = [];

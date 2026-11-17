@@ -65,7 +65,7 @@ trait TournamentSchemaChecks
             $after = $query->get()->map(fn ($row) => (array) $row)->all();
             $this->assertEqualsCanonicalizing($before['rows'], $after, $name.' original values');
         }
-        $this->assertSame(count($baseline['migrations']['rows']) + 6, DB::table('migrations')->count());
+        $this->assertSame(count($baseline['migrations']['rows']) + count($paths), DB::table('migrations')->count());
         $this->assertSame(0, DB::table('users')->where('is_scorer', true)->count());
         foreach (['tournament_groups', 'group_teams', 'matches', 'player_match_stats', 'player_tournament_stats'] as $table) {
             $this->assertSame(0, DB::table($table)->count());
@@ -128,7 +128,7 @@ trait TournamentSchemaChecks
         $match = TournamentMatch::findOrFail($f['match']);
         $this->assertSame('upcoming', $match->status);
         $this->assertSame(5, $match->overs_per_innings);
-        $this->assertSame(11, $match->max_wickets);
+        $this->assertSame(7, $match->max_wickets);
         $this->assertSame(1, $match->version);
         $this->assertSame(0, $match->player_stats_revision);
         $this->assertNull($match->team1_runs);
@@ -223,7 +223,7 @@ trait TournamentSchemaChecks
         return [
             'negative runs' => [['runs_scored' => -1]],
             'out of range runs' => [['runs_scored' => 2147483648]],
-            'excess wickets' => [['wickets_taken' => 12]],
+            'excess wickets' => [['wickets_taken' => 8]],
             'negative balls' => [['bowling_balls' => -1]],
             'fractional balls' => [['balls_faced' => '1.5']],
             'too many dots' => [['dot_balls' => 5, 'bowling_balls' => 4]],
@@ -337,8 +337,8 @@ trait TournamentSchemaChecks
         $this->assertRejected(fn () => DB::table('player_tournament_stats')->insert(array_replace($this->summaryRow($f), [
             'runs_scored' => 1, 'runs_scored_recorded_count' => 1, 'highest_score' => 1, 'highest_score_match_id' => 999999,
         ])));
-        DB::table('player_match_stats')->insert(array_replace($this->playerRow($f), ['wickets_taken' => 11, 'runs_scored' => 0]));
-        $this->assertSame(11, PlayerMatchStat::firstOrFail()->wickets_taken);
+        DB::table('player_match_stats')->insert(array_replace($this->playerRow($f), ['wickets_taken' => 7, 'runs_scored' => 0]));
+        $this->assertSame(7, PlayerMatchStat::firstOrFail()->wickets_taken);
         DB::table('player_tournament_stats')->insert($this->summaryRow($f));
         DB::table('player_tournament_stats')->insert(array_replace($this->summaryRow($f), ['tournament_year' => 2027]));
         $this->assertSame(2, $f['player']->playerTournamentStats()->count());

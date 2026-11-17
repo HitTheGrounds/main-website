@@ -45,7 +45,7 @@ class PublicTournamentServiceTest extends TestCase
     private function official(array $changes = []): array
     {
         return array_replace(['status' => 'finished', 'result_published_at' => now(), 'result_type' => 'win',
-            'result_method' => 'normal', 'team1_runs' => 100, 'team2_runs' => 90, 'team1_wickets' => 3, 'team2_wickets' => 11,
+            'result_method' => 'normal', 'team1_runs' => 100, 'team2_runs' => 90, 'team1_wickets' => 3, 'team2_wickets' => 7,
             'team1_deliveries' => 20, 'team2_deliveries' => 14, 'result_note' => 'PRIVATE-OFFICIAL-NOTE'], $changes);
     }
 
@@ -71,7 +71,7 @@ class PublicTournamentServiceTest extends TestCase
         $row = $payload[0]['matches'][0];
         $this->assertSame($match->id, $row['id']);
         $this->assertSame(100, $row['result']['team1']['runs']);
-        $this->assertSame(['runs' => 90, 'wickets' => 11, 'overs' => 3, 'balls' => 2], $row['result']['team2']);
+        $this->assertSame(['runs' => 90, 'wickets' => 7, 'overs' => 3, 'balls' => 2], $row['result']['team2']);
         $this->assertStringContainsString('10 runs', $row['result']['description']);
         $this->assertSame(0, DB::transactionLevel());
         $this->assertWritableConnection();

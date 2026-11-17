@@ -62,7 +62,7 @@ class ScorerResultsScreenTest extends TestCase
     {
         return ['result_type' => 'win', 'result_method' => 'normal', 'winner_id' => $match->team1_id,
             'batting_first_id' => $match->team1_id, 'team1_runs' => 100, 'team1_wickets' => 3,
-            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 11,
+            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 7,
             'team2_overs' => 3, 'team2_balls' => 0];
     }
 
@@ -298,7 +298,7 @@ class ScorerResultsScreenTest extends TestCase
             ->assertSet('form.result_method', $type === 'tie' ? 'normal' : null);
         if ($type === 'tie') {
             foreach (['team1', 'team2'] as $side) {
-                foreach (['runs' => 0, 'wickets' => 11, 'overs' => 5, 'balls' => 0] as $field => $value) {
+                foreach (['runs' => 0, 'wickets' => 7, 'overs' => 5, 'balls' => 0] as $field => $value) {
                     $component->set('form.'.$side.'_'.$field, $value);
                 }
             }

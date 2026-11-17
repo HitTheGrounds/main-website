@@ -43,7 +43,7 @@ trait MatchStructureChecks
             $this->assertSame($input['team2_id'], $result['team2_id']);
             $this->assertSame($balls, $result['balls_per_over']);
             $this->assertSame(5, $result['overs_per_innings']);
-            $this->assertSame(11, $result['max_wickets']);
+            $this->assertSame(7, $result['max_wickets']);
             $this->assertNull($result['bracket_position']);
             $this->assertCount(8, $result);
         }

@@ -112,7 +112,7 @@ PHP;
         $service = app(MatchResultService::class);
         $service->saveDraft(2026, $match->id, $match->fresh()->version, ['result_type' => 'win', 'result_method' => 'normal',
             'winner_id' => $match->team1_id, 'batting_first_id' => $match->team1_id, 'team1_runs' => 100, 'team1_wickets' => 3,
-            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 11, 'team2_overs' => 3, 'team2_balls' => 0]);
+            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 7, 'team2_overs' => 3, 'team2_balls' => 0]);
 
         return $service->review(2026, $match->id);
     }

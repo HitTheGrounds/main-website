@@ -142,7 +142,7 @@ class GroupStandingsCalculator
     {
         Validator::make($match->only(['balls_per_over', 'overs_per_innings', 'max_wickets', 'result_method']), [
             'balls_per_over' => ['required', Rule::in([4, 6])], 'overs_per_innings' => ['required', Rule::in([5])],
-            'max_wickets' => ['required', Rule::in([11])],
+            'max_wickets' => ['required', Rule::in([7])],
             'result_method' => ['required', Rule::in(['normal', 'super_over', 'coin_toss', 'revised_target', 'official_decision'])],
         ])->validate();
         $adjusted = $match->result_method === 'revised_target';

@@ -33,7 +33,7 @@ return new class extends Migration
                 batting_status VARCHAR(32) NULL,
                 bowling_balls INTEGER NULL CHECK (bowling_balls BETWEEN 0 AND 2147483647 AND bowling_balls = CAST(bowling_balls AS INTEGER)),
                 runs_conceded INTEGER NULL CHECK (runs_conceded BETWEEN 0 AND 2147483647 AND runs_conceded = CAST(runs_conceded AS INTEGER)),
-                wickets_taken INTEGER NULL CHECK (wickets_taken BETWEEN 0 AND 11 AND wickets_taken = CAST(wickets_taken AS INTEGER)),
+                wickets_taken INTEGER NULL CHECK (wickets_taken BETWEEN 0 AND 7 AND wickets_taken = CAST(wickets_taken AS INTEGER)),
                 dot_balls INTEGER NULL CHECK (dot_balls BETWEEN 0 AND 2147483647 AND dot_balls = CAST(dot_balls AS INTEGER)),
 
                 pending_action VARCHAR(16) NULL DEFAULT 'replace',

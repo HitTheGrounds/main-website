@@ -56,7 +56,7 @@ trait MatchResultPublicationChecks
     {
         return ['result_type' => 'win', 'result_method' => 'normal', 'winner_id' => $match->team1_id,
             'batting_first_id' => $match->team1_id, 'team1_runs' => 100, 'team1_wickets' => 3,
-            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 11,
+            'team1_overs' => 5, 'team1_balls' => 0, 'team2_runs' => 90, 'team2_wickets' => 7,
             'team2_overs' => 3, 'team2_balls' => 0];
     }
 
@@ -152,7 +152,7 @@ trait MatchResultPublicationChecks
         $this->assertSame($match->team1_id, $draft->winner_id);
         $this->assertSame(2, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->points);
         $review = $this->resultService()->review(2026, $match->id);
-        $this->assertSame('Side 2 won by 6 wickets.', $review['description']);
+        $this->assertSame('Side 2 won by 2 wickets.', $review['description']);
         $corrected = $this->resultService()->publish(2026, $match->id, $review['version'], $review['draft_hash']);
         $this->assertSame(101, $corrected->team2_runs);
         $this->assertEquals($firstLock, $corrected->structure_locked_at);
@@ -239,7 +239,7 @@ trait MatchResultPublicationChecks
     public static function badResultDrafts(): array
     {
         return [[['created_by' => 3]], [['status' => 'finished']], [['team1_deliveries' => 3]],
-            [['team1_runs' => -1]], [['team1_wickets' => 12]], [['team1_overs' => 5, 'team1_balls' => 1]],
+            [['team1_runs' => -1]], [['team1_wickets' => 8]], [['team1_overs' => 5, 'team1_balls' => 1]],
             [['nrr_inputs' => ['team1' => ['runs' => -1]]]], [['nrr_inputs' => ['team2' => ['secret' => 1]]]],
             [['result_note' => str_repeat('x', 8193)]], [[]]];
     }

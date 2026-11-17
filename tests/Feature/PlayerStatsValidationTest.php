@@ -17,7 +17,7 @@ class PlayerStatsValidationTest extends TestCase
         $this->assertNull($data['balls_faced']);
         $this->assertNull($data['bowling_balls']);
         $this->assertSame(6, $data['dot_balls']);
-        $bowling = $validator->validate(['bowling_balls' => 25, 'dot_balls' => 12, 'wickets_taken' => 11]);
+        $bowling = $validator->validate(['bowling_balls' => 25, 'dot_balls' => 12, 'wickets_taken' => 7]);
         $this->assertNull($bowling['runs_scored']);
         $this->assertSame(25, $bowling['bowling_balls']);
         $this->assertSame(12, $bowling['dot_balls']);
@@ -36,7 +36,7 @@ class PlayerStatsValidationTest extends TestCase
             [['runs_scored' => 'abc'], 'runs_scored'], [['runs_scored' => []], 'runs_scored'],
             [['runs_scored' => ' 1'], 'runs_scored'], [['runs_scored' => '+1'], 'runs_scored'],
             [['runs_scored' => '01'], 'runs_scored'], [['runs_scored' => 2147483648], 'runs_scored'],
-            [['wickets_taken' => 12], 'wickets_taken'], [['dot_balls' => 4, 'bowling_balls' => 3], 'dot_balls'],
+            [['wickets_taken' => 8], 'wickets_taken'], [['dot_balls' => 4, 'bowling_balls' => 3], 'dot_balls'],
             [['runs_scored' => 9, 'fours' => 1, 'sixes' => 1], 'runs_scored'],
             [['batting_status' => '<script>out</script>'], 'batting_status'],
             [['record_state' => 'published'], 'player'], [['player_gender' => 'Male'], 'player'],

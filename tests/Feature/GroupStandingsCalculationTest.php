@@ -30,8 +30,8 @@ class GroupStandingsCalculationTest extends TestCase
             'id' => 1, 'tournament_year' => 2026, 'group_id' => 1, 'stage' => 'G', 'status' => 'finished',
             'result_published_at' => '2026-11-15 10:00:00', 'team1_id' => 1, 'team2_id' => 2,
             'result_type' => 'win', 'result_method' => 'normal', 'winner_id' => 1,
-            'balls_per_over' => 4, 'overs_per_innings' => 5, 'max_wickets' => 11,
-            'team1_runs' => 100, 'team2_runs' => 90, 'team1_wickets' => 3, 'team2_wickets' => 11,
+            'balls_per_over' => 4, 'overs_per_innings' => 5, 'max_wickets' => 7,
+            'team1_runs' => 100, 'team2_runs' => 90, 'team1_wickets' => 3, 'team2_wickets' => 7,
             'team1_deliveries' => 20, 'team2_deliveries' => 12,
         ], $changes));
     }
@@ -72,7 +72,7 @@ class GroupStandingsCalculationTest extends TestCase
         $this->assertSame('2.000000', $rows[1]['nrr']);
         $this->assertSame('-2.000000', $rows[2]['nrr']);
         $this->assertSame($before, $match->getAttributes());
-        $match->team2_wickets = 10;
+        $match->team2_wickets = 6;
         $this->assertSame('-10.000000', $this->calculate([$match])['rows'][1]['nrr']);
     }
 
@@ -146,7 +146,7 @@ class GroupStandingsCalculationTest extends TestCase
 
     public function test_adjusted_nrr_uses_official_figures_without_reapplying_the_actual_all_out_rule(): void
     {
-        $match = $this->match(['result_method' => 'revised_target', 'winner_id' => 2, 'team1_wickets' => 11,
+        $match = $this->match(['result_method' => 'revised_target', 'winner_id' => 2, 'team1_wickets' => 7,
             'nrr_inputs' => ['included' => true, 'reason' => 'Official adjusted figures',
                 'team1' => ['runs' => 70, 'deliveries' => 16], 'team2' => ['runs' => 61, 'deliveries' => 14]]]);
         $a = $this->calculate([$match])['rows'][1];
@@ -205,7 +205,7 @@ class GroupStandingsCalculationTest extends TestCase
     {
         return [
             [['winner_id' => 3]], [['team2_id' => 3]], [['result_type' => 'unknown']],
-            [['team1_runs' => null]], [['team1_deliveries' => 21]], [['team2_wickets' => 12]],
+            [['team1_runs' => null]], [['team1_deliveries' => 21]], [['team2_wickets' => 8]],
             [['winner_id' => 2]], [['result_type' => 'tie', 'winner_id' => null]],
             [['result_method' => 'super_over']], [['result_method' => 'revised_target', 'nrr_inputs' => null]],
             [['result_method' => 'revised_target', 'nrr_inputs' => ['included' => true, 'reason' => 'Official', 'team1' => ['runs' => 2, 'deliveries' => 3]]]],
@@ -255,7 +255,7 @@ class GroupStandingsCalculationTest extends TestCase
         $result = app(MatchResultValidator::class)->validate($match, [
             'result_type' => 'win', 'result_method' => 'revised_target', 'winner_id' => 2,
             'revised_target' => 60, 'result_note' => 'Official rain-shortened result.',
-            'team1_runs' => 100, 'team1_wickets' => 11, 'team1_overs' => 4, 'team1_balls' => 0,
+            'team1_runs' => 100, 'team1_wickets' => 7, 'team1_overs' => 4, 'team1_balls' => 0,
             'team2_runs' => 61, 'team2_wickets' => 2, 'team2_overs' => 3, 'team2_balls' => 2,
             'nrr_inputs' => ['included' => true, 'reason' => 'Official adjusted figures',
                 'team1' => ['runs' => 70, 'overs' => 4, 'balls' => 0],

@@ -37,7 +37,7 @@ class PlayerStatsValidator
         };
         $rules = [];
         foreach (self::METRICS as $field) {
-            $rules[$field] = ['nullable', $integer, 'integer', 'between:0,'.($field === 'wickets_taken' ? 11 : 2147483647)];
+            $rules[$field] = ['nullable', $integer, 'integer', 'between:0,'.($field === 'wickets_taken' ? 7 : 2147483647)];
         }
         $rules['batting_status'] = ['nullable', Rule::in(['out', 'not_out', 'did_not_bat', 'retired_hurt', 'retired_out'])];
         $data = Validator::make($input, $rules)->validate();

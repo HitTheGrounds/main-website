@@ -329,7 +329,7 @@ new class extends Component {
                         <legend class="px-2 font-bold">{{ $discipline }}</legend>
                         <div class="grid grid-cols-2 gap-3">
                             @foreach($fields as $field => $label)
-                                <label><span class="label">{{ $label }}</span><input type="number" inputmode="numeric" min="0" max="{{ $field === 'wickets_taken' ? 11 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
+                                <label><span class="label">{{ $label }}</span><input type="number" inputmode="numeric" min="0" max="{{ $field === 'wickets_taken' ? 7 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
                             @endforeach
                         </div>
                         @if($discipline === 'Batting')

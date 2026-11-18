@@ -94,6 +94,6 @@
 
 /* Group and round jump buttons: compact on phones. */
 @media (max-width: 639px) {
-  .tc-jump { gap: .3rem; }
+  .tc-jump { gap: .3rem; justify-content: center; }
   .tc .tc-jump .btn { min-height: 2.125rem; padding: .3rem .625rem; font-size: .75rem; line-height: 1.2; }
 }

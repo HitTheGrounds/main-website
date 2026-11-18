@@ -112,7 +112,6 @@
                     </tbody>
                 </table>
             </div>
-            <p class="mt-3 text-center text-sm text-base-content/80">Incomplete results, tied positions, unavailable NRR or unequal group sizes make the comparison provisional. Abandoned and no-result matches do not contribute to NRR.</p>
         @endif
     </section>
 @endif

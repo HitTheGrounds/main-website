@@ -71,7 +71,7 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         if ($count === 0) {
             $response->assertSee('Groups have not been announced yet.');
         } else {
-            $response->assertSee('Qualification confirmed')->assertSee('overflow-x-auto');
+            $response->assertDontSee('Qualified for the knockouts')->assertSee('(qualified)')->assertSee('overflow-x-auto');
         }
     }
 
@@ -87,9 +87,10 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $this->group('Smaller group', 2);
         $this->match($teams[0]->id, $teams[1]->id, ['stage' => 'G', 'group_id' => $group]);
         $response = $this->get('/tournament?tab=table')->assertOk()->assertSee('Group <A>')->assertDontSee('Group <A>', false)
-            ->assertSee('0 of 6 possible group fixtures')->assertSee('5 fixtures not scheduled; 1 scheduled fixtures without published results.')
-            ->assertSee('Group results are incomplete.')->assertSee('Not available')->assertSee('Some teams share a position.')
-            ->assertSee('Groups have different team counts.')->assertSee('Provisional')->assertDontSee('How standings are ranked')
+            // The per-group "Results & qualification details" panel is gone; qualified teams carry a Q marker.
+            ->assertDontSee('Results & qualification details')->assertDontSee('possible group fixtures')
+            ->assertSee('Not available')->assertDontSee('Qualified for the knockouts')->assertSee('(qualified)')
+            ->assertDontSee('Runner-up comparison')->assertDontSee('How standings are ranked')
             ->assertDontSee('PRIVATE-');
         $rows = $response->viewData('tableData')['groups'][0]['teams'];
         $this->assertSame([1, 1, 3, 4], array_column($rows, 'rank'));
@@ -103,8 +104,8 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         DB::table('group_teams')->where('team_id', $teams[0]->id)->update(['points' => 2]);
         $this->match($teams[0]->id, $teams[1]->id, ['stage' => 'G', 'group_id' => $group, 'status' => 'finished',
             'result_published_at' => now(), 'result_type' => 'no_result']);
-        $this->get('/tournament?tab=table')->assertOk()->assertSee('1 of 1 possible group fixtures')
-            ->assertSee('Group results complete')->assertDontSee('Group results are incomplete.')->assertDontSee('Not available')
+        $this->get('/tournament?tab=table')->assertOk()->assertDontSee('Runner-up comparison')
+            ->assertDontSee('Group results are incomplete.')->assertDontSee('Not available')
             ->assertSee('0.0000')->assertDontSee('0.000000');
     }
 
@@ -112,7 +113,7 @@ class PublicTournamentTablesAndBracketTest extends TestCase
     {
         $this->group('Waiting group', 0);
         $this->get('/tournament?tab=table')->assertOk()->assertSee('Teams have not been assigned')
-            ->assertSee('No runner-up comparison is available yet.');
+            ->assertDontSee('Runner-up comparison');
         $response = $this->get('/tournament?tab=bracket')->assertOk()->assertSee('Choose a knockout round');
         $this->assertSame(7, substr_count($response->getContent(), '>To be confirmed<'));
         $response->assertDontSee('Winner of ')->assertDontSee('A1 vs');

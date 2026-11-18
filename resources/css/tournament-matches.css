@@ -81,3 +81,7 @@
   .tc-table-team .tc-badge-cse { font-size: .625rem; }
   .tc-table-team .tc-badge-initials { font-size: .6875rem; }
 }
+
+/* Table tab: centre every column (headings and values) except Team, on all screen sizes.
+   Position is already centred in tournament.css. */
+:is(.tc-standings, .tc-runners) :is(th, td):nth-child(n+3) { text-align: center; }

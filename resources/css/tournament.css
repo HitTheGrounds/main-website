@@ -212,6 +212,10 @@
 .tc-playoffs { position: relative; display: grid; gap: 1.5rem; padding-inline-start: 2rem; }
 .tc-playoff-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; color: var(--color-primary-ink); }
 .tc-playoff-mirror { display: none; }
+.tc-playoffs .tc-round-head { grid-row: 1; align-self: stretch; margin: 0; }
+.tc-playoff-round[data-stage="QF"] .tc-round-head { grid-column: 1; }
+.tc-playoff-round[data-stage="SF"] .tc-round-head { grid-column: 2; }
+.tc-playoff-round[data-stage="F"] .tc-round-head { grid-column: 3; }
 .tc-playoff-matches { display: grid; gap: 1rem; }
 .tc-playoff-slot { min-width: 0; position: relative; }
 .tc-playoff-slot .tc-match { max-width: 200px; margin-inline: auto; }
@@ -220,8 +224,17 @@
 .tc-bracket-team-details .tc-team-name { min-width: 0; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
 .tc-bracket-team-details .tc-team-score { max-width: 45%; text-align: right; font-variant-numeric: tabular-nums; }
 .tc-playoff-slot .tc-score { font-size: .875rem; font-weight: 400; }
-.tc-team-logo { position: relative; width: min(100%, 4.5rem); height: 2.75rem; border-radius: .375rem; overflow: hidden;  font-size: .875rem; }
-.tc-team-logo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;  }
+.tc-team-logo {
+  position: relative;
+  width: min(100%, 4.5rem);
+  height: 2.75rem;
+  padding: .5rem;
+  background: #fff;
+  border: 1px solid var(--tc-line);
+  border-radius: .375rem;
+  font-size: .875rem;
+}
+.tc-team-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .tc-team-logo img[hidden] { display: none; }
 
 @media (min-width: 75rem) {
@@ -231,10 +244,6 @@
   .tc-playoff-mirror span { font-size: 1.25rem; font-weight: 800; border-left: 3px solid var(--color-primary); padding-left: .625rem; }
   .tc-playoff-mirror[data-stage="SF"] { grid-column: 4; }
   .tc-playoff-mirror[data-stage="QF"] { grid-column: 5; }
-  .tc-playoffs .tc-round-head { grid-row: 1; align-self: stretch; margin: 0; }
-  .tc-playoff-round[data-stage="QF"] .tc-round-head { grid-column: 1; }
-  .tc-playoff-round[data-stage="SF"] .tc-round-head { grid-column: 2; }
-  .tc-playoff-round[data-stage="F"] .tc-round-head { grid-column: 3; }
   .tc-playoff-slot { grid-column: var(--column); grid-row: var(--row); }
 }
 
@@ -244,7 +253,7 @@
     width: max-content;
     min-width: 100%;
     grid-template-columns: repeat(3, 200px);
-    grid-template-rows: repeat(8, minmax(0, 1fr));
+    grid-template-rows: auto repeat(8, minmax(0, 1fr));
     justify-content: center;
     align-items: center;
     gap: 0 40px;

@@ -42,9 +42,10 @@ class PublicPlayerListsTest extends TestCase
             ->assertDontSee('Filter player stats')
             ->assertSee('Most runs')->assertDontSee('Joint leader (provisional)')->assertSee('award/orange_cap.avif')->assertDontSee('Orange Cap (provisional)')
             ->assertSee('Published player 5')->assertDontSee('Published player 6')->assertDontSee('Unknown player')
-            ->assertSee('7 of 8 players with eligible published entries')->assertSee('Some match entries may be incomplete.')
-            ->assertSee('including everyone tied at the fifth')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
+            ->assertDontSee('How these rankings work')->assertSee('Refresh')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
         $this->assertCount(6, $response->viewData('rankingData')['entries']);
+        $this->assertSame(7, $response->viewData('rankingData')['coverage']['players_with_recorded_metric']);
+        $this->assertSame(8, $response->viewData('rankingData')['coverage']['players_with_published_entries']);
         $this->assertSame(2, substr_count($response->getContent(), 'award/orange_cap.avif'));
         $this->assertSame([1, 1, 3, 4, 5, 5], array_column($response->viewData('rankingData')['entries'], 'rank'));
     }
@@ -64,7 +65,7 @@ class PublicPlayerListsTest extends TestCase
         $teamName = DB::table('teams')->value('team_name');
         $response = $this->get('/tournament?tab=stats&category='.$category)->assertOk()->assertSee($heading)
             ->assertSee('Known player')->assertSee($teamName)->assertDontSee(' recorded match')->assertDontSee('tc-player-leader')
-            ->assertSee('Super Over performances are excluded.')->assertDontSee('PRIVATE-');
+            ->assertDontSee('Super Over performances are excluded.')->assertDontSee('PRIVATE-');
         $this->assertSame($category, $response->viewData('rankingData')['category']);
         if ($category === 'wickets') {
             $response->assertSee('award/purple_cap.avif')->assertDontSee('Purple Cap (provisional)')->assertDontSee('Orange Cap');
@@ -89,8 +90,7 @@ class PublicPlayerListsTest extends TestCase
 
     public function test_empty_and_zero_categories_do_not_invent_cap_holders(): void
     {
-        $this->get('/tournament?tab=stats')->assertOk()->assertSee('No published figures are available')
-            ->assertSee('0 of 0 players with eligible published entries');
+        $this->get('/tournament?tab=stats')->assertOk()->assertSee('No published figures are available');
         $this->summary('Zero player', 0);
         $this->get('/tournament?tab=stats')->assertOk()->assertSee('Zero player')->assertSee('No title holder yet.')
             ->assertDontSee('Orange Cap')->assertDontSee('Leader (provisional)');

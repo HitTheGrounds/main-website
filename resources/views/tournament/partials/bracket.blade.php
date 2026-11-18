@@ -1,5 +1,6 @@
 @php
     $stages = ['G' => 'Group stage', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'];
+    $roundHeadings = ['QF' => 'Quarterfinals', 'SF' => 'Semifinals', 'F' => 'Finals'];
     $statuses = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
     $sources = [];
     $quarterColumns = [];
@@ -26,8 +27,16 @@
 <div class="tc-playoff-scroll" role="region" aria-label="Playoff bracket">
     <div class="tc-playoffs" data-playoff-bracket>
         <canvas class="tc-playoff-lines" aria-hidden="true"></canvas>
+        @foreach (['SF', 'QF'] as $stage)
+            <div class="tc-round-head tc-playoff-mirror" data-stage="{{ $stage }}" aria-hidden="true">
+                <span>{{ $roundHeadings[$stage] }}</span>
+            </div>
+        @endforeach
         @foreach ($bracketData['rounds'] as $stage => $positions)
             <section id="round-{{ $stage }}" tabindex="-1" aria-labelledby="round-{{ $stage }}-heading" class="tc-playoff-round" data-stage="{{ $stage }}">
+                <div class="tc-round-head">
+                    <h3 id="round-{{ $stage }}-heading">{{ $roundHeadings[$stage] }}</h3>
+                </div>
                 <div class="tc-playoff-matches">
                     @foreach ($positions as $position)
                         @php
@@ -39,9 +48,9 @@
                             };
                             $row = $stage === 'QF' ? $quarterRows[$column]++ : '2 / span 2';
                             $mobileRow = match ($stage) {
-                                'QF' => (2 * ($row - 2) + ($column === 5 ? 5 : 1)).' / span 2',
-                                'SF' => ($column === 2 ? 1 : 5).' / span 4',
-                                'F' => '1 / span 8',
+                                'QF' => (2 * ($row - 2) + ($column === 5 ? 6 : 2)).' / span 2',
+                                'SF' => ($column === 2 ? 2 : 6).' / span 4',
+                                'F' => '2 / span 8',
                             };
                         @endphp
                         <div class="tc-playoff-slot" style="--column: {{ $column }}; --row: {{ $row }}; --mobile-row: {{ $mobileRow }}"

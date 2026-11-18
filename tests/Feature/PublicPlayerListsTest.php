@@ -40,12 +40,12 @@ class PublicPlayerListsTest extends TestCase
         $response = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('aria-label="Player group"', false)
             ->assertSee('aria-label="Stats category"', false)
             ->assertDontSee('Filter player stats')
-            ->assertSee('Most runs')->assertDontSee('Joint leader (provisional)')->assertSee('Orange Cap (provisional)')
+            ->assertSee('Most runs')->assertDontSee('Joint leader (provisional)')->assertSee('award/orange_cap.avif')->assertDontSee('Orange Cap (provisional)')
             ->assertSee('Published player 5')->assertDontSee('Published player 6')->assertDontSee('Unknown player')
             ->assertSee('7 of 8 players with eligible published entries')->assertSee('Some match entries may be incomplete.')
             ->assertSee('including everyone tied at the fifth')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
         $this->assertCount(6, $response->viewData('rankingData')['entries']);
-        $this->assertSame(2, substr_count($response->getContent(), 'Orange Cap (provisional)'));
+        $this->assertSame(2, substr_count($response->getContent(), 'award/orange_cap.avif'));
         $this->assertSame([1, 1, 3, 4, 5, 5], array_column($response->viewData('rankingData')['entries'], 'rank'));
     }
 
@@ -63,11 +63,11 @@ class PublicPlayerListsTest extends TestCase
             'dot_balls' => 8, 'dot_balls_recorded_count' => 2]);
         $teamName = DB::table('teams')->value('team_name');
         $response = $this->get('/tournament?tab=stats&category='.$category)->assertOk()->assertSee($heading)
-            ->assertSee('Known player')->assertSee($teamName)->assertSee('Recorded match entries')
+            ->assertSee('Known player')->assertSee($teamName)->assertDontSee(' recorded match')->assertDontSee('tc-player-leader')
             ->assertSee('Super Over performances are excluded.')->assertDontSee('PRIVATE-');
         $this->assertSame($category, $response->viewData('rankingData')['category']);
         if ($category === 'wickets') {
-            $response->assertSee('Purple Cap (provisional)')->assertDontSee('Orange Cap');
+            $response->assertSee('award/purple_cap.avif')->assertDontSee('Purple Cap (provisional)')->assertDontSee('Orange Cap');
         }
     }
 

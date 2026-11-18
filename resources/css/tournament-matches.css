@@ -107,16 +107,19 @@
   overflow-x: auto;
 }
 .tc-stats-categories a { flex: none; white-space: nowrap; }
-.tc-panel.tc-stats-panel { padding-top: 0; }
+.tc-panel.tc-stats-panel { padding: 0; }
+.tc-stats-panel > [role="region"] { border-radius: inherit; }
 .tc-stats-leaderboard { width: 100%; border-collapse: collapse; text-align: start; }
-.tc-stats-leaderboard :is(th, td) { padding: .625rem .375rem; border-bottom: 1px solid var(--tc-line); text-align: start; vertical-align: middle; }
-.tc-stats-leaderboard :is(th, td):last-child { text-align: end; }
+.tc-stats-leaderboard :is(th, td) { padding: .875rem .375rem; border-bottom: 1px solid var(--tc-line); text-align: start; vertical-align: middle; }
+.tc-stats-leaderboard :is(th, td):first-child { padding-inline-start: 1.125rem; }
+.tc-stats-leaderboard :is(th, td):last-child { padding-inline-end: 1.125rem; text-align: end; }
+.tc-stats-score { display: inline-flex; align-items: center; gap: .75rem; white-space: nowrap; }
+.tc-stats-score img { flex: none; width: 2rem; height: 2rem; object-fit: contain; }
 .tc-stats-leaderboard thead { font-size: .8125rem; }
 .tc-stats-leaderboard tbody th { width: 100%; overflow-wrap: anywhere; }
-.tc-stats-team { margin-top: .25rem; }
-.tc-stats-team .tc-badge { flex-shrink: 0; }
-.tc-stats-team, .tc-stats-record { font-size: .8125rem; font-weight: 400; }
-.tc-stats-record { display: block; margin-top: .25rem; }
+.tc-stats-logo .tc-badge { width: 4rem; height: auto; padding: 0; background: none; box-shadow: none; }
+.tc-stats-logo img { display: block; width: 100%; height: auto; }
+.tc-stats-team { display: block; margin-top: .25rem; font-size: .8125rem; font-weight: 400; }
 
 /* Qualified teams: a "Q" marker after the name. */
 .tc-table-team-name { display: inline; }

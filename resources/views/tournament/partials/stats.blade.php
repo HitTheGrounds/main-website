@@ -30,30 +30,40 @@
             <div role="region" aria-label="Player rankings" tabindex="0" class="overflow-x-auto">
                 <table class="tc-stats-leaderboard">
                     <caption class="sr-only">{{ $categories[$category] }}, All players</caption>
-                    <thead><tr><th scope="col">Rank</th><th scope="col">Player</th><th scope="col">{{ $figures[$category] }}</th></tr></thead>
                     <tbody>
                         @foreach ($rankingData['entries'] as $entry)
-                            @php $leader = in_array($entry['player_id'], $rankingData['leader_ids'], true); @endphp
-                            <tr @class(['tc-player-leader' => $leader])>
+                            @php
+                                $cap = in_array($entry['player_id'], $rankingData['leader_ids'], true)
+                                    ? match ($category) {
+                                        'runs' => 'Orange',
+                                        'wickets' => 'Purple',
+                                        default => null,
+                                    }
+                                    : null;
+                            @endphp
+                            <tr>
                                 <td class="font-semibold">{{ $entry['rank'] }}</td>
+                                <td class="tc-stats-logo">
+                                    <x-tournament.team-badge :name="$entry['team_name']" />
+                                </td>
                                 <th scope="row" class="break-words">
                                     {{ $entry['player_name'] }}
-                                    <span class="tc-table-team tc-stats-team">
-                                        <x-tournament.team-badge :name="$entry['team_name']" />
-                                        <span>{{ $entry['team_name'] }}</span>
-                                    </span>
-                                    <span class="tc-stats-record">{{ $entry['recorded_count'] }} recorded {{ $entry['recorded_count'] === 1 ? 'match' : 'matches' }}</span>
-                                    @if ($leader && in_array($category, ['runs', 'wickets'], true))
-                                        <span class="badge badge-outline mt-1 h-auto whitespace-normal py-1 text-xs font-normal">{{ $category === 'runs' ? 'Orange Cap' : 'Purple Cap' }} (provisional)</span>
-                                    @endif
+                                    <span class="tc-stats-team">{{ $entry['team_name'] }}</span>
                                 </th>
-                                <td class="text-xl font-bold tabular-nums">{{ $entry['value'] }}</td>
+                                <td class="text-xl font-bold tabular-nums">
+                                    <span class="tc-stats-score">
+                                        @if ($cap)
+                                            <img src="{{ asset('award/'.strtolower($cap).'_cap.avif') }}" alt="{{ $cap }} Cap" width="32" height="32">
+                                        @endif
+                                        <span>{{ $entry['value'] }}</span>
+                                    </span>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
-            <p class="mt-3 text-center text-sm text-base-content/80">Recorded match entries count only entries containing this figure. Other match entries may be missing. Super Over performances are excluded.</p>
+            <p class="mt-3 text-center text-sm text-base-content/80">Super Over performances are excluded.</p>
         @endif
         <details class="tc-notes">
             <summary>How these rankings work</summary>

@@ -112,7 +112,7 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $this->group('Waiting group', 0);
         $this->get('/tournament?tab=table')->assertOk()->assertSee('Teams have not been assigned')
             ->assertSee('No runner-up comparison is available yet.');
-        $response = $this->get('/tournament?tab=bracket')->assertOk()->assertSee('Choose a knockout round');
+        $response = $this->get('/tournament?tab=bracket')->assertOk()->assertDontSee('Choose a knockout round');
         $this->assertSame(7, substr_count($response->getContent(), '>To be confirmed<'));
         $response->assertDontSee('Winner of ')->assertDontSee('A1 vs');
     }

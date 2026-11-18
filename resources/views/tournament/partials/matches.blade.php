@@ -23,7 +23,6 @@
         @foreach ($statusTabs as $value => $label)
             <a href="{{ route('tournament.index', ['tab' => 'matches', 'status' => $value, ...$keptFilters]) }}"
                @if ($currentStatus === $value) aria-current="page" @endif>
-                @if ($value === 'live')<span class="tc-live-dot" aria-hidden="true"></span>@endif
                 {{ $label }}
             </a>
         @endforeach

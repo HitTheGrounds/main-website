@@ -7,9 +7,6 @@
 .tc-status-tabs a:not([aria-current]):hover { background: rgb(255 255 255 / .6); }
 .tc-status-tabs a:active { transform: scale(.97); }
 .tc-status-tabs a[aria-current] { background: var(--color-secondary); color: var(--color-secondary-content); view-transition-name: tc-status-pill; }
-.tc-live-dot { position: relative; width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--color-primary); }
-.tc-live-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--color-primary); animation: tc-pulse 1.8s cubic-bezier(.22,1,.36,1) infinite; }
-@keyframes tc-pulse { from { transform: scale(1); opacity: .7; } to { transform: scale(2.6); opacity: 0; } }
 .tc-filter-matches > summary { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .5rem; list-style: none; }
 .tc-filter-matches > summary::-webkit-details-marker { display: none; }
 .tc-filter-matches > summary .tc-icon { width: 18px; height: 18px; }
@@ -59,10 +56,15 @@
 .tc-badge-initials { background: var(--color-base-200); font-size: .8125rem; font-weight: 800; letter-spacing: .02em; color: var(--color-base-content); }
 
 @media (min-width: 640px) {
-  .tc-status-tabs { width: fit-content; min-width: 28rem; }
+  .tc-status-tabs { width: fit-content; min-width: 28rem; margin-inline: auto; }
   .tc-status-tabs a { font-size: .875rem; padding-inline: 1rem; }
   .tc-fixture-score { font-size: 1.5rem; }
 }
 @media (min-width: 1024px) { .tc-fixture-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; } }
 @media (min-width: 1536px) { .tc-fixture-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .tc-live-dot::after, .tc-fixture-status-live::before { animation: none; } .tc-status-tabs a { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .tc-fixture-status-live::before { animation: none; } .tc-status-tabs a { transition: none; } }
+
+/* Tournament masthead: centre the title and the section tabs.
+   Overrides only, so tournament.css (shared with the bracket work) stays untouched. */
+.tc-hero { text-align: center; }
+@media (min-width: 1024px) { .tc-nav { justify-content: center; } }

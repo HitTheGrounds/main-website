@@ -104,7 +104,8 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $this->match($teams[0]->id, $teams[1]->id, ['stage' => 'G', 'group_id' => $group, 'status' => 'finished',
             'result_published_at' => now(), 'result_type' => 'no_result']);
         $this->get('/tournament?tab=table')->assertOk()->assertSee('1 of 1 possible group fixtures')
-            ->assertSee('Group results complete')->assertDontSee('Group results are incomplete.')->assertDontSee('Not available');
+            ->assertSee('Group results complete')->assertDontSee('Group results are incomplete.')->assertDontSee('Not available')
+            ->assertSee('0.0000')->assertDontSee('0.000000');
     }
 
     public function test_empty_group_and_empty_bracket_have_honest_placeholders(): void

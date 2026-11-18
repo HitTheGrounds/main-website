@@ -1,3 +1,8 @@
+@php
+    // NRR is stored to 6 decimal places and ranking uses that full value; show 4.
+    $formatNrr = fn (?string $nrr) => $nrr === null ? 'Not available'
+        : (string) \Brick\Math\BigDecimal::of($nrr)->toScale(4, \Brick\Math\RoundingMode::HALF_UP);
+@endphp
 @if ($tableData['groups'] === [])
     <p class="mt-6 rounded-box border border-base-300 p-6 text-center">Groups have not been announced yet.</p>
 @else
@@ -33,6 +38,9 @@
                                     <tr>
                                         <td>{{ $team['rank'] }}</td>
                                         <th scope="row" class="min-w-40 max-w-72 break-words">
+                                            <span class="tc-table-team">
+                                            <x-tournament.team-badge :name="$team['name']" />
+                                            <span class="tc-table-team-text">
                                             {{ $team['name'] }}
                                             <span class="tc-small-record">
                                                 <span><abbr title="Played">P</abbr> {{ $team['played'] }}</span>
@@ -44,10 +52,12 @@
                                             @if ($team['qualified'])
                                                 <span class="tc-qualification">Qualification confirmed</span>
                                             @endif
+                                            </span>
+                                            </span>
                                         </th>
                                         <td>{{ $team['played'] }}</td><td>{{ $team['wins'] }}</td><td>{{ $team['losses'] }}</td>
                                         <td>{{ $team['ties'] }}</td><td>{{ $team['no_results'] }}</td>
-                                        <td class="font-bold">{{ $team['points'] }}</td><td>{{ $team['nrr'] ?? 'Not available' }}</td>
+                                        <td class="font-bold">{{ $team['points'] }}</td><td>{{ $formatNrr($team['nrr']) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -88,15 +98,20 @@
                         @foreach ($tableData['runner_up_guidance'] as $team)
                             <tr>
                                 <td>{{ $team['rank'] }}</td><th scope="row" class="min-w-40 max-w-72 break-words">
+                                    <span class="tc-table-team">
+                                    <x-tournament.team-badge :name="$team['name']" />
+                                    <span class="tc-table-team-text">
                                     {{ $team['name'] }}
                                     <span class="tc-small-record">
                                         <span>{{ $team['group_name'] }}</span>
                                         <span>Played {{ $team['played'] }}</span>
                                         <span>{{ $team['provisional'] ? 'Provisional' : 'Group results complete' }}</span>
                                     </span>
+                                    </span>
+                                    </span>
                                 </th>
                                 <td class="break-words">{{ $team['group_name'] }}</td><td>{{ $team['played'] }}</td><td>{{ $team['points'] }}</td>
-                                <td>{{ $team['nrr'] ?? 'Not available' }}</td><td>{{ $team['provisional'] ? 'Provisional' : 'Group results complete' }}</td>
+                                <td>{{ $formatNrr($team['nrr']) }}</td><td>{{ $team['provisional'] ? 'Provisional' : 'Group results complete' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

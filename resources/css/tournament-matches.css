@@ -68,3 +68,16 @@
    Overrides only, so tournament.css (shared with the bracket work) stays untouched. */
 .tc-hero { text-align: center; }
 @media (min-width: 1024px) { .tc-nav { justify-content: center; } }
+
+/* Table tab: team badge beside the team name in the standings rows. */
+.tc-table-team { display: flex; align-items: center; gap: .5rem; }
+.tc-table-team-text { min-width: 0; }
+.tc-table-team .tc-badge { width: 2.25rem; height: 1.625rem; padding: .15rem; border-radius: .4rem; }
+.tc-table-team .tc-badge-cse { gap: .12rem; font-size: .5rem; }
+.tc-table-team .tc-badge-initials { font-size: .625rem; }
+@media (min-width: 768px) {
+  .tc-table-team { gap: .625rem; }
+  .tc-table-team .tc-badge { width: 2.75rem; height: 2rem; padding: .2rem; border-radius: .5rem; }
+  .tc-table-team .tc-badge-cse { font-size: .625rem; }
+  .tc-table-team .tc-badge-initials { font-size: .6875rem; }
+}

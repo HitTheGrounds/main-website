@@ -51,14 +51,19 @@ class PublicPublicationTimesTest extends TestCase
         $review = $players->review(2026, $id);
         $players->publish(2026, $id, $review['version'], $review['player_stats_revision'], $review['receipt']);
         request()->attributes->remove('user');
-        // Beside Refresh, the stats view shows the newer of the result and player-stats publications.
+        // Publication times are no longer printed on the page; check the clocks behind each view (UTC).
+        $utc = fn (?string $time) => $time === null ? null : CarbonImmutable::parse($time)->utc()->format('H:i');
         $oldPage = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('tc-updated')->assertDontSee('Publication details');
         $oldData = $oldPage->viewData('rankingData');
+        $this->assertSame('12:00', $utc($oldData['publication_times']['player_stats']));
+        $this->assertSame('11:00', $utc($oldData['publication_times']['match_results']));
         $oldHtml = $oldPage->getContent();
         $this->assertSame(20, $oldData['entries'][0]['value']);
-        foreach (['matches', 'table', 'bracket'] as $tab) {
-            $this->get('/tournament?tab='.$tab)->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh');
+        foreach (['matches', 'table'] as $tab) {
+            $data = $this->get('/tournament?tab='.$tab)->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh')->viewData($tab === 'matches' ? 'matchData' : 'tableData');
+            $this->assertSame('11:00', $utc($data['latest_result_published_at']));
         }
+        $this->assertNull($this->get('/tournament?tab=bracket')->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh')->viewData('bracketData')['latest_result_published_at']);
 
         $this->travelTo(CarbonImmutable::parse('2026-11-16 13:00:00 UTC'));
         request()->attributes->set('user', $actor);
@@ -73,8 +78,8 @@ class PublicPublicationTimesTest extends TestCase
         $review = $players->review(2026, $id);
         $players->publish(2026, $id, $review['version'], $review['player_stats_revision'], $review['receipt']);
         request()->attributes->remove('user');
-        $newPage = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('tc-updated')
-            ->assertSee('Refresh this page for the latest published results.');
+        $newPage = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh this page for the latest published results.');
+        $this->assertSame('14:00', $utc($newPage->viewData('rankingData')['publication_times']['player_stats']));
         $this->assertSame(30, $newPage->viewData('rankingData')['entries'][0]['value']);
         $this->assertSame($oldHtml, $oldPage->getContent());
         foreach (['wire:poll', 'setInterval(', 'WebSocket(', 'http-equiv="refresh"'] as $automaticRefresh) {
@@ -93,6 +98,7 @@ class PublicPublicationTimesTest extends TestCase
         request()->attributes->remove('user');
         $withdrawn = $this->get('/tournament?tab=stats')->assertOk()->assertSee('No published figures are available')
             ->assertDontSee('tc-updated')->assertDontSee('award/orange_cap.avif');
+        $this->assertSame('15:00', $utc($withdrawn->viewData('rankingData')['publication_times']['player_stats']));
         $this->assertSame([], $withdrawn->viewData('rankingData')['entries']);
         $this->assertSame(0, $withdrawn->viewData('rankingData')['coverage']['players_with_published_entries']);
         $this->travelBack();

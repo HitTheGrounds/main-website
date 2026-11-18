@@ -10,6 +10,7 @@
     <div class="hidden lg:block">
         <x-TeamsSection variant="desktop" />
     </div>
+    <x-GroundPlanSection />
     <x-MobileHighlights />
     {{-- <x-ContendersSection /> --}}
     {{-- On phones the committee and description live on the About page. --}}

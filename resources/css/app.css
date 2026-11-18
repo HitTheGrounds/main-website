@@ -583,3 +583,71 @@ html { scroll-padding-top: 5.5rem; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
 [x-cloak] { display: none !important; }
+
+.ground-plan-decoration { display: none; }
+@media (min-width: 1280px) {
+  .ground-plan-decoration { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+  .ground-plan-orbit { position: absolute; top: 26%; height: 66%; width: 24%; color: var(--color-primary); opacity: .46; }
+  .ground-plan-orbit-left { left: -3%; transform: rotate(-18deg); }
+  .ground-plan-orbit-right { right: -3%; transform: rotate(18deg); }
+  .ground-plan-extra { position: absolute; width: clamp(75px, 7vw, 130px); color: var(--color-primary-ink); opacity: .55; }
+  .ground-plan-bat { left: 15%; top: 19%; }
+  .ground-plan-doodle { position: absolute; width: clamp(65px, 6vw, 115px); height: auto; color: var(--color-primary-ink); opacity: .6; }
+  .ground-plan-doodle-2 { left: 19%; top: 40%; width: 70px; }
+  .ground-plan-doodle-3 { left: 12%; bottom: 9%; rotate: 8deg; }
+  .ground-plan-doodle-4 { left: 2%; bottom: 3%; width: 80px; }
+  .ground-plan-doodle-5 { right: 10%; top: 12%; rotate: -10deg; }
+  .ground-plan-doodle-6 { right: 2%; bottom: 9%; rotate: 20deg; }
+  .ground-plan-doodle-7 { right: 22%; top: 5%; width: 65px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ground-plan-ball { animation: ground-plan-bowl 12s ease-in-out infinite alternate; }
+  .ground-plan-ring { transform-origin: 160px 265px; animation: ground-plan-turn 24s ease-in-out infinite alternate; }
+  .ground-plan-trail { animation: ground-plan-dash 12s ease-in-out infinite alternate; }
+  .ground-plan-extra { animation: ground-plan-float 10s ease-in-out infinite alternate; }
+  .ground-plan-doodle { animation: ground-plan-float 10s ease-in-out infinite alternate; }
+  .ground-plan-doodle:nth-child(even) { animation-delay: -5s; animation-duration: 12s; }
+  #ground-plan .ground-plan-bat,
+  #ground-plan .ground-plan-doodle-6 {
+    animation: ground-plan-bat-sway 10s ease-in-out infinite alternate;
+  }
+  #ground-plan .ground-plan-doodle-6 { animation-delay: -5s; }
+}
+@keyframes ground-plan-bat-sway {
+  from { transform: translate(-6px, 5px) rotate(-4deg); }
+  to { transform: translate(6px, -5px) rotate(4deg); }
+}
+@keyframes ground-plan-float {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-18px) rotate(-6deg); }
+}
+@keyframes ground-plan-bowl {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(165px, -335px) rotate(12deg); }
+}
+@keyframes ground-plan-turn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+@keyframes ground-plan-dash {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -102; }
+}
+
+@media (min-width: 1024px) {
+  #ground-plan .ground-plan-container {
+    height: calc(100dvh - 5.5rem);
+    padding-block: clamp(1rem, 3dvh, 2rem);
+  }
+  .ground-plan-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .ground-plan-heading { flex-shrink: 0; gap: 1rem; margin-bottom: 1rem; }
+  .ground-plan-heading h2 { font-size: clamp(2.2rem, 6dvh, 3.5rem); }
+  .ground-plan-heading p { margin-top: .5rem; }
+  .ground-plan-image { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 0; border: 0; background: transparent; }
+  .ground-plan-image img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+}

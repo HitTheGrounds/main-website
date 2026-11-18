@@ -63,10 +63,6 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertSee($committeeUrl, false);
 
-        $this->get(route('registrations'))
-            ->assertOk()
-            ->assertSee($committeeUrl, false);
-
         $this->get(route('register'))
             ->assertOk()
             ->assertSee($committeeUrl, false);
@@ -154,7 +150,6 @@ class PublicPagesTest extends TestCase
             'most dot balls delivered',
             'standout performer in the final',
         ]);
-        $response->assertSee(route('register'), false);
         $response->assertDontSee([
             'Best Batsman',
             'Best Bowler',

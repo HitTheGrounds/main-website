@@ -43,7 +43,7 @@ class PublicTournamentController extends Controller
 
         if ($tab === 'stats') {
             try {
-                $rankingData = $tournament->rankings($year, array_intersect_key($request->query(), array_flip(['category', 'gender'])));
+                $rankingData = $tournament->rankings($year, array_intersect_key($request->query(), ['category' => true]));
             } catch (ValidationException $exception) {
                 $filterErrors = $exception->errors();
             }

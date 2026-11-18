@@ -45,7 +45,7 @@
                 if (! $filterErrors && $tab === 'matches') {
                     $refreshParameters += $matchData['filters'];
                 } elseif (! $filterErrors && $tab === 'stats') {
-                    $refreshParameters += ['category' => $rankingData['category'], 'gender' => $rankingData['gender']];
+                    $refreshParameters += ['category' => $rankingData['category']];
                 }
             @endphp
             <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">

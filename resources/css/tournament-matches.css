@@ -92,6 +92,29 @@
   .tc .tc-jump .btn { min-height: 2.125rem; padding: .3rem .625rem; font-size: .75rem; line-height: 1.2; }
 }
 
+.tc-status-tabs.tc-stats-categories {
+  display: flex;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: auto;
+  overflow-x: auto;
+}
+.tc-stats-categories a { flex: none; white-space: nowrap; }
+.tc-panel.tc-stats-panel { padding: 0; }
+.tc-stats-panel > [role="region"] { border-radius: inherit; }
+.tc-stats-leaderboard { width: 100%; border-collapse: collapse; text-align: start; }
+.tc-stats-leaderboard :is(th, td) { padding: .875rem .375rem; border-bottom: 1px solid var(--tc-line); text-align: start; vertical-align: middle; }
+.tc-stats-leaderboard :is(th, td):first-child { padding-inline-start: 1.125rem; }
+.tc-stats-leaderboard :is(th, td):last-child { padding-inline-end: 1.125rem; text-align: end; }
+.tc-stats-score { display: inline-flex; align-items: center; gap: .75rem; white-space: nowrap; }
+.tc-stats-score img { flex: none; width: 2rem; height: 2rem; object-fit: contain; }
+.tc-stats-leaderboard thead { font-size: .8125rem; }
+.tc-stats-leaderboard tbody th { width: 100%; overflow-wrap: anywhere; }
+.tc-stats-logo .tc-badge { width: 4rem; height: auto; padding: 0; background: none; box-shadow: none; }
+.tc-stats-logo img { display: block; width: 100%; height: auto; }
+.tc-stats-team { display: block; margin-top: .25rem; font-size: .8125rem; font-weight: 400; }
+
 /* Qualified teams: a "Q" marker after the name. */
 .tc-table-team-name { display: inline; }
 .tc-q { display: inline-flex; align-items: center; justify-content: center; width: 1.125rem; height: 1.125rem; margin-left: .375rem; vertical-align: .1em; border-radius: .3rem; background: var(--color-primary); color: var(--color-primary-content); font-size: .625rem; font-weight: 800; line-height: 1; letter-spacing: 0; }

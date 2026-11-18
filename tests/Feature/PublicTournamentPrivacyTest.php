@@ -139,7 +139,7 @@ class PublicTournamentPrivacyTest extends TestCase
         $before = $this->sourceState();
         $input = ['year' => 2027, 'winner_id' => $match['team1_id'], 'result_published_at' => now()->toIso8601String(),
             'is_scorer' => true, 'draft_result' => ['result_note' => 'PRIVATE-FORGED']];
-        $this->get('/tournament?'.http_build_query($input))->assertOk()->assertViewHas('year', 2026)
+        $this->get('/tournament?status=upcoming&'.http_build_query($input))->assertOk()->assertViewHas('year', 2026)
             ->assertDontSee('PRIVATE-FORGED')->assertSee('Scores appear after the result is published.');
         foreach (['post', 'put', 'patch', 'delete'] as $verb) {
             $this->{$verb}('/tournament', $input)->assertStatus(405);

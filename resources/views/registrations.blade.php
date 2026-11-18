@@ -81,7 +81,7 @@
                                 </div>
                                 <div class="flex-1">
                                     <h3 class="font-bold text-xl mb-2">Access the Registration Form</h3>
-                                    <p class="text-base-content/80">Registration can be completed through the <span class="font-semibold">Hit the Grounds 2026</span> official website. Click the registration button below to access the registration page and start the process.</p>
+                                    <p class="text-base-content/80">Registration can be completed through the <span class="font-semibold">Hit the Grounds 2026</span> official website. Registrations for the 2026 tournament are now closed.</p>
                                 </div>
                             </div>
 
@@ -145,50 +145,10 @@
                     </div>
                 </div>
 
-                <!-- CTA Section -->
                 <div class="card bg-primary text-primary-content shadow-sm">
                     <div class="card-body items-center text-center">
-                        <h2 class="card-title text-2xl mb-2 font-title">Ready to Participate?</h2>
-                        <p class="mb-6">Register your company or university and start building your team today</p>
-                        @php
-                            $user = App\Helpers\CompanyAuth::user();
-                            $isAdmin = $user?->is_admin === true;
-                        @endphp
-
-                        @if($user)
-                            @if($isAdmin)
-                                <a href="{{ route(App\Helpers\CompanyAuth::dashboardRoute($user)) }}" class="btn btn-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    Go to Admin Dashboard
-                                </a>
-                            @else
-                                <a href="{{ route(App\Helpers\CompanyAuth::dashboardRoute($user)) }}" class="btn btn-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                                    </svg>
-                                    Go to Dashboard
-                                </a>
-                            @endif
-                        @else
-                            @if(config('registration.enabled'))
-                                <a href="{{ route('register') }}" class="btn btn-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                    </svg>
-                                    Register Your Organization
-                                </a>
-                            @else
-                                <button onclick="registration_closed_modal.showModal()" class="btn btn-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                    </svg>
-                                    Registrations Closed
-                                </button>
-                            @endif
-                        @endif
+                        <h2 class="card-title text-2xl font-title">Registrations Closed</h2>
+                        <p>Company registrations for Hit the Grounds 2026 are now closed.</p>
                     </div>
                 </div>
 
@@ -203,26 +163,4 @@
         </div>
     </x-PageContainer>
 
-    <!-- Registration Closed Modal -->
-    <dialog id="registration_closed_modal" class="modal modal-bottom sm:modal-middle">
-        <div class="modal-box">
-            <div class="flex flex-col items-center gap-4 py-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <h3 class="font-bold text-2xl">Registrations Closed</h3>
-                <p class="text-center text-base-content/80">
-                    Organization registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route('about') }}#committee">Contact Us</a>.
-                </p>
-            </div>
-            <div class="modal-action">
-                <form method="dialog" class="w-full">
-                    <button class="btn btn-primary w-full">Close</button>
-                </form>
-            </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
 </x-layouts.public>

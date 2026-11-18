@@ -89,7 +89,7 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $response = $this->get('/tournament?tab=table')->assertOk()->assertSee('Group <A>')->assertDontSee('Group <A>', false)
             ->assertSee('0 of 6 possible group fixtures')->assertSee('5 fixtures not scheduled; 1 scheduled fixtures without published results.')
             ->assertSee('Group results are incomplete.')->assertSee('Not available')->assertSee('Some teams share a position.')
-            ->assertSee('Groups have different team counts.')->assertSee('Provisional')->assertSee('It does not confirm qualification.')
+            ->assertSee('Groups have different team counts.')->assertSee('Provisional')->assertDontSee('How standings are ranked')
             ->assertDontSee('PRIVATE-');
         $rows = $response->viewData('tableData')['groups'][0]['teams'];
         $this->assertSame([1, 1, 3, 4], array_column($rows, 'rank'));
@@ -104,7 +104,8 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $this->match($teams[0]->id, $teams[1]->id, ['stage' => 'G', 'group_id' => $group, 'status' => 'finished',
             'result_published_at' => now(), 'result_type' => 'no_result']);
         $this->get('/tournament?tab=table')->assertOk()->assertSee('1 of 1 possible group fixtures')
-            ->assertSee('Group results complete')->assertDontSee('Group results are incomplete.')->assertDontSee('Not available');
+            ->assertSee('Group results complete')->assertDontSee('Group results are incomplete.')->assertDontSee('Not available')
+            ->assertSee('0.0000')->assertDontSee('0.000000');
     }
 
     public function test_empty_group_and_empty_bracket_have_honest_placeholders(): void

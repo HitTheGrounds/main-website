@@ -58,6 +58,11 @@ if (bracket) {
                     context.arcTo(lane, startY, lane, endY, radius);
                     context.arcTo(lane, endY, endX, endY, radius);
                     context.lineTo(endX, endY);
+
+                    const arrowBackX = endX + (leftToRight ? -7 : 7);
+                    context.moveTo(arrowBackX, endY - 4);
+                    context.lineTo(endX, endY);
+                    context.lineTo(arrowBackX, endY + 4);
                 }
             }
 

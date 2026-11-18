@@ -81,15 +81,15 @@
 .tc-scoreboard { --tc-scoreboard-gutter: 1rem; padding-inline: var(--tc-scoreboard-gutter); }
 .tc-team { display: grid; grid-template-columns: minmax(0,1fr) minmax(4.5rem,auto); align-items: center; gap: .75rem; padding: .75rem 0; }
 .tc-playoffs .tc-team-eliminated { opacity: .45; }
-.tc-playoffs .tc-team-winner { position: relative; }
-.tc-playoffs .tc-team-winner::before {
+.tc-playoffs .tc-team-winner .tc-team-score { position: relative; }
+.tc-playoffs .tc-team-winner .tc-team-score::after {
   content: '';
   position: absolute;
-  left: calc(-1 * var(--tc-scoreboard-gutter));
+  right: calc(-1 * var(--tc-scoreboard-gutter));
   top: 50%;
-  transform: translate(-50%, -50%) rotate(135deg);
-  width: 15px;
-  height: 15px;
+  transform: translate(50%, -50%) rotate(-45deg);
+  width: min(12px, calc(var(--tc-scoreboard-gutter) * 1.125));
+  aspect-ratio: 1;
   background: #ff6a13;
   clip-path: polygon(0 0, 100% 0, 0 100%);
   pointer-events: none;

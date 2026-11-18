@@ -29,7 +29,7 @@
         @endforeach
     </nav>
 
-    <details class="tc-filter" @if ($hasFilters || $filters['sort'] !== 'schedule') open @endif>
+    <details class="tc-filter tc-filter-matches" @if ($hasFilters || $filters['sort'] !== 'schedule') open @endif>
         <summary>
             <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
             Filter matches
@@ -74,11 +74,11 @@
         <p>Scores shown after publication</p>
     </div>
 
-    <div class="tc-match-grid" aria-label="Match list">
+    <div class="tc-fixture-grid" aria-label="Match list">
         @forelse ($matchData['matches'] as $match)
-            @include('tournament.partials.match-card')
+            @include('tournament.partials.fixture-card')
         @empty
-            <p class="tc-empty lg:col-span-2">
+            <p class="tc-fixture-empty">
                 @if ($pagination['total'] > 0)
                     No matches on this page. Choose a previous page or reset the filters.
                 @elseif ($hasFilters)

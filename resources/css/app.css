@@ -3,6 +3,7 @@
 @import "aos/dist/aos.css";
 @import './page-scrollbar.css';
 @import './tournament.css';
+@import './tournament-matches.css';
 @import './scorer.css';
 
 @source '../views';

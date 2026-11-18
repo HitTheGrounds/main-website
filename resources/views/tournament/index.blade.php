@@ -45,7 +45,7 @@
                 if (! $filterErrors && $tab === 'matches') {
                     $refreshParameters += $matchData['filters'];
                 } elseif (! $filterErrors && $tab === 'stats') {
-                    $refreshParameters += ['category' => $rankingData['category'], 'gender' => $rankingData['gender']];
+                    $refreshParameters += ['category' => $rankingData['category']];
                 }
                 // Latest publication behind this view, shown beside Refresh. Stats uses whichever
                 // of the match-result and player-stats publications is newer.

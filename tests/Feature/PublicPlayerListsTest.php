@@ -37,13 +37,15 @@ class PublicPlayerListsTest extends TestCase
             $this->summary('Published player '.$index, $runs);
         }
         $this->summary('Unknown player', null);
-        $response = $this->get('/tournament?tab=stats')->assertOk()->assertSee('method="GET"', false)
-            ->assertSee('Most runs')->assertSee('Joint leader (provisional)')->assertSee('Orange Cap (provisional)')
+        $response = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('aria-label="Player group"', false)
+            ->assertSee('aria-label="Stats category"', false)
+            ->assertDontSee('Filter player stats')
+            ->assertSee('Most runs')->assertDontSee('Joint leader (provisional)')->assertSee('Orange Cap (provisional)')
             ->assertSee('Published player 5')->assertDontSee('Published player 6')->assertDontSee('Unknown player')
             ->assertSee('7 of 8 players with eligible published entries')->assertSee('Some match entries may be incomplete.')
             ->assertSee('including everyone tied at the fifth')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
         $this->assertCount(6, $response->viewData('rankingData')['entries']);
-        $this->assertSame(2, substr_count($response->getContent(), 'Joint leader (provisional)'));
+        $this->assertSame(2, substr_count($response->getContent(), 'Orange Cap (provisional)'));
         $this->assertSame([1, 1, 3, 4, 5, 5], array_column($response->viewData('rankingData')['entries'], 'rank'));
     }
 
@@ -69,19 +71,19 @@ class PublicPlayerListsTest extends TestCase
         }
     }
 
-    public function test_gender_filters_show_separate_total_and_best_innings_lists(): void
+    public function test_public_rankings_include_all_players_even_with_legacy_gender_parameters(): void
     {
         $this->summary('Male totals leader', 200, 'Male', ['highest_score' => 60]);
         $this->summary('Male innings leader', 100, 'Male', ['highest_score' => 90]);
         $this->summary('Female totals leader', 180, 'Female', ['highest_score' => 70]);
         $this->summary('Female innings leader', 110, 'Female', ['highest_score' => 100]);
-        foreach (['Male', 'Female'] as $gender) {
-            $other = $gender === 'Male' ? 'Female' : 'Male';
+        foreach (['Male', 'Female', 'Other'] as $gender) {
             $runs = $this->get('/tournament?tab=stats&category=runs&gender='.$gender)->assertOk()
-                ->assertSee($gender.' players')->assertDontSee($other.' totals leader')->assertDontSee('Orange Cap');
+                ->assertSee('All players')->assertSee('Male totals leader')->assertSee('Female totals leader')
+                ->assertSee('Orange Cap')->assertDontSee('gender=', false);
             $innings = $this->get('/tournament?tab=stats&category=highest_innings&gender='.$gender)->assertOk();
-            $this->assertSame($gender.' totals leader', $runs->viewData('rankingData')['entries'][0]['player_name']);
-            $this->assertSame($gender.' innings leader', $innings->viewData('rankingData')['entries'][0]['player_name']);
+            $this->assertSame('Male totals leader', $runs->viewData('rankingData')['entries'][0]['player_name']);
+            $this->assertSame('Female innings leader', $innings->viewData('rankingData')['entries'][0]['player_name']);
         }
     }
 
@@ -107,14 +109,13 @@ class PublicPlayerListsTest extends TestCase
 
     public static function invalidFilters(): array
     {
-        return [[['category' => ['runs']]], [['category' => '<script>PRIVATE-INJECTION</script>']],
-            [['gender' => ['Male']]], [['gender' => 'Other']]];
+        return [[['category' => ['runs']]], [['category' => '<script>PRIVATE-INJECTION</script>']]];
     }
 
     #[DataProvider('invalidFilters')]
     public function test_invalid_stats_filters_have_a_safe_reset_response(array $filters): void
     {
         $this->get('/tournament?'.http_build_query(['tab' => 'stats', ...$filters]))->assertStatus(422)
-            ->assertSee('Select valid player stats filters')->assertSee('Reset stats filters')->assertDontSee('PRIVATE-INJECTION');
+            ->assertSee('This stats selection is unavailable.')->assertSee('Back to Stats')->assertDontSee('PRIVATE-INJECTION');
     }
 }

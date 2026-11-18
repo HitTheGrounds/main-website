@@ -97,3 +97,23 @@
   .tc-jump { gap: .3rem; justify-content: center; }
   .tc .tc-jump .btn { min-height: 2.125rem; padding: .3rem .625rem; font-size: .75rem; line-height: 1.2; }
 }
+
+.tc-status-tabs.tc-stats-categories {
+  display: flex;
+  width: max-content;
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: auto;
+  overflow-x: auto;
+}
+.tc-stats-categories a { flex: none; white-space: nowrap; }
+.tc-panel.tc-stats-panel { padding-top: 0; }
+.tc-stats-leaderboard { width: 100%; border-collapse: collapse; text-align: start; }
+.tc-stats-leaderboard :is(th, td) { padding: .625rem .375rem; border-bottom: 1px solid var(--tc-line); text-align: start; vertical-align: middle; }
+.tc-stats-leaderboard :is(th, td):last-child { text-align: end; }
+.tc-stats-leaderboard thead { font-size: .8125rem; }
+.tc-stats-leaderboard tbody th { width: 100%; overflow-wrap: anywhere; }
+.tc-stats-team { margin-top: .25rem; }
+.tc-stats-team .tc-badge { flex-shrink: 0; }
+.tc-stats-team, .tc-stats-record { font-size: .8125rem; font-weight: 400; }
+.tc-stats-record { display: block; margin-top: .25rem; }

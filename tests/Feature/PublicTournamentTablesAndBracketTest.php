@@ -89,7 +89,7 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $response = $this->get('/tournament?tab=table')->assertOk()->assertSee('Group <A>')->assertDontSee('Group <A>', false)
             ->assertSee('0 of 6 possible group fixtures')->assertSee('5 fixtures not scheduled; 1 scheduled fixtures without published results.')
             ->assertSee('Group results are incomplete.')->assertSee('Not available')->assertSee('Some teams share a position.')
-            ->assertSee('Groups have different team counts.')->assertSee('Provisional')->assertSee('It does not confirm qualification.')
+            ->assertSee('Groups have different team counts.')->assertSee('Provisional')->assertDontSee('How standings are ranked')
             ->assertDontSee('PRIVATE-');
         $rows = $response->viewData('tableData')['groups'][0]['teams'];
         $this->assertSame([1, 1, 3, 4], array_column($rows, 'rank'));

@@ -85,3 +85,15 @@
 /* Table tab: centre every column (headings and values) except Team, on all screen sizes.
    Position is already centred in tournament.css. */
 :is(.tc-standings, .tc-runners) :is(th, td):nth-child(n+3) { text-align: center; }
+
+/* Section head: latest update time beside the Refresh button. */
+.tc-head-actions { display: flex; align-items: center; gap: .625rem; margin-left: auto; }
+.tc-updated { font-size: .75rem; line-height: 1.35; text-align: right; color: color-mix(in srgb, var(--color-base-content) 72%, transparent); }
+.tc-updated time { display: block; font-weight: 700; color: var(--color-base-content); }
+@media (min-width: 640px) { .tc-updated time { display: inline; } }
+
+/* Group and round jump buttons: compact on phones. */
+@media (max-width: 639px) {
+  .tc-jump { gap: .3rem; }
+  .tc .tc-jump .btn { min-height: 2.125rem; padding: .3rem .625rem; font-size: .75rem; line-height: 1.2; }
+}

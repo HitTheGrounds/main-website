@@ -12,10 +12,6 @@
         @endforeach
         <a class="btn btn-outline" href="#runner-comparison">Runner-ups</a>
     </nav>
-    <details class="tc-standings-guide">
-        <summary>How standings are ranked</summary>
-        <p>Positions use points, then net run rate (NRR). Equal records share a position. Qualification is confirmed separately by the committee.</p>
-    </details>
     <div class="tc-groups">
         @foreach ($tableData['groups'] as $group)
             <section id="group-{{ $group['id'] }}" tabindex="-1" aria-labelledby="group-{{ $group['id'] }}-heading" class="tc-panel">
@@ -83,7 +79,6 @@
 
     <section id="runner-comparison" tabindex="-1" aria-labelledby="runner-guidance-heading" class="tc-panel mt-8">
         <h3 id="runner-guidance-heading" class="text-center font-heading text-3xl">Runner-up comparison</h3>
-        <p class="mx-auto mt-3 max-w-[56ch] text-center text-base-content/80">This comparison uses points, then NRR. It does not confirm qualification. Teams sharing the second position, including joint leaders, are included.</p>
         @if ($tableData['unequal_groups'])
             <p class="mt-3 text-center font-semibold">Groups have different team counts. Cross-group comparisons need committee review.</p>
         @endif

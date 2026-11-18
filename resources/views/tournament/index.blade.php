@@ -47,11 +47,28 @@
                 } elseif (! $filterErrors && $tab === 'stats') {
                     $refreshParameters += ['category' => $rankingData['category'], 'gender' => $rankingData['gender']];
                 }
+                // Latest publication behind this view, shown beside Refresh. Stats uses whichever
+                // of the match-result and player-stats publications is newer.
+                $updatedAt = null;
+                if (! $filterErrors) {
+                    $times = $tab === 'stats'
+                        ? array_values($rankingData['publication_times'])
+                        : [(match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData })['latest_result_published_at'] ?? null];
+                    $updatedAt = collect($times)->filter()->map(fn ($time) => \Carbon\CarbonImmutable::parse($time))->max()
+                        ?->setTimezone(config('tournament.timezone'));
+                }
             @endphp
+            <div class="tc-head-actions">
+                @if ($updatedAt !== null)
+                    <p class="tc-updated">Updated <time datetime="{{ $updatedAt->toIso8601String() }}" title="Sri Lanka time">{{ $updatedAt->format('j M, g:i A') }}</time><span class="sr-only"> (Sri Lanka time)</span></p>
+                @elseif (! $filterErrors)
+                    <p class="tc-updated">No results published yet</p>
+                @endif
             <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">
                 <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17"/></svg>
                 Refresh
             </a>
+            </div>
             <p class="sr-only">{{ $tabs[$tab]['description'] }}</p>
         </section>
         @if ($tab === 'matches')
@@ -66,16 +83,6 @@
         @if (! $filterErrors)
             <footer class="tc-publication">
                 <p>Refresh this page for the latest published results.</p>
-                <details>
-                    <summary>Publication details</summary>
-                    @if ($tab === 'stats')
-                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest player stats publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['player_stats']])
-                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest match result publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['match_results']])
-                    @else
-                        @php $pageData = match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData }; @endphp
-                        @include('tournament.partials.publication-time', ['publicationLabel' => $tab === 'matches' ? 'Latest match result publication for these filters' : 'Latest match result publication in this view', 'publicationTime' => $pageData['latest_result_published_at']])
-                    @endif
-                </details>
             </footer>
         @endif
     </div>

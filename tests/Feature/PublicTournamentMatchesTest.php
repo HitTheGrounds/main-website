@@ -48,11 +48,18 @@ class PublicTournamentMatchesTest extends TestCase
             ]);
         }
         $hidden = $this->match($group, $teams[0]->id, $teams[3]->id, ['status' => 'finished']);
-        $response = $this->get('/tournament')->assertOk()->assertSee('Upcoming')->assertSee('In progress')
-            ->assertSee('Scores appear after the result is published.')->assertSee('Schedule to be confirmed')
-            ->assertDontSee('543210')->assertDontSee('987654')->assertDontSee('PRIVATE-')
+        foreach (['upcoming' => 'Yet to start.', 'live' => 'Match in progress.'] as $status => $note) {
+            $response = $this->get('/tournament?status='.$status)->assertOk()->assertSee('Upcoming')->assertSee('In progress')
+                ->assertSee($note)->assertSee('Scores appear after the result is published.')
+                ->assertDontSee('Schedule to be confirmed')->assertDontSee('543210')->assertDontSee('987654')
+                ->assertDontSee('PRIVATE-')->assertDontSee('match-'.$hidden.'-heading', false);
+            $this->assertCount(1, $response->viewData('matchData')['matches']);
+        }
+        // With no status chosen the Matches tab opens on Finished; unpublished results stay hidden.
+        $response = $this->get('/tournament')->assertOk()->assertSee('aria-current="page"', false)
             ->assertDontSee('match-'.$hidden.'-heading', false);
-        $this->assertCount(2, $response->viewData('matchData')['matches']);
+        $this->assertSame('finished', $response->viewData('matchData')['filters']['status']);
+        $this->assertCount(0, $response->viewData('matchData')['matches']);
     }
 
     public function test_official_cards_show_real_zero_unknowns_formats_and_local_schedule(): void
@@ -62,13 +69,15 @@ class PublicTournamentMatchesTest extends TestCase
             $this->match($group, $teams[0]->id, $teams[$index + 1]->id, [
                 'status' => 'finished', 'result_published_at' => now(), 'result_type' => 'no_result',
                 'balls_per_over' => $balls, 'team1_runs' => 0, 'team1_wickets' => 0, 'team1_deliveries' => 13,
-                'scheduled_at' => '2026-11-20 03:00:00',
+                'scheduled_at' => '2026-11-20 03:00:00', 'team2_runs' => $index === 1 ? 5 : null,
             ]);
         }
-        $this->get('/tournament')->assertOk()->assertSee('4 balls per over')->assertSee('6 balls per over')
-            ->assertSee('0/0')->assertSee('3.1 overs')->assertSee('2.1 overs')->assertSee('Runs not recorded')
-            ->assertSee('Wickets not recorded')->assertSee('Overs not recorded')->assertSee('No result.')
-            ->assertSee('20 Nov 2026, 8:30 AM')->assertSee('Sri Lanka time');
+        // Cards no longer print the schedule, venue or match format. An innings with nothing
+        // recorded gets one line; a partly recorded innings names each missing part.
+        $this->get('/tournament')->assertOk()->assertSee('0/0')->assertSeeText('3.1 overs')->assertSeeText('2.1 overs')
+            ->assertSee('Score not recorded')->assertDontSee('Runs not recorded')
+            ->assertSee('Wickets not recorded')->assertSee('Overs not recorded')
+            ->assertSee('No result.')->assertDontSee('balls per over')->assertDontSee('20 Nov 2026, 8:30 AM');
     }
 
     public static function outcomes(): array
@@ -110,19 +119,20 @@ class PublicTournamentMatchesTest extends TestCase
         $this->assertSame([], array_intersect(array_column($first->viewData('matchData')['matches'], 'id'),
             array_column($second->viewData('matchData')['matches'], 'id')));
         $this->get('/tournament?stage=F')->assertOk()->assertSee('No public matches match these filters.');
-        $this->get('/tournament?page=99')->assertOk()->assertSee('No matches on this page.');
+        $this->get('/tournament?status=live&page=99')->assertOk()->assertSee('No matches on this page.');
     }
 
     public function test_empty_edition_and_escaped_public_text(): void
     {
-        $this->get('/tournament')->assertOk()->assertSee('No public matches are available yet.');
+        $this->get('/tournament')->assertOk()->assertSee('No finished matches have published results yet.');
+        $this->get('/tournament?status=upcoming')->assertOk()->assertSee('No upcoming matches are scheduled right now.');
         [$group, $teams] = $this->fixture();
         $name = '<script>alert("team")</script>';
         DB::table('teams')->where('id', $teams[0]->id)->update(['team_name' => $name]);
         $venue = '<img src=x onerror=alert(1)>';
         $this->match($group, $teams[0]->id, $teams[1]->id, ['venue' => $venue]);
-        $this->get('/tournament')->assertOk()->assertSee($name)->assertDontSee($name, false)
-            ->assertSee($venue)->assertDontSee($venue, false)->assertDontSee('PRIVATE-');
+        $this->get('/tournament?status=upcoming')->assertOk()->assertSee($name)->assertDontSee($name, false)
+            ->assertDontSee($venue, false)->assertDontSee('PRIVATE-');
     }
 
     public static function invalidFilters(): array

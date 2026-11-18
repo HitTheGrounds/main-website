@@ -1,4 +1,16 @@
 <x-layouts.public title="Tournament" description="Match results, group standings, knockout bracket and player leaders for Hit the Grounds.">
+    {{-- Same-page crossfade between tournament views. Both pages must opt in, so
+         this only runs on tournament-to-tournament navigation; browsers without
+         support just load the page. --}}
+    <style>
+        @view-transition { navigation: auto; }
+        ::view-transition-group(tc-status-pill) { animation-duration: .38s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+        ::view-transition-old(tc-match-list) { animation: .18s cubic-bezier(.22, 1, .36, 1) both tc-vt-out; }
+        ::view-transition-new(tc-match-list) { animation: .32s cubic-bezier(.22, 1, .36, 1) both tc-vt-in; }
+        @keyframes tc-vt-out { to { opacity: 0; } }
+        @keyframes tc-vt-in { from { opacity: 0; transform: translateY(8px); } }
+        @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+    </style>
     <div class="tc">
         <div class="tc-masthead">
         <header class="tc-hero">

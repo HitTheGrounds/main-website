@@ -6,10 +6,10 @@ use App\Models\GroupTeam;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
+use App\Support\TeamLogo;
 use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -196,8 +196,11 @@ class PublicTournamentService
             $rows = $this->assignments($year);
             $teams = $this->teams(array_merge($rows->pluck('team_id')->all(),
                 $matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->all()));
+            // Uploaded company logos are only a fallback; TeamLogo checks the
+            // config map first, the same lookup every other tab uses.
             $logos = DB::table('teams')->join('companies', 'companies.id', '=', 'teams.company_id')
-                ->whereIntegerInRaw('teams.id', $matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->unique()->all())
+                ->whereIntegerInRaw('teams.id', array_values(array_unique(array_merge($rows->pluck('team_id')->all(),
+                    $matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->all()))))
                 ->whereNotNull('companies.logo')->pluck('companies.logo', 'teams.id');
             $rounds = [];
             foreach (['QF', 'SF', 'F'] as $stage) {
@@ -209,8 +212,7 @@ class PublicTournamentService
                         // Current eligibility/approval is private scoring guidance.
                         $sides[$side] = $team === null ? null : array_intersect_key($team, array_flip(['id', 'name', 'source_match_id']));
                         if ($team !== null) {
-                            $logo = $logos->get($team['id']);
-                            $sides[$side]['logo_url'] = filled($logo) ? Storage::disk('public')->url($logo) : null;
+                            $sides[$side]['logo'] = TeamLogo::resolve($team['name'] ?? null, $logos->get($team['id']));
                         }
                     }
 

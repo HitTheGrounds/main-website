@@ -141,6 +141,33 @@ class PublicTournamentTablesAndBracketTest extends TestCase
             ->assertDontSee('href="#match-'.$qf4.'-heading">Winner of ', false);
     }
 
+    public function test_bracket_logos_use_the_shared_lookup_config_first_then_upload_then_initials(): void
+    {
+        [, $teams] = $this->group('Knockout teams', 3);
+        $teams[0]->update(['team_name' => 'Mapped Team']);
+        $teams[1]->update(['team_name' => 'Uploaded Team']);
+        $teams[2]->update(['team_name' => 'Plain Team']);
+        DB::table('companies')->where('id', $teams[1]->company_id)->update(['logo' => 'company-logos/uploaded.png']);
+        config(['tournament-teams.teams' => ['mapped team' => '99x']]);
+        $this->win($teams[0]->id, $teams[1]->id, 'QF', 1);
+        $this->win($teams[2]->id, $teams[0]->id, 'QF', 2);
+
+        $qf = $this->get('/tournament?tab=bracket')->assertOk()
+            ->assertSee(asset('images/teams/99x.webp'), false)
+            ->assertSee('company-logos/uploaded.png', false)
+            ->viewData('bracketData')['rounds']['QF'];
+        $this->assertSame(['type' => 'initials', 'initials' => 'PT'], $qf[1]['team1']['logo']);
+    }
+
+    public function test_final_winner_is_marked_champion(): void
+    {
+        [, $teams] = $this->group('Final teams');
+        $this->win($teams[0]->id, $teams[1]->id, 'F', 1);
+        $this->get('/tournament?tab=bracket')->assertOk()
+            ->assertSee('Champion: '.$teams[0]->team_name)->assertSee('tc-team-champion', false)
+            ->assertSee('(champion)');
+    }
+
     public function test_unpublished_finished_knockouts_remain_unconfirmed(): void
     {
         [, $teams] = $this->group('Knockout teams');

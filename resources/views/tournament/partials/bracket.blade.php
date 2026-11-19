@@ -4,6 +4,7 @@
     $statuses = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
     $sources = [];
     $quarterColumns = [];
+    $quarterSourceRows = [];
     $remainingColumns = [1, 1, 5, 5];
     foreach ($bracketData['rounds']['SF'] as $semi) {
         $column = $semi['position'] === 1 ? 1 : 5;
@@ -11,11 +12,25 @@
             $source = $semi[$side]['source_match_id'] ?? null;
             if ($source !== null) {
                 $quarterColumns[$source] = $column;
+                // Stack each quarter-final level with the semi-final row it feeds,
+                // so connector lines never cross (team1's source on top).
+                $quarterSourceRows[$source] = $side === 'team1' ? 2 : 3;
                 unset($remainingColumns[array_search($column, $remainingColumns, true)]);
             }
         }
     }
     $quarterRows = [1 => 2, 5 => 2];
+    // Rows already claimed by a fed quarter-final, per column; others take what is left.
+    $takenRows = [1 => [], 5 => []];
+    foreach ($quarterSourceRows as $source => $sourceRow) {
+        $takenRows[$quarterColumns[$source]][] = $sourceRow;
+    }
+    $freeQuarterRow = function (int $column) use (&$takenRows) {
+        $free = collect([2, 3, 4, 5])->first(fn ($candidate) => ! in_array($candidate, $takenRows[$column], true));
+        $takenRows[$column][] = $free;
+
+        return $free;
+    };
     foreach ($bracketData['rounds'] as $stage => $positions) {
         foreach ($positions as $position) {
             if ($position['match'] !== null) {
@@ -46,7 +61,7 @@
                                 'SF' => $position['position'] === 1 ? 2 : 4,
                                 'F' => 3,
                             };
-                            $row = $stage === 'QF' ? $quarterRows[$column]++ : '2 / span 2';
+                            $row = $stage === 'QF' ? ($quarterSourceRows[$matchId] ?? $freeQuarterRow($column)) : '2 / span 2';
                             $mobileRow = match ($stage) {
                                 'QF' => (2 * ($row - 2) + ($column === 5 ? 6 : 2)).' / span 2',
                                 'SF' => ($column === 2 ? 2 : 6).' / span 4',
@@ -56,9 +71,15 @@
                         <div class="tc-playoff-slot" style="--column: {{ $column }}; --row: {{ $row }}; --mobile-row: {{ $mobileRow }}"
                             data-match="{{ $matchId }}" data-sources="{{ implode(' ', array_filter([$position['team1']['source_match_id'] ?? null, $position['team2']['source_match_id'] ?? null])) }}">
                             @if ($position['match'] !== null)
-                                @include('tournament.partials.match-card', ['match' => $position['match'], 'bracketCard' => true, 'bracketTeams' => $position])
-                                @if ($stage !== 'QF')
+                                @php($championId = $stage === 'F' ? ($position['match']['result']['winner_id'] ?? null) : null)
+                                @if ($championId !== null)
+                                    {{-- Champion badge above the final card. --}}
+                                    <p class="tc-champion-badge">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0Z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg>
+                                        Champion: {{ $position['match']['team1']['id'] === $championId ? $position['match']['team1']['name'] : $position['match']['team2']['name'] }}
+                                    </p>
                                 @endif
+                                @include('tournament.partials.match-card', ['match' => $position['match'], 'bracketCard' => true, 'bracketTeams' => $position])
                             @else
                                 <div class="tc-empty-slot">
                                     <h4 class="font-heading text-2xl">{{ $stages[$stage] }} {{ $position['position'] }}</h4>

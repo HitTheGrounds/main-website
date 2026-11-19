@@ -35,20 +35,30 @@ if (bracket) {
             context.lineWidth = 1.5;
             context.beginPath();
 
+            // The card inside a slot (a champion badge may sit above it).
+            const cardOf = slot => slot.querySelector('.tc-match, .tc-empty-slot') ?? slot.firstElementChild;
+            // Vertical centre of an element, relative to the bracket.
+            const middle = box => box.top + box.height / 2 - bounds.top;
+
             for (const target of slots) {
-                const to = target.firstElementChild.getBoundingClientRect();
+                const to = cardOf(target).getBoundingClientRect();
                 const sources = target.dataset.sources.split(' ').filter(Boolean);
                 const entersFinal = target.closest('[data-stage]').dataset.stage === 'F';
                 for (const [index, id] of sources.entries()) {
                     const source = matches.get(id);
                     if (!source) continue;
-                    const from = source.firstElementChild.getBoundingClientRect();
+                    const sourceCard = cardOf(source);
+                    const from = sourceCard.getBoundingClientRect();
                     const leftToRight = from.left < to.left;
                     const start = leftToRight ? from.right : from.left;
                     const end = !leftToRight ? to.right : to.left;
-                    const startY = from.top + from.height / 2 - bounds.top;
+                    // Start at the winner's row once a winner is published, else the card middle.
+                    const winnerRow = sourceCard.querySelector('.tc-team-winner');
+                    const startY = middle((winnerRow ?? sourceCard).getBoundingClientRect());
+                    // End at the row where that team appears in the next card, when known.
+                    const landingRow = cardOf(target).querySelector(`.tc-team[data-from="${id}"]`);
                     const endFraction = entersFinal || sources.length === 1 ? .5 : (index + 1) / 3;
-                    const endY = to.top + to.height * endFraction - bounds.top;
+                    const endY = landingRow ? middle(landingRow.getBoundingClientRect()) : to.top + to.height * endFraction - bounds.top;
                     const lane = (start + end) / 2 - bounds.left;
                     const startX = start - bounds.left;
                     const endX = end - bounds.left;

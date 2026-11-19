@@ -15,16 +15,25 @@
                 $hasBracketWinner = $bracketCard && $winnerId !== null;
                 $isWinner = $match[$side]['id'] === $winnerId;
             @endphp
-            <div @class(['tc-team', 'tc-team-eliminated' => $hasBracketWinner && ! $isWinner, 'tc-team-winner' => $hasBracketWinner && $isWinner])>
+            @php($isChampion = $bracketCard && $isWinner && $winnerId !== null && ($match['stage'] ?? null) === 'F')
+            {{-- data-from: the earlier match this team came through, so bracket lines can land on this row. --}}
+            <div @class(['tc-team', 'tc-team-eliminated' => $hasBracketWinner && ! $isWinner, 'tc-team-winner' => $hasBracketWinner && $isWinner, 'tc-team-champion' => $isChampion])
+                @if ($bracketCard) data-from="{{ $bracketTeams[$side]['source_match_id'] ?? '' }}" @endif>
                 @if ($bracketCard)
-                    <span class="tc-team-logo" aria-hidden="true">
-                        @if ($logo = $bracketTeams[$side]['logo_url'] ?? null)
-                            <img src="{{ $logo }}" alt="">
+                    {{-- Logo chosen by App\Support\TeamLogo, the same lookup as every other tab. --}}
+                    @php($logo = $bracketTeams[$side]['logo'] ?? \App\Support\TeamLogo::resolve($match[$side]['name']))
+                    <span @class(['tc-team-logo', 'tc-team-logo-text' => $logo['type'] !== 'logo']) aria-hidden="true">
+                        @if ($logo['type'] === 'logo')
+                            <img src="{{ $logo['url'] }}" alt="" decoding="async">
+                        @elseif ($logo['type'] === 'cse')
+                            <span class="tc-team-logo-cse">CSE<i></i>{{ $logo['batch'] }}</span>
+                        @else
+                            {{ $logo['initials'] }}
                         @endif
                     </span>
                     <div class="tc-bracket-team-details">
                 @endif
-                <{{ $nameTag }} class="tc-team-name">{{ $match[$side]['name'] }}</{{ $nameTag }}>
+                <{{ $nameTag }} class="tc-team-name">@if ($isChampion)<svg class="tc-champion-cup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0Z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/></svg>@endif{{ $match[$side]['name'] }}@if ($isChampion)<span class="sr-only"> (champion)</span>@elseif ($hasBracketWinner && $isWinner)<span class="sr-only"> (winner)</span>@endif</{{ $nameTag }}>
                 <{{ $scoreTag }} class="tc-team-score">
                     @if ($innings !== null)
                         @if ($innings['runs'] !== null)

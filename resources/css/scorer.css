@@ -519,6 +519,13 @@
 .sst-table thead th { background: var(--color-base-200); font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
 .sst-table thead abbr { text-decoration: none; }
 .sst-table thead th:nth-child(2) { text-align: left; }
+
+/* Knockouts page tabs (reuse the match-page .sr-tab look). */
+.ko-tabs { display: flex; gap: .25rem; border-bottom: 1px solid var(--scorer-line); overflow-x: auto; scrollbar-width: none; }
+.ko-tabs .sr-tab { background: none; border: 0; cursor: pointer; }
+.ko-step { display: inline-grid; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: var(--color-base-200); font-size: .75rem; font-weight: 800; }
+.ko-tabs .is-active .ko-step { background: var(--color-primary); color: var(--color-primary-content); }
+[x-cloak] { display: none !important; }
 .sst-table tbody tr { border-bottom: 1px solid var(--scorer-line); }
 .sst-table tbody tr:last-child { border-bottom: 0; }
 .sst-table tbody tr:nth-child(even) { background: rgb(235 230 219 / .3); }

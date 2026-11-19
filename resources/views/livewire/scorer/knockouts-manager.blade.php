@@ -134,7 +134,8 @@ new class extends Component {
     }
 }; ?>
 
-<div class="scorer-screen space-y-5">
+{{-- Two tabs, switched in the browser (both panels stay rendered for Livewire). --}}
+<div class="scorer-screen space-y-5" x-data="{ tab: location.hash === '#bracket' ? 'bracket' : 'qualify', show(t) { this.tab = t; history.replaceState(null, '', t === 'bracket' ? '#bracket' : location.pathname); } }">
     <header class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Qualification &amp; bracket</h1>
         <p>Tournament {{ $selection['year'] }}. Select advancing teams and choose each knockout matchup manually.</p>
@@ -145,11 +146,15 @@ new class extends Component {
         <p wire:loading role="status" class="text-sm">Loading tournament details...</p>
     </div>
 
-    <nav class="scorer-actions" aria-label="Knockout tasks">
-        <a class="btn btn-outline" href="#qualification-heading">1. Select advancing teams</a>
-        <a class="btn btn-outline" href="#bracket-heading">2. Arrange knockout fixtures</a>
-    </nav>
-    <section aria-labelledby="qualification-heading" class="card border border-base-300 bg-base-100"><div class="card-body space-y-4">
+    <div class="ko-tabs" role="tablist" aria-label="Knockout tasks">
+        <button type="button" role="tab" id="ko-tab-qualify" aria-controls="ko-panel-qualify" class="sr-tab" :class="tab === 'qualify' && 'is-active'" :aria-selected="tab === 'qualify'" x-on:click="show('qualify')">
+            <span class="ko-step">1</span> Select advancing teams
+        </button>
+        <button type="button" role="tab" id="ko-tab-bracket" aria-controls="ko-panel-bracket" class="sr-tab" :class="tab === 'bracket' && 'is-active'" :aria-selected="tab === 'bracket'" x-on:click="show('bracket')">
+            <span class="ko-step">2</span> Arrange knockout fixtures
+        </button>
+    </div>
+    <section id="ko-panel-qualify" role="tabpanel" aria-labelledby="ko-tab-qualify" x-show="tab === 'qualify'" class="card border border-base-300 bg-base-100"><div class="card-body space-y-4">
         <h2 id="qualification-heading" tabindex="-1" class="text-xl font-bold">Advancing teams</h2>
         <p class="scorer-instruction" aria-live="polite">{{ count($selected) }} of {{ $selection['capacity'] }} places selected in this form. Saved: {{ count($selection['selected']) }}.</p>
         <p class="text-sm">Table position is guidance. You may select any approved team, including more than one from a group.</p>
@@ -209,7 +214,7 @@ new class extends Component {
         </details>
     </div></section>
 
-    <section aria-labelledby="bracket-heading" class="card border border-base-300 bg-base-100"><div class="card-body space-y-4">
+    <section id="ko-panel-bracket" role="tabpanel" aria-labelledby="ko-tab-bracket" x-show="tab === 'bracket'" x-cloak class="card border border-base-300 bg-base-100"><div class="card-body space-y-4">
         <h2 id="bracket-heading" tabindex="-1" class="text-xl font-bold">Knockout bracket</h2>
         <nav aria-label="Knockout rounds" class="flex flex-wrap gap-2">
             @foreach($roundNames as $key => $name)<button type="button" wire:click="chooseRound('{{ $key }}')" wire:confirm="Load this round? Unsaved fixture choices and position reviews will be cleared." wire:loading.attr="disabled" @if($stage === $key) aria-current="page" @endif class="btn btn-sm {{ $stage === $key ? 'btn-primary' : 'btn-outline' }}">{{ $name }}</button>@endforeach

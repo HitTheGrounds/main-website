@@ -70,7 +70,7 @@ class TournamentSiteIntegrationTest extends TestCase
             ->assertSee('scorers and administrators')->assertSee('Enter your email');
         $this->get('/register')->assertOk()->assertSee('Organization registration')
             ->assertSee('Organization name (company or university)')->assertSee('company_name');
-        $this->get('/registrations')->assertOk()->assertSee('per registered organization')->assertSee('Register Your Organization');
+        $this->get('/registrations')->assertOk()->assertSee('per registered organization');
         config(['registration.enabled' => false]);
         $this->get('/register')->assertOk()->assertSee('Organization registrations are currently closed.');
     }

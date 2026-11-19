@@ -30,6 +30,14 @@
             <div role="region" aria-label="Player rankings" tabindex="0" class="overflow-x-auto">
                 <table class="tc-stats-leaderboard">
                     <caption class="sr-only">{{ $categories[$category] }}, All players</caption>
+                    <thead class="sr-only">
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">Team</th>
+                            <th scope="col">Player</th>
+                            <th scope="col">{{ $categories[$category] }}</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach ($rankingData['entries'] as $entry)
                             @php

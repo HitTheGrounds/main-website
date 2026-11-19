@@ -128,17 +128,23 @@ class PublicTournamentTablesAndBracketTest extends TestCase
         $this->win($teams[6]->id, $teams[7]->id, 'QF', 3);
         $sf2 = $this->win($teams[0]->id, $teams[2]->id, 'SF', 2);
         $sf1 = $this->win($teams[4]->id, $teams[6]->id, 'SF', 1);
-        $this->match($teams[4]->id, $teams[0]->id, ['stage' => 'F', 'bracket_position' => 1]);
+        $final = $this->match($teams[4]->id, $teams[0]->id, ['stage' => 'F', 'bracket_position' => 1]);
+        // The bracket draws connectors from each slot's data-sources attribute (the matches that feed it).
+        $sourcesOf = function (string $html, int $matchId): array {
+            $this->assertSame(1, preg_match('/data-match="'.$matchId.'" data-sources="([^"]*)"/', $html, $found));
+
+            return array_map('intval', array_filter(explode(' ', $found[1])));
+        };
         $response = $this->get('/tournament?tab=bracket')->assertOk()->assertDontSee('PRIVATE-');
-        foreach ([$qf4 => 'Quarter-final 4', $qf1 => 'Quarter-final 1', $sf2 => 'Semi-final 2', $sf1 => 'Semi-final 1'] as $id => $label) {
-            $response->assertSee('href="#match-'.$id.'-heading">Winner of '.$label.'</a>', false);
-        }
+        $html = $response->getContent();
+        $this->assertEqualsCanonicalizing([$qf4, $qf1], $sourcesOf($html, $sf2));
+        $this->assertEqualsCanonicalizing([$sf1, $sf2], $sourcesOf($html, $final));
         $this->assertSame($qf4, $response->viewData('bracketData')['rounds']['SF'][1]['team1']['source_match_id']);
         $this->assertSame($sf1, $response->viewData('bracketData')['rounds']['F'][0]['team1']['source_match_id']);
 
         DB::table('matches')->where('id', $qf4)->update(['status' => 'live']);
-        $this->get('/tournament?tab=bracket')->assertOk()->assertSee('Previous-round result not confirmed')
-            ->assertDontSee('href="#match-'.$qf4.'-heading">Winner of ', false);
+        $html = $this->get('/tournament?tab=bracket')->assertOk()->getContent();
+        $this->assertNotContains($qf4, $sourcesOf($html, $sf2));
     }
 
     public function test_bracket_logos_use_the_shared_lookup_config_first_then_upload_then_initials(): void

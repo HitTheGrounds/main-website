@@ -17,6 +17,11 @@
         @case('pin')<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10" r="2.25"/>@break
         @case('ball')<circle cx="12" cy="12" r="8.5"/><path d="M8.2 4.4c1.8 2.1 2.8 4.7 2.8 7.6s-1 5.5-2.8 7.6M15.8 4.4c-1.8 2.1-2.8 4.7-2.8 7.6s1 5.5 2.8 7.6"/>@break
         @case('rotate-ccw')<path d="M4 4v5h5"/><path d="M5.1 15a8 8 0 1 0 1.9-8.3L4 9"/>@break
+        @case('arrow-left')<path d="M19 12H5M11 6l-6 6 6 6"/>@break
+        @case('eye')<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.75"/>@break
+        @case('save')<path d="M5 4h11l3 3v13H5Z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>@break
+        @case('trash')<path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/>@break
+        @case('send')<path d="M21 3 10 14M21 3l-7 18-4-7-7-4Z"/>@break
         @case('trophy')<path d="M8 4h8v5a4 4 0 0 1-8 0Z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/>@break
     @endswitch
 </svg>

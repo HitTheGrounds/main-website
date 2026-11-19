@@ -70,12 +70,16 @@ class ScorerResultsScreenTest extends TestCase
     {
         [$actor, $match] = $this->fixture();
         $this->signedIn($actor)->get('/scorer/matches/'.$match->id.'/result')->assertOk()
-            ->assertSee('Match result')->assertSee('noindex, nofollow');
+            ->assertSee('Match result')->assertSee('noindex, nofollow')
+            ->assertSee('href="'.route('scorer.matches.players', ['matchId' => $match->id]).'"', false)
+            ->assertSee('aria-current="page"', false);
         Volt::test('scorer.result-editor', ['matchId' => $match->id])
             ->set('form.team1_runs', '0')->call('saveDraft')->assertHasNoErrors()->assertSet('hasDraft', true)
             ->assertSee('No team result has been published.')
             ->set('form', $this->input($match))->call('reviewResult')->assertHasNoErrors()->assertSee('Review before publishing')
-            ->call('publishResult')->assertHasNoErrors()->assertSet('hasDraft', false)->assertSet('review', null)
+            ->assertSet('panel', 'review')->call('returnToDraft')->assertSet('panel', '')->assertSet('review', null)
+            ->call('reviewResult')->assertSet('panel', 'review')
+            ->call('publishResult')->assertHasNoErrors()->assertSet('hasDraft', false)->assertSet('review', null)->assertSet('panel', '')
             ->assertSee('Team result published');
         $this->assertSame('finished', $match->fresh()->status);
         $this->assertSame(2, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->points);

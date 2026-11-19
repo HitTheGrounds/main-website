@@ -35,7 +35,9 @@ new class extends Component {
 
     public function with(): array
     {
-        return ['data' => $this->snapshot(), 'metrics' => $this->metrics()];
+        return ['data' => $this->snapshot(), 'metrics' => $this->metrics(),
+            // For the shared match header (same scorer-only read as the result page).
+            'match' => app(\App\Services\Tournament\MatchSchedulingService::class)->findForScheduling((int) config('tournament.year'), $this->matchId)];
     }
 
     public function selectTeam(int $teamId): void
@@ -208,16 +210,11 @@ new class extends Component {
 }; ?>
 
 <div class="scorer-screen space-y-5">
-    <header class="scorer-heading">
-        <h1 class="text-2xl font-bold sm:text-3xl">Player figures</h1>
-        <p>{{ $data['teams'][0]['team_name'] }} vs {{ $data['teams'][1]['team_name'] }}</p>
-        <nav class="scorer-actions" aria-label="Match tools">
-            <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
-            <a href="{{ route('scorer.matches.result', ['matchId' => $matchId]) }}" class="link ml-3">Team result</a>
-        </nav>
-        <p class="text-sm">Enter normal innings only. Exclude Super Over figures. You can skip players and leave fields blank.</p>
-        @unless($data['eligible'])<p class="text-sm">Drafts can be saved now. Publishing requires a finished, published win or tie.</p>@endunless
-    </header>
+    <x-scorer.match-header :match="$match" active="players" title="Player figures" />
+    <div class="sr-hint">
+        <p>Enter normal innings only. Exclude Super Over figures. You can skip players and leave fields blank.</p>
+        @unless($data['eligible'])<p>Drafts can be saved now. Publishing requires a finished, published win or tie.</p>@endunless
+    </div>
     <div class="scorer-feedback" aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
         @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif

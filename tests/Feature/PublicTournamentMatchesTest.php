@@ -122,6 +122,40 @@ class PublicTournamentMatchesTest extends TestCase
         $this->get('/tournament?status=live&page=99')->assertOk()->assertSee('No matches on this page.');
     }
 
+    public static function matchStatuses(): array
+    {
+        return [['finished'], ['upcoming'], ['live']];
+    }
+
+    #[DataProvider('matchStatuses')]
+    public function test_status_tabs_sort_by_latest_update_or_latest_publication(string $status): void
+    {
+        [$group, $teams] = $this->fixture(6);
+        $ids = [];
+        // Creation order, scheduled time, and updated_at on finished rows must
+        // not override the requested publication/update order.
+        foreach ([['10:00', '12:00'], ['11:00', '09:00'], ['12:00', null], ['08:00', null], ['10:00', null]] as $i => [$result, $players]) {
+            $details = ['status' => $status, 'scheduled_at' => '2026-11-25 20:00:00',
+                'updated_at' => $i === 3 ? null : '2026-11-20 '.(['12:00', '11:00', '12:00', '08:00', '10:00'][$i]).':00'];
+            if ($status === 'finished') {
+                $details += ['result_type' => 'no_result', 'result_published_at' => '2026-11-20 '.$result.':00',
+                    'player_stats_published_at' => $players === null ? null : '2026-11-20 '.$players.':00'];
+                $details['updated_at'] = '2026-11-21 20:00:00';
+            }
+            $ids[] = $this->match($group, $teams[0]->id, $teams[$i + 1]->id, $details);
+        }
+        $expected = [$ids[2], $ids[0], $ids[1], $ids[4], $ids[3]];
+        $response = $this->get('/tournament?status='.$status)->assertOk()
+            ->assertSee($status === 'finished' ? 'Latest published first' : 'Latest updated first');
+        $this->assertSame($expected, array_column($response->viewData('matchData')['matches'], 'id'));
+        if ($status === 'finished') {
+            $this->assertSame($expected,
+                array_column($this->get('/tournament')->assertOk()->viewData('matchData')['matches'], 'id'));
+        }
+        $this->assertSame($expected, array_column($this->get('/tournament?status='.$status.'&sort=schedule')
+            ->assertOk()->viewData('matchData')['matches'], 'id'));
+    }
+
     public function test_empty_edition_and_escaped_public_text(): void
     {
         $this->get('/tournament')->assertOk()->assertSee('No finished matches have published results yet.');

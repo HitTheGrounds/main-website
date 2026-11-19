@@ -56,12 +56,14 @@ class PublicTournamentService
             'stage' => ['nullable', 'string', Rule::in(['G', 'QF', 'SF', 'F'])],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
-            'sort' => ['nullable', 'string', Rule::in(['schedule', 'newest'])],
+            'sort' => ['nullable', 'string', Rule::in(['recent', 'schedule', 'newest'])],
             'page' => ['nullable', 'integer', 'between:1,10000'],
         ])->validate();
         $filters = ['stage' => $filters['stage'] ?? null, 'status' => $filters['status'] ?? null,
             'group_id' => isset($filters['group_id']) ? (int) $filters['group_id'] : null,
-            'sort' => $filters['sort'] ?? 'schedule', 'page' => (int) ($filters['page'] ?? 1)];
+            // Preserve old schedule-sort links while applying the current recency rule.
+            'sort' => ($filters['sort'] ?? 'recent') === 'schedule' ? 'recent' : ($filters['sort'] ?? 'recent'),
+            'page' => (int) ($filters['page'] ?? 1)];
 
         return $this->snapshots->run(function () use ($year, $filters) {
             $groups = $this->groups($year);
@@ -73,8 +75,15 @@ class PublicTournamentService
             }
             $total = (clone $query)->count();
             $latestResult = (clone $query)->where('status', 'finished')->max('result_published_at');
-            if ($filters['sort'] === 'schedule') {
-                $query->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')->orderBy('scheduled_at')->orderBy('id');
+            if ($filters['sort'] === 'recent') {
+                // A schedule edit must not bump a finished result above a more
+                // recently published match. CASE works on both supported databases.
+                $recent = "CASE WHEN status = 'finished' THEN
+                    CASE WHEN player_stats_published_at IS NULL OR result_published_at >= player_stats_published_at
+                        THEN result_published_at ELSE player_stats_published_at END
+                    ELSE updated_at END";
+                $query->orderByRaw('CASE WHEN ('.$recent.') IS NULL THEN 1 ELSE 0 END')
+                    ->orderByRaw('('.$recent.') DESC')->orderByDesc('id');
             } else {
                 $query->orderByDesc('id');
             }

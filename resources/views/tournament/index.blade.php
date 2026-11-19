@@ -40,20 +40,6 @@
 
         <section aria-labelledby="tournament-section-heading" class="tc-section-head">
             <h2 id="tournament-section-heading">{{ $tabs[$tab]['label'] }}</h2>
-            @php
-                $refreshParameters = ['tab' => $tab];
-                if (! $filterErrors && $tab === 'matches') {
-                    $refreshParameters += $matchData['filters'];
-                } elseif (! $filterErrors && $tab === 'stats') {
-                    $refreshParameters += ['category' => $rankingData['category']];
-                }
-            @endphp
-            <div class="tc-head-actions">
-                <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">
-                    <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17"/></svg>
-                    Refresh
-                </a>
-            </div>
             <p class="sr-only">{{ $tabs[$tab]['description'] }}</p>
         </section>
         @if ($tab === 'matches')
@@ -67,8 +53,27 @@
         @endif
         @if (! $filterErrors)
             <footer class="tc-publication">
-                <p>Refresh this page for the latest published results.</p>
+                <p>This page updates automatically when new results are published.</p>
             </footer>
         @endif
     </div>
+    @if (! $filterErrors)
+        <script>
+            (() => {
+                let rev = @js($rev);
+                setInterval(async () => {
+                    if (document.hidden) return;
+                    try {
+                        const next = (await (await fetch(@js(route('tournament.rev')))).json()).rev;
+                        if (rev !== null && next !== rev) {
+                            const html = await (await fetch(location.href)).text();
+                            const fresh = new DOMParser().parseFromString(html, 'text/html').querySelector('.tc');
+                            if (fresh) document.querySelector('.tc').replaceWith(fresh);
+                        }
+                        rev = next;
+                    } catch (e) { /* network blip: try again next tick */ }
+                }, 10000);
+            })();
+        </script>
+    @endif
 </x-layouts.public>

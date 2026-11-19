@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\Tournament\PublicTournamentService;
+use App\Services\Tournament\TournamentWriteService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class PublicTournamentController extends Controller
@@ -22,6 +24,8 @@ class PublicTournamentController extends Controller
 
         $year = config('tournament.year');
         abort_unless(is_int($year) && $year >= 1 && $year <= 9999, 503, 'Tournament information is temporarily unavailable.');
+        // Read before the data so a write that lands mid-request still triggers the page's next refresh.
+        $rev = (int) Cache::get(TournamentWriteService::revisionKey($year), 0);
 
         $matchData = null;
         $tableData = null;
@@ -61,6 +65,6 @@ class PublicTournamentController extends Controller
             }
         }
 
-        return response()->view('tournament.index', compact('tabs', 'tab', 'year', 'matchData', 'tableData', 'bracketData', 'rankingData', 'filterErrors'), $filterErrors ? 422 : 200);
+        return response()->view('tournament.index', compact('tabs', 'tab', 'year', 'rev', 'matchData', 'tableData', 'bracketData', 'rankingData', 'filterErrors'), $filterErrors ? 422 : 200);
     }
 }

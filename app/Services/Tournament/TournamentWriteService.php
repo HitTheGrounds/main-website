@@ -4,6 +4,7 @@ namespace App\Services\Tournament;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
@@ -41,6 +42,8 @@ class TournamentWriteService
                 }
 
                 $result = $write();
+                // Public pages poll this revision (tournament.rev route) to know when to refresh.
+                DB::afterCommit(fn () => self::bumpRevision($year));
                 if ($previousTimeout !== null) {
                     $connection->selectOne("SELECT set_config('lock_timeout', ?, true)", [$previousTimeout]);
                 }
@@ -56,6 +59,20 @@ class TournamentWriteService
                 'tournament' => 'Another update is in progress. Please reload and try again.',
             ]);
         }
+    }
+
+    public static function revisionKey(int $year): string
+    {
+        return "tournament.rev.$year";
+    }
+
+    private static function bumpRevision(int $year): void
+    {
+        $key = self::revisionKey($year);
+        if (! Cache::has($key)) {
+            Cache::forever($key, 0);
+        }
+        Cache::increment($key);
     }
 
     private function lockYear(Connection $connection, int $year): string

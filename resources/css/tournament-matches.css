@@ -86,9 +86,6 @@
    Position is already centred in tournament.css. */
 :is(.tc-standings, .tc-runners) :is(th, td):nth-child(n+3) { text-align: center; }
 
-/* Section head refresh action. */
-.tc-head-actions { display: flex; align-items: center; gap: .625rem; margin-left: auto; }
-
 /* Group and round jump buttons: compact on phones. */
 @media (max-width: 639px) {
   .tc-jump { gap: .3rem; justify-content: center; }

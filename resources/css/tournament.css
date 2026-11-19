@@ -58,7 +58,6 @@
 .tc-icon { width: 20px; height: 20px; flex: none; }
 .tc-section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; margin-bottom: .625rem; }
 .tc-section-head h2 { font-size: 1.25rem; font-weight: 800; letter-spacing: -.025em; }
-.tc-refresh { display: inline-flex; align-items: center; gap: .375rem; min-height: 44px; font-size: .8125rem; font-weight: 700; padding-inline: .75rem; border: 1px solid var(--tc-line); border-radius: .625rem; }
 .tc-filter { border: 1px solid var(--tc-line); border-radius: .75rem; margin-bottom: .875rem; background: var(--color-base-200); }
 .tc-filter > summary, .tc-notes > summary { cursor: pointer; min-height: 48px; padding: .875rem 1rem; font-weight: 700; font-size: .875rem; }
 .tc-filter > summary span { margin-left: .5rem; font-weight: 500; font-size: .75rem; }

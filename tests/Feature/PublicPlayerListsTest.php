@@ -42,7 +42,7 @@ class PublicPlayerListsTest extends TestCase
             ->assertDontSee('Filter player stats')
             ->assertSee('Most runs')->assertDontSee('Joint leader (provisional)')->assertSee('award/orange_cap.avif')->assertDontSee('Orange Cap (provisional)')
             ->assertSee('Published player 5')->assertDontSee('Published player 6')->assertDontSee('Unknown player')
-            ->assertDontSee('How these rankings work')->assertSee('Refresh')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
+            ->assertDontSee('How these rankings work')->assertDontSee('PRIVATE-')->assertDontSee('Purple Cap');
         $this->assertCount(6, $response->viewData('rankingData')['entries']);
         $this->assertSame(7, $response->viewData('rankingData')['coverage']['players_with_recorded_metric']);
         $this->assertSame(8, $response->viewData('rankingData')['coverage']['players_with_published_entries']);

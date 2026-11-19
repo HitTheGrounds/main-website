@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Services\Tournament\TournamentWriteService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
+use RuntimeException;
 use Tests\TestCase;
 
 class PublicTournamentHubTest extends TestCase
@@ -39,12 +42,12 @@ class PublicTournamentHubTest extends TestCase
         $response = $this->get('/tournament')->assertOk()->assertViewIs('tournament.index')
             ->assertViewHas('tab', 'matches')->assertViewHas('year', 2026)
             ->assertSee('Tournament sections')->assertSee('aria-current="page"', false)
-            ->assertSee('aria-label="Refresh matches"', false)->assertSee('index, follow, max-image-preview:large');
+            ->assertSee('index, follow, max-image-preview:large');
 
         foreach (['matches', 'table', 'bracket', 'stats'] as $tab) {
             $response->assertSee('href="'.route('tournament.index', ['tab' => $tab]).'"', false);
         }
-        foreach (['wire:poll', 'setInterval(', 'WebSocket(', 'Match record', 'Publish result'] as $privateOrLiveContent) {
+        foreach (['wire:poll', 'WebSocket(', 'Match record', 'Publish result'] as $privateOrLiveContent) {
             $response->assertDontSee($privateOrLiveContent, false);
         }
         $this->get('/scorer/dashboard')->assertRedirect(route('login'));
@@ -83,5 +86,23 @@ class PublicTournamentHubTest extends TestCase
         $this->get('/tournament?year=2025')->assertOk()->assertViewHas('year', 2026);
         config(['tournament.year' => 0]);
         $this->get('/tournament')->assertStatus(503)->assertSee('Service Unavailable');
+    }
+
+    public function test_committed_writes_bump_the_polled_revision_but_rolled_back_ones_do_not(): void
+    {
+        $this->registerTournamentRoutes();
+        Cache::forget('tournament.rev.2026');
+        $this->get('/tournament/rev')->assertOk()->assertExactJson(['rev' => 0]);
+
+        app(TournamentWriteService::class)->run(2026, fn () => null);
+        $this->get('/tournament/rev')->assertExactJson(['rev' => 1]);
+        // The page embeds the same revision as its starting point, so the first poll can't miss a change.
+        $this->assertSame(1, $this->get('/tournament')->assertOk()->viewData('rev'));
+
+        try {
+            app(TournamentWriteService::class)->run(2026, fn () => throw new RuntimeException('rollback'));
+        } catch (RuntimeException) {
+        }
+        $this->get('/tournament/rev')->assertExactJson(['rev' => 1]);
     }
 }

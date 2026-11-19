@@ -60,10 +60,10 @@ class PublicPublicationTimesTest extends TestCase
         $oldHtml = $oldPage->getContent();
         $this->assertSame(20, $oldData['entries'][0]['value']);
         foreach (['matches', 'table'] as $tab) {
-            $data = $this->get('/tournament?tab='.$tab)->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh')->viewData($tab === 'matches' ? 'matchData' : 'tableData');
+            $data = $this->get('/tournament?tab='.$tab)->assertOk()->assertDontSee('tc-updated')->viewData($tab === 'matches' ? 'matchData' : 'tableData');
             $this->assertSame('11:00', $utc($data['latest_result_published_at']));
         }
-        $this->assertNull($this->get('/tournament?tab=bracket')->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh')->viewData('bracketData')['latest_result_published_at']);
+        $this->assertNull($this->get('/tournament?tab=bracket')->assertOk()->assertDontSee('tc-updated')->viewData('bracketData')['latest_result_published_at']);
 
         $this->travelTo(CarbonImmutable::parse('2026-11-16 13:00:00 UTC'));
         request()->attributes->set('user', $actor);
@@ -78,11 +78,11 @@ class PublicPublicationTimesTest extends TestCase
         $review = $players->review(2026, $id);
         $players->publish(2026, $id, $review['version'], $review['player_stats_revision'], $review['receipt']);
         request()->attributes->remove('user');
-        $newPage = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('tc-updated')->assertSee('Refresh this page for the latest published results.');
+        $newPage = $this->get('/tournament?tab=stats')->assertOk()->assertDontSee('tc-updated')->assertSee('This page updates automatically when new results are published.');
         $this->assertSame('14:00', $utc($newPage->viewData('rankingData')['publication_times']['player_stats']));
         $this->assertSame(30, $newPage->viewData('rankingData')['entries'][0]['value']);
         $this->assertSame($oldHtml, $oldPage->getContent());
-        foreach (['wire:poll', 'setInterval(', 'WebSocket(', 'http-equiv="refresh"'] as $automaticRefresh) {
+        foreach (['wire:poll', 'WebSocket(', 'http-equiv="refresh"'] as $automaticRefresh) {
             $newPage->assertDontSee($automaticRefresh, false);
         }
         $this->travelTo(CarbonImmutable::parse('2026-11-16 15:00:00 UTC'));

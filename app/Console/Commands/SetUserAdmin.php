@@ -31,12 +31,19 @@ class SetUserAdmin extends Command
 
         $user = User::where('email', $email)->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->error("User with email '{$email}' not found.");
+
             return 1;
         }
 
-        $isAdmin = !$revoke;
+        $isAdmin = ! $revoke;
+        if ($isAdmin && $user->is_scorer) {
+            $this->error('Cannot promote scorer accounts to admin. Use a separate admin account.');
+
+            return 1;
+        }
+
         $user->is_admin = $isAdmin;
         $user->save();
 

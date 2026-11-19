@@ -46,6 +46,21 @@ class Team extends Model
         return $this->members()->where('is_captain', true)->first();
     }
 
+    public function groupAssignments(): HasMany
+    {
+        return $this->hasMany(GroupTeam::class);
+    }
+
+    public function playerMatchStats(): HasMany
+    {
+        return $this->hasMany(PlayerMatchStat::class);
+    }
+
+    public function playerTournamentStats(): HasMany
+    {
+        return $this->hasMany(PlayerTournamentStat::class);
+    }
+
     public function getMaleCount(): int
     {
         return $this->members()->where('gender', 'Male')->count();

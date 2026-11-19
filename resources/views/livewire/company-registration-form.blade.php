@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Helpers\CompanyAuth;
 use App\Support\IpThrottle;
 use App\Models\Company;
 use App\Models\VerificationCode;
@@ -174,7 +175,7 @@ new class extends Component {
         cookie()->queue('company_token', $token, config('app.jwt_ttl'), '/', null, $secure, true, false, 'strict');
 
         // Redirect to dashboard
-        $this->redirect('/company/dashboard', navigate: true);
+        $this->redirect(route(CompanyAuth::dashboardRoute($user), absolute: false), navigate: true);
     }
 }; ?>
 
@@ -186,7 +187,7 @@ new class extends Component {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <p class="text-center text-base-content">
-                Company registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route('about') }}#committee">Contact Us</a>.
+                Organization registrations are currently closed. For inquiries, please <a class="btn-link" href="{{ route('about') }}#committee">Contact Us</a>.
             </p>
         </div>
 
@@ -199,11 +200,11 @@ new class extends Component {
         <form wire:submit="register" class="flex flex-col gap-6" id="company-registration-form">
             <x-mary-input
                 wire:model="company_name"
-                label="{{ __('Company Name') }}"
+                label="{{ __('Organization name (company or university)') }}"
                 type="text"
                 required
                 autofocus
-                placeholder="Enter company name"
+                placeholder="Enter company or university name"
             />
 
             <x-mary-input
@@ -220,7 +221,7 @@ new class extends Component {
                 type="email"
                 required
                 autocomplete="email"
-                placeholder="contact@company.com"
+                placeholder="contact@example.com"
             />
 
             <x-mary-input

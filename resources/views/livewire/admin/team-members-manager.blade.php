@@ -2,6 +2,8 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Helpers\CompanyAuth;
+use App\Services\Tournament\RosterProtectionService;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -19,12 +21,16 @@ new class extends Component {
 
     public function openAddModal(): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $this->reset('member_name', 'gender', 'is_captain', 'editingId');
         $this->showModal = true;
     }
 
     public function openEditModal(int $id): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $member = TeamMember::find($id);
         if ($member && $member->team_id === $this->team->id) {
             $this->editingId = $id;
@@ -37,6 +43,8 @@ new class extends Component {
 
     public function saveMember(): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         // Check member limit for new members
         if (!$this->editingId && $this->team->members()->count() >= 12) {
             $this->addError('member_name', 'Team can only have up to 12 members.');
@@ -85,13 +93,10 @@ new class extends Component {
 
     public function deleteMember(int $id): void
     {
-        $member = TeamMember::find($id);
-        if ($member && $member->team_id === $this->team->id) {
-            // Delete picture if exists
-            if ($member->picture) {
-                Storage::disk('public')->delete($member->picture);
-            }
-            $member->delete();
+        $this->resetErrorBag('team');
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
+        if (app(RosterProtectionService::class)->deleteMember($this->team->id, $id, $user, asAdmin: true)) {
             $this->team->refresh();
         }
     }
@@ -104,6 +109,9 @@ new class extends Component {
 }; ?>
 
 <div>
+    @error('team')
+        <div role="alert" class="alert alert-error mb-4">{{ $message }}</div>
+    @enderror
     <div class="flex justify-between items-center mb-4">
         <h2 class="card-title">Team Members ({{ $team->members->count() }}/12)</h2>
         <button wire:click="openAddModal" class="btn btn-primary btn-sm" {{ $team->members->count() >= 12 ? 'disabled' : '' }}>

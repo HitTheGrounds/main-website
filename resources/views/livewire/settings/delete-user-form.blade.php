@@ -1,7 +1,9 @@
 <?php
 
 use App\Livewire\Actions\Logout;
+use App\Services\Tournament\RosterProtectionService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -16,7 +18,12 @@ new class extends Component {
             'password' => ['required', 'string', 'current_password'],
         ]);
 
-        tap(Auth::user(), $logout(...))->delete();
+        try {
+            app(RosterProtectionService::class)->deleteAccount(Auth::user());
+        } catch (ValidationException $exception) {
+            throw ValidationException::withMessages(['password' => $exception->errors()['team']]);
+        }
+        $logout();
 
         $this->redirect('/', navigate: true);
     }

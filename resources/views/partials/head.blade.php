@@ -39,7 +39,10 @@
 <meta name="twitter:image:alt" content="{{ $pageImageAlt }}">
 
 <!-- Additional SEO -->
-@php $robots = request()->routeIs(config('seo.indexable')) ? 'index, follow, max-image-preview:large' : 'noindex, nofollow'; @endphp
+@php
+    $indexableTournament = request()->routeIs('tournament.index') && config('tournament.enabled') === true;
+    $robots = request()->routeIs(config('seo.indexable')) || $indexableTournament ? 'index, follow, max-image-preview:large' : 'noindex, nofollow';
+@endphp
 <meta name="robots" content="{{ $robots }}">
 <meta name="googlebot" content="{{ $robots }}">
 <meta name="theme-color" content="#F4F1EA">
@@ -55,8 +58,8 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-{{-- Google Analytics: production only, and not for the admin area, so our own visits do not skew the numbers --}}
-@if (app()->environment('production') && config('services.google_analytics.id') && ! request()->is('admin/*'))
+{{-- Google Analytics: production only; skip private admin and scorer workspaces. --}}
+@if (app()->environment('production') && config('services.google_analytics.id') && ! request()->is('admin/*', 'scorer/*'))
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ config('services.google_analytics.id') }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];

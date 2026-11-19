@@ -30,7 +30,7 @@ class NotFoundPageTest extends TestCase
     {
         $this->get('/no-such-page')->assertNotFound()
             ->assertSee('<title>Page not found | Hit the Grounds 2026</title>', false)
-            ->assertSee('Company Login');
+            ->assertSee('Sign in');
     }
 
     public function test_the_404_page_has_an_accessible_heading_and_respects_reduced_motion(): void

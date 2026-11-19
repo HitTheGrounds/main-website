@@ -91,7 +91,16 @@
                                 <x-mary-icon name="o-users" class="w-5 h-5" />
                                 Users
                             </x-mary-menu-item>
+                            @if (config('tournament.enabled') === true && Route::has('admin.tournament.scorers.index'))
+                                <x-mary-menu-item link="{{ route('admin.tournament.scorers.index') }}" :active="request()->routeIs('admin.tournament.scorers.*')" wire:navigate>
+                                    <x-mary-icon name="o-user-group" class="w-5 h-5" />
+                                    Scorer accounts
+                                </x-mary-menu-item>
+                            @endif
                         </x-mary-menu>
+                        @if (config('tournament.enabled') === true && Route::has('tournament.index'))
+                            <a href="{{ route('tournament.index') }}" class="btn btn-outline btn-sm mx-4 my-2">Public results</a>
+                        @endif
                     </div>
 
                     <!-- Desktop User Menu -->

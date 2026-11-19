@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\CompanyAuth;
 use App\Services\JWTService;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,11 +20,11 @@ class EnsureCompanyGuest
         $token = $request->cookie('company_token');
 
         if ($token) {
-            $jwtService = new JWTService();
+            $jwtService = new JWTService;
             $user = $jwtService->getUserFromToken($token);
 
             if ($user) {
-                return redirect()->route('company.dashboard');
+                return redirect()->route(CompanyAuth::dashboardRoute($user));
             }
         }
 

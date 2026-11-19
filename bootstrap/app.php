@@ -19,8 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'guest.company' => \App\Http\Middleware\EnsureCompanyGuest::class,
+            'company.area' => \App\Http\Middleware\EnsureCompanyAreaAccess::class,
             'auth.company' => \App\Http\Middleware\EnsureCompanyAuthenticated::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+            'scorer' => \App\Http\Middleware\EnsureUserIsScorer::class,
         ]);
 
         // Add security headers to all web requests

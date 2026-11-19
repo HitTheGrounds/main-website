@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
-use Livewire\Volt\Volt;
 
 Route::get('/', function () {
     return view('home');
@@ -10,12 +8,15 @@ Route::get('/', function () {
 
 Route::get('/sitemap.xml', function () {
     $urls = collect(config('seo.indexable'))->map(fn ($name) => route($name));
+    if (config('tournament.enabled') === true && Route::has('tournament.index')) {
+        $urls->push(route('tournament.index'));
+    }
 
     return response()->view('sitemap', ['urls' => $urls])->header('Content-Type', 'application/xml');
 })->name('sitemap');
 
 Route::get('/robots.txt', function () {
-    $body = "User-agent: *\nDisallow: /admin\nDisallow: /company\nDisallow: /login\nDisallow: /register\nDisallow: /dashboard\nDisallow: /teams\n\nSitemap: ".route('sitemap')."\n";
+    $body = "User-agent: *\nDisallow: /admin\nDisallow: /company\nDisallow: /scorer\nDisallow: /login\nDisallow: /register\nDisallow: /dashboard\nDisallow: /teams\n\nSitemap: ".route('sitemap')."\n";
 
     return response($body)->header('Content-Type', 'text/plain');
 })->name('robots');
@@ -107,7 +108,7 @@ Route::middleware(['auth.company', 'admin'])->group(function () {
     })->name('company.public-profile');
 });
 
-Route::middleware('auth.company')->group(function () {
+Route::middleware(['auth.company', 'company.area'])->group(function () {
     Route::get('/company/dashboard', function () {
         return view('company.dashboard');
     })->name('company.dashboard');
@@ -128,30 +129,35 @@ Route::middleware('auth.company')->group(function () {
         if ($team->user_id !== request()->attributes->get('user')->id) {
             abort(403);
         }
+
         return view('company.teams.show', ['team' => $team]);
     })->name('company.teams.show');
 
-    Route::post('/company/logout', function (Illuminate\Http\Request $request) {
-        $token = $request->cookie('company_token');
-
-        if ($token) {
-            $jwtService = new App\Services\JWTService();
-            $user = $jwtService->getUserFromToken($token);
-
-            if ($user) {
-                $jwtService->revokeToken($user);
-            }
-        }
-
-        // Clear the cookie
-        cookie()->queue(cookie()->forget('company_token'));
-
-        return redirect()->route('home');
-    })->name('company.logout');
 });
+
+// Shared JWT logout remains available to every authenticated account type.
+Route::post('/company/logout', function (Illuminate\Http\Request $request) {
+    $token = $request->cookie('company_token');
+
+    if ($token) {
+        $jwtService = new App\Services\JWTService;
+        $user = $jwtService->getUserFromToken($token);
+
+        if ($user) {
+            $jwtService->revokeToken($user);
+        }
+    }
+
+    // Clear the cookie
+    cookie()->queue(cookie()->forget('company_token'));
+
+    return redirect()->route('home');
+})->middleware('auth.company')->name('company.logout');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 require __DIR__.'/auth.php';
+
+require __DIR__.'/tournament.php';

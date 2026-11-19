@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Helpers\CompanyAuth;
 use App\Support\IpThrottle;
 use App\Models\VerificationCode;
 use App\Notifications\VerificationCodeNotification;
@@ -132,7 +133,7 @@ new class extends Component {
         cookie()->queue('company_token', $token, config('app.jwt_ttl'), '/', null, true, true, false, 'strict');
 
         // Redirect to admin dashboard
-        $this->redirect('/admin/dashboard', navigate: true);
+        $this->redirect(route(CompanyAuth::dashboardRoute($user), absolute: false), navigate: true);
     }
 }; ?>
 

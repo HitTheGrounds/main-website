@@ -24,6 +24,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Re-run only the original page's applicable checks on Livewire updates.
+        // Guest login/registration pages do not acquire authenticated middleware.
+        Livewire::addPersistentMiddleware([
+            \App\Http\Middleware\EnsureTournamentEnabled::class,
+            \App\Http\Middleware\EnsureCompanyAuthenticated::class,
+            \App\Http\Middleware\EnsureCompanyAreaAccess::class,
+            \App\Http\Middleware\EnsureUserIsAdmin::class,
+            \App\Http\Middleware\EnsureUserIsScorer::class,
+        ]);
+
         // Per-IP limits (the OTP/registration actions add their own tighter per-IP counters)
         RateLimiter::for('livewire', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
         RateLimiter::for('auth-pages', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));

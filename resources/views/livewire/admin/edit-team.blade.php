@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Team;
+use App\Helpers\CompanyAuth;
 use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
@@ -30,6 +31,8 @@ new class extends Component {
 
     public function update(): void
     {
+        $user = CompanyAuth::user();
+        abort_unless($user && $user->is_admin, 403);
         $validated = $this->validate();
 
         $this->team->update($validated);

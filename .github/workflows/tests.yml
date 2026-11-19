@@ -53,3 +53,27 @@ jobs:
       # and the test base class stubs Vite, so no .env file or frontend build is needed.
       - name: Run tests
         run: vendor/bin/phpunit
+
+  postgresql:
+    name: PostgreSQL isolation (PHP 8.3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, xml, pdo_pgsql, fileinfo
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      # Uses the same disposable runner as local development; no database secrets.
+      - name: Run disposable PostgreSQL tests
+        run: composer test:postgresql

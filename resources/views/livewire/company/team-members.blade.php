@@ -2,6 +2,8 @@
 
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Helpers\CompanyAuth;
+use App\Services\Tournament\RosterProtectionService;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
@@ -25,14 +27,16 @@ new class extends Component {
 
     public function getExistingMemberProperty()
     {
+        $this->authorizeTeamOwner();
         if ($this->editingId) {
-            return TeamMember::find($this->editingId);
+            return $this->team->members()->find($this->editingId);
         }
         return null;
     }
 
     public function openAddModal(): void
     {
+        $this->authorizeTeamOwner();
         if ($this->team->locked) {
             return;
         }
@@ -43,6 +47,7 @@ new class extends Component {
 
     public function openEditModal(int $id): void
     {
+        $this->authorizeTeamOwner();
         if ($this->team->locked) {
             return;
         }
@@ -62,6 +67,7 @@ new class extends Component {
 
     public function saveMember(): void
     {
+        $this->authorizeTeamOwner();
         // Check if team is locked
         if ($this->team->locked) {
             $this->addError('member_name', 'This team is locked and cannot be modified.');
@@ -163,25 +169,33 @@ new class extends Component {
 
     public function deleteMember(int $id): void
     {
+        $this->authorizeTeamOwner();
+        $this->resetErrorBag('team');
         // Check if team is locked
         if ($this->team->locked) {
             return;
         }
 
-        $member = TeamMember::find($id);
-        if ($member && $member->team_id === $this->team->id) {
-            // Delete picture if exists
-            if ($member->picture) {
-                Storage::disk('public')->delete($member->picture);
-            }
-            $member->delete();
+        $user = CompanyAuth::user();
+        abort_unless($user && !$user->is_scorer && $this->team->user_id === $user->id, 403);
+        if (app(RosterProtectionService::class)->deleteMember($this->team->id, $id, $user)) {
             $this->team->refresh();
             $this->dispatch("team-members-updated.{$this->team->id}");
         }
     }
+
+    private function authorizeTeamOwner(): void
+    {
+        $user = CompanyAuth::user();
+        $this->team->refresh();
+        abort_unless($user && !$user->is_scorer && $this->team->user_id === $user->id, 403);
+    }
 }; ?>
 
 <div>
+    @error('team')
+        <div role="alert" class="alert alert-error mb-4">{{ $message }}</div>
+    @enderror
     <div class="card bg-base-100 border border-base-300 shadow-xs">
         <div class="card-body">
             <div class="flex justify-between items-center">

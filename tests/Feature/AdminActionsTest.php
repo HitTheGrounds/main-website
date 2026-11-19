@@ -42,6 +42,7 @@ class AdminActionsTest extends TestCase
 
     public function test_approving_from_the_list_publishes_the_team_on_the_industry_page(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create(['team_name' => 'Hidden Hawks', 'approved' => false]);
         $this->get(route('teams.industry'))->assertDontSee('Hidden Hawks');
 
@@ -52,6 +53,7 @@ class AdminActionsTest extends TestCase
 
     public function test_teams_list_can_lock_and_unlock_a_team(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create(['locked' => false]);
 
         Volt::test('admin.teams-list')->call('toggleLock', $team->id);
@@ -73,6 +75,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_edit_a_team(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create();
 
         Volt::test('admin.edit-team', ['team' => $team])
@@ -87,6 +90,7 @@ class AdminActionsTest extends TestCase
 
     public function test_editing_a_team_validates_the_captain_email(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create();
 
         Volt::test('admin.edit-team', ['team' => $team])->set('captain_email', 'nope')->call('update')->assertHasErrors(['captain_email']);
@@ -94,6 +98,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_delete_a_team_and_its_members(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create();
         TeamMember::factory()->count(3)->create(['team_id' => $team->id]);
 
@@ -105,6 +110,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_promote_a_user_without_a_company(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $user = User::factory()->create(['company_id' => null, 'is_admin' => false]);
 
         Volt::test('admin.users-list')->call('promoteToAdmin', $user->id);
@@ -114,11 +120,30 @@ class AdminActionsTest extends TestCase
 
     public function test_a_user_with_a_company_cannot_be_promoted(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $user = User::factory()->create(['company_id' => Company::factory()->create()->id, 'is_admin' => false]);
 
         Volt::test('admin.users-list')->call('promoteToAdmin', $user->id);
 
         $this->assertFalse($user->fresh()->is_admin);
+    }
+
+    public function test_admin_cannot_promote_scorer_accounts_even_by_direct_action(): void
+    {
+        config(['tournament.enabled' => false]);
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
+        foreach ([false, true] as $admin) {
+            $user = User::factory()->create(['company_id' => null, 'is_admin' => $admin]);
+            $user->is_scorer = true;
+            $user->save();
+            $before = $user->fresh()->getAttributes();
+            Volt::test('admin.users-list')
+                ->assertDontSee('wire:click="promoteToAdmin('.$user->id.')"', false)
+                ->call('promoteToAdmin', $user->id)
+                ->assertDispatched('error', message: 'Cannot promote scorer accounts to admin. Use a separate admin account.')
+                ->assertNotDispatched('user-promoted');
+            $this->assertSame($before, $user->fresh()->getAttributes());
+        }
     }
 
     public function test_admin_demotion_is_not_available(): void
@@ -145,6 +170,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_change_a_companys_team_limit(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $company = Company::factory()->create(['max_team_count' => 2]);
 
         Volt::test('admin.companies-list')->set('maxTeamCount', 5)->call('updateMaxTeamCount', $company->id)->assertHasNoErrors();
@@ -154,6 +180,7 @@ class AdminActionsTest extends TestCase
 
     public function test_team_limit_is_validated(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $company = Company::factory()->create(['max_team_count' => 2]);
 
         foreach ([-1, 101, 'many'] as $bad) {
@@ -165,6 +192,7 @@ class AdminActionsTest extends TestCase
 
     public function test_admin_can_manage_team_members_and_the_captain_is_unique(): void
     {
+        Livewire::withCookie('company_token', (new JWTService)->generateToken(User::factory()->create(['is_admin' => true])));
         $team = Team::factory()->create();
 
         $component = Volt::test('admin.team-members-manager', ['team' => $team])

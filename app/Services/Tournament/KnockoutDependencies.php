@@ -23,7 +23,7 @@ class KnockoutDependencies
                 && in_array($before->winner_id, [$match->team1_id, $match->team2_id], true)) {
                 $published = $match->result_published_at !== null || $match->player_stats_published_at !== null;
                 throw ValidationException::withMessages(['tournament' => 'This change would invalidate '.$next.' match #'.$match->id.'. '
-                    .($published ? 'Its history is already published; resolve it through the organizers.' : 'Resolve that fixture explicitly before retrying.')
+                    .($published ? 'Its history is already published; resolve it through the organizers.' : 'Edit or delete that unused fixture from Matches before retrying. Saved drafts must be discarded first.')
                     .' No fixtures are removed automatically.']);
             }
         }

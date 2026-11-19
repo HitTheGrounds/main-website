@@ -7,7 +7,6 @@ use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use App\Support\TeamLogo;
-use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -43,6 +42,7 @@ class PublicTournamentService
         private MatchResultDescription $descriptions,
         private GroupFixtureCoverage $coverage,
         private KnockoutEligibility $eligibility,
+        private StandingsRanker $ranker,
     ) {}
 
     public function matches(int $year, array $filters = []): array
@@ -295,23 +295,7 @@ class PublicTournamentService
 
     private function rank(array $entries): array
     {
-        $compare = function ($a, $b): int {
-            if ($a['points'] !== $b['points']) {
-                return $b['points'] <=> $a['points'];
-            }
-            if ($a['nrr'] === null || $b['nrr'] === null) {
-                return ($a['nrr'] === null ? 1 : 0) <=> ($b['nrr'] === null ? 1 : 0);
-            }
-
-            return BigDecimal::of($b['nrr'])->compareTo(BigDecimal::of($a['nrr']));
-        };
-        usort($entries, fn ($a, $b) => $compare($a, $b) ?: $a['id'] <=> $b['id']);
-        foreach ($entries as $index => &$entry) {
-            $entry['rank'] = $index > 0 && $compare($entries[$index - 1], $entry) === 0 ? $entries[$index - 1]['rank'] : $index + 1;
-        }
-        unset($entry);
-
-        return $entries;
+        return $this->ranker->rank($entries);
     }
 
     private function validateYear(int $year): void

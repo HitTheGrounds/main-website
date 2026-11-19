@@ -76,7 +76,7 @@
             <x-scorer.icon name="users" /> Player figures
         </a>
         <button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-edit-btn">
-            <x-scorer.icon name="pencil" /> Edit schedule
+            <x-scorer.icon name="pencil" /> Edit match
         </button>
     </footer>
 </article>

@@ -20,7 +20,7 @@ class MatchStructureValidator
      * transaction, with group/team locks, immediately before inserting the match.
      * Database unique indexes remain the final duplicate safeguard.
      */
-    public function validate(int $year, array $input): array
+    public function validate(int $year, array $input, ?int $currentMatchId = null): array
     {
         $fields = ['stage', 'group_id', 'bracket_position', 'team1_id', 'team2_id',
             'balls_per_over', 'overs_per_innings', 'max_wickets'];
@@ -58,7 +58,7 @@ class MatchStructureValidator
             $teams = Team::whereIn('id', [$data['team1_id'], $data['team2_id']])->orderBy('id')->get();
             $assignments = GroupTeam::where('tournament_year', $year)->orderBy('id')->get();
             $this->eligibility->pair($year, $data['stage'], (int) $data['team1_id'], (int) $data['team2_id'], $teams, $assignments, $matches);
-            $this->integrity->assertFixture($year, $data['stage'], (int) $data['bracket_position'], (int) $data['team1_id'], (int) $data['team2_id'], $matches);
+            $this->integrity->assertFixture($year, $data['stage'], (int) $data['bracket_position'], (int) $data['team1_id'], (int) $data['team2_id'], $matches, $currentMatchId);
 
             return ['stage' => $data['stage'], 'group_id' => null, 'bracket_position' => (int) $data['bracket_position'],
                 'team1_id' => (int) $data['team1_id'], 'team2_id' => (int) $data['team2_id'],
@@ -88,6 +88,7 @@ class MatchStructureValidator
         // Either orientation represents the same fixture. Keep the submitted
         // Team 1/Team 2 order in the returned values for display and score entry.
         if (TournamentMatch::where('tournament_year', $year)->where('stage', 'G')->where('group_id', $groupId)
+            ->when($currentMatchId !== null, fn ($query) => $query->where('id', '!=', $currentMatchId))
             ->where(fn ($query) => $query
                 ->where(fn ($pair) => $pair->where('team1_id', $teamIds[0])->where('team2_id', $teamIds[1]))
                 ->orWhere(fn ($pair) => $pair->where('team1_id', $teamIds[1])->where('team2_id', $teamIds[0])))

@@ -16,6 +16,15 @@ new class extends Component {
     public array $newStructure = ['team1_id' => '', 'team2_id' => '', 'balls_per_over' => '4'];
     public array $newSchedule = ['status' => 'upcoming', 'venue' => '', 'scheduled_at' => '', 'display_number' => '', 'batting_first_id' => ''];
     public array $schedule = [];
+    public array $fixtureStructure = [];
+    #[Locked]
+    public bool $fixtureEditable = false;
+    #[Locked]
+    public int $fixtureGroupVersion = 0;
+    #[Locked]
+    public ?string $fixtureRevision = null;
+    #[Locked]
+    public array $fixtureTeams = [];
     public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => ''];
     public string $notice = '';
     // Which popup is open: '' (none), 'create' or 'edit'. UI state only; the
@@ -39,17 +48,38 @@ new class extends Component {
     #[Locked]
     public array $filters = [];
 
+    public function mount(): void
+    {
+        if (request()->filled('edit')) {
+            $input = Validator::make(request()->query(), ['edit' => ['required', 'integer', 'min:1']])->validate();
+            $this->openMatch((int) $input['edit']);
+        }
+    }
+
     public function with(): array
     {
         $setup = app(TournamentGroupService::class)->setup($this->year());
         $teams = $setup['groups']->firstWhere('id', $this->selectedGroupId)['teams'] ?? collect();
         $approvedIds = Team::whereIn('id', $teams->pluck('id'))->where('approved', true)->pluck('id');
+        $service = app(MatchSchedulingService::class);
+        $matches = $service->listing($this->year(), $this->filters);
+        $editing = null;
+        if ($this->editingId !== null) {
+            try {
+                $editing = $service->findForScheduling($this->year(), $this->editingId);
+            } catch (ValidationException) {
+                // Another scorer may have deleted this unused fixture. Keep
+                // permission failures intact, but stop rendering a missing editor.
+                $this->reset('editingId', 'editingVersion', 'fixtureEditable', 'fixtureStructure', 'fixtureTeams', 'fixtureRevision', 'fixtureGroupVersion', 'panel', 'schedule');
+                $this->notice = 'This fixture was removed by another update. The match list has been reloaded.';
+            }
+        }
 
         return [
             'groups' => $setup['groups'],
             'teams' => $teams->whereIn('id', $approvedIds),
-            'matches' => app(MatchSchedulingService::class)->listing($this->year(), $this->filters),
-            'editing' => $this->editingId === null ? null : app(MatchSchedulingService::class)->findForScheduling($this->year(), $this->editingId),
+            'matches' => $matches,
+            'editing' => $editing,
             'year' => $this->year(),
         ];
     }
@@ -120,6 +150,9 @@ new class extends Component {
             && $match->player_stats_published_at === null && $match->result_type === null && $match->winner_id === null;
         $this->publishedResult = $match->result_published_at !== null;
         $this->battingEditable = $match->structure_locked_at === null && $match->result_published_at === null;
+        $this->fixtureEditable = app(MatchSchedulingService::class)->canEditFixture($match);
+        $this->fixtureStructure = $match->only(['stage', 'group_id', 'bracket_position', 'team1_id', 'team2_id', 'balls_per_over', 'overs_per_innings', 'max_wickets']);
+        $this->loadFixtureOptions();
         $this->schedule = [
             'status' => $match->status, 'venue' => $match->venue ?? '',
             'scheduled_at' => $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('Y-m-d\TH:i') ?? '',
@@ -142,10 +175,88 @@ new class extends Component {
         if (! $this->battingEditable) {
             unset($input['batting_first_id']);
         }
-        $match = app(MatchSchedulingService::class)->updateSchedule($this->year(), $this->editingId, $this->editingVersion, $input);
+        $match = $this->fixtureEditable
+            ? app(MatchSchedulingService::class)->updateFixture($this->year(), $this->editingId, $this->editingVersion,
+                $this->fixtureGroupVersion, $this->normalizedStructure(), $input, $this->fixtureRevision)
+            : app(MatchSchedulingService::class)->updateSchedule($this->year(), $this->editingId, $this->editingVersion, $input);
         $this->openMatch($match->id);
         $this->panel = '';
-        $this->notice = 'Match schedule saved.';
+        $this->notice = 'Match details saved.';
+    }
+
+    public function updatedFixtureStructure(mixed $value, ?string $key): void
+    {
+        if (! $this->fixtureEditable) {
+            return;
+        }
+        if (in_array($key, ['stage', 'group_id'], true)) {
+            if ($key === 'stage') {
+                $this->fixtureStructure['group_id'] = '';
+                $this->fixtureStructure['bracket_position'] = '';
+                $format = ['G' => 'group', 'QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$value] ?? null;
+                if ($format === null) {
+                    throw ValidationException::withMessages(['stage' => 'Select a valid tournament round.']);
+                }
+                $this->fixtureStructure['balls_per_over'] = config('tournament.default_balls_per_over.'.$format);
+            }
+            $this->fixtureStructure['team1_id'] = '';
+            $this->fixtureStructure['team2_id'] = '';
+            $this->schedule['batting_first_id'] = '';
+            $this->loadFixtureOptions();
+        } elseif (in_array($key, ['team1_id', 'team2_id'], true)
+            && ! in_array((string) ($this->schedule['batting_first_id'] ?? ''), [
+                (string) ($this->fixtureStructure['team1_id'] ?? ''), (string) ($this->fixtureStructure['team2_id'] ?? ''),
+            ], true)) {
+            $this->schedule['batting_first_id'] = '';
+        }
+    }
+
+    public function deleteFixture(): void
+    {
+        $this->resetErrorBag();
+        if ($this->editingId === null || $this->editingVersion === null) {
+            throw ValidationException::withMessages(['tournament' => 'Open a fixture before deleting it.']);
+        }
+        app(MatchSchedulingService::class)->deleteFixture($this->year(), $this->editingId, $this->editingVersion);
+        $this->reset('editingId', 'editingVersion', 'fixtureEditable', 'fixtureStructure', 'fixtureTeams', 'fixtureRevision', 'fixtureGroupVersion', 'panel', 'schedule');
+        $this->resetPage();
+        $this->notice = 'Unused fixture deleted. You can correct group assignments or create its replacement.';
+    }
+
+    private function loadFixtureOptions(): void
+    {
+        $this->fixtureTeams = [];
+        $this->fixtureGroupVersion = 0;
+        $this->fixtureRevision = null;
+        if (! $this->fixtureEditable) {
+            return;
+        }
+        $stage = $this->fixtureStructure['stage'] ?? 'G';
+        if ($stage !== 'G') {
+            $round = app(MatchSchedulingService::class)->knockoutOptions($this->year(), $stage);
+            $this->fixtureTeams = $round['candidates'];
+            $this->fixtureRevision = $round['revision'];
+
+            return;
+        }
+        $group = app(TournamentGroupService::class)->setup($this->year())['groups']
+            ->firstWhere('id', (int) ($this->fixtureStructure['group_id'] ?? 0));
+        if ($group) {
+            $this->fixtureGroupVersion = $group['version'];
+            $this->fixtureTeams = $group['teams']->values()->all();
+        }
+    }
+
+    private function normalizedStructure(): array
+    {
+        $structure = $this->fixtureStructure;
+        foreach (['group_id', 'bracket_position'] as $key) {
+            if (($structure[$key] ?? null) === '') {
+                $structure[$key] = null;
+            }
+        }
+
+        return $structure;
     }
 
     public function changeResultStatus(string $status): void
@@ -309,7 +420,7 @@ new class extends Component {
             @if($editing)
                 <header class="sd-dialog-head" wire:key="schedule-editor-{{ $editing->id }}">
                     <div>
-                        <h2 id="edit-schedule-heading">Edit schedule</h2>
+                        <h2 id="edit-schedule-heading">{{ $fixtureEditable ? 'Edit scheduled fixture' : 'Edit schedule' }}</h2>
                         <p>{{ $editing->team1->team_name }} vs {{ $editing->team2->team_name }}</p>
                     </div>
                     <button type="button" x-on:click="$el.closest('dialog').close()" class="sd-icon-btn" aria-label="Close">
@@ -321,7 +432,11 @@ new class extends Component {
                         @include('livewire.scorer.partials.dashboard-feedback')
                     @endif
                     <ul class="sd-lock-notes">
-                        <li>Teams, group and match format cannot be changed in this schedule form.</li>
+                        @if($fixtureEditable)
+                            <li>Teams, round, group, bracket position and format can be corrected before play or scoring starts. Five overs and seven wickets remain the tournament rules.</li>
+                        @else
+                            <li>Teams, group and match format are protected once play or scoring starts. Discard unpublished drafts and return an unplayed match to Upcoming before changing its setup.</li>
+                        @endif
                         @if(!$statusEditable)<li>Result status is locked in the schedule form.</li>@endif
                         @if(!$battingEditable)<li>Batting-first team is locked after result publication.</li>@endif
                     </ul>
@@ -340,9 +455,40 @@ new class extends Component {
                         </div>
                     @endif
                     <form id="edit-schedule-form" wire:submit="saveSchedule">
+                        @if($fixtureEditable)
+                            <fieldset class="sd-fieldset">
+                                <legend>Teams and match format</legend>
+                                <div class="sd-form-grid">
+                                    <label><span class="label">Round</span><select wire:model.live="fixtureStructure.stage" class="select w-full">
+                                        @foreach(['G' => 'Group', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'] as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
+                                    </select></label>
+                                    @if(($fixtureStructure['stage'] ?? 'G') === 'G')
+                                        <label><span class="label">Group</span><select wire:model.live="fixtureStructure.group_id" class="select w-full"><option value="">Choose a group</option>
+                                            @foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach
+                                        </select></label>
+                                    @else
+                                        <label><span class="label">Bracket position</span><select wire:model="fixtureStructure.bracket_position" class="select w-full"><option value="">Choose position</option>
+                                            @for($position = 1; $position <= (int) config('tournament.knockout_slots.'.($fixtureStructure['stage'] ?? ''), 0); $position++)<option value="{{ $position }}">{{ $position }}</option>@endfor
+                                        </select></label>
+                                    @endif
+                                    @foreach(['team1_id' => 'Team 1', 'team2_id' => 'Team 2'] as $key => $label)
+                                        <label><span class="label">{{ $label }}</span><select wire:model.live="fixtureStructure.{{ $key }}" class="select w-full"><option value="">Select a team</option>
+                                            @foreach($fixtureTeams as $team)<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endforeach
+                                        </select></label>
+                                    @endforeach
+                                    <label><span class="label">Balls per over</span><select wire:model="fixtureStructure.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
+                                </div>
+                            </fieldset>
+                        @endif
                         <div class="sd-form-grid">
                             @if($statusEditable)<label><span class="label">Match status</span><select wire:model="schedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>@endif
-                            @if($battingEditable)<label><span class="label">Batting first</span><select wire:model="schedule.batting_first_id" class="select w-full"><option value="">Not decided</option><option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option></select></label>@endif
+                            @if($battingEditable)<label><span class="label">Batting first</span><select wire:model="schedule.batting_first_id" class="select w-full"><option value="">Not decided</option>
+                                @if($fixtureEditable)
+                                    @foreach($fixtureTeams as $team)@if(in_array((string) $team['id'], [(string) ($fixtureStructure['team1_id'] ?? ''), (string) ($fixtureStructure['team2_id'] ?? '')], true))<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endif @endforeach
+                                @else
+                                    <option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option>
+                                @endif
+                            </select></label>@endif
                             <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" class="input w-full" /></label>
                             <label><span class="label">Venue</span><input wire:model="schedule.venue" maxlength="255" class="input w-full" /></label>
                             <label><span class="label">Match number</span><input type="number" min="1" wire:model="schedule.display_number" class="input w-full" /></label>
@@ -350,12 +496,17 @@ new class extends Component {
                     </form>
                 </div>
                 <footer class="sd-dialog-foot">
+                    @if($fixtureEditable)
+                        <button type="button" wire:click="deleteFixture" wire:confirm="Delete this unused fixture? This cannot be undone. You can create a corrected fixture afterward." wire:loading.attr="disabled" class="btn btn-outline btn-error">
+                            <x-scorer.icon name="trash" /> Delete unused fixture
+                        </button>
+                    @endif
                     <button type="button" wire:click="reloadMatch" wire:confirm="Discard unsaved schedule changes and load the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost sd-btn-quiet sd-foot-start">
                         <x-scorer.icon name="refresh" /> Reload this match
                     </button>
                     <button type="button" x-on:click="$el.closest('dialog').close()" class="btn btn-ghost">Cancel</button>
                     <button type="submit" form="edit-schedule-form" wire:loading.attr="disabled" class="btn btn-primary">
-                        <x-scorer.icon name="check" /> Save schedule
+                        <x-scorer.icon name="check" /> {{ $fixtureEditable ? 'Save match details' : 'Save schedule' }}
                     </button>
                 </footer>
             @endif

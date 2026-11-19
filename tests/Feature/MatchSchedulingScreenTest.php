@@ -171,6 +171,27 @@ class MatchSchedulingScreenTest extends TestCase
         $this->assertSame(0, $match->fresh()->team1_runs);
     }
 
+    public function test_cards_show_published_scores_only_and_popups_follow_panel_state(): void
+    {
+        $this->scorer();
+        $input = $this->fixture();
+        $published = app(MatchSchedulingService::class)->create(2026, 3, $input);
+        $published->forceFill(['status' => 'finished', 'team1_runs' => 54, 'team1_wickets' => 3, 'team1_deliveries' => 20,
+            'team2_runs' => 41, 'team2_wickets' => 7, 'team2_deliveries' => 18, 'result_type' => 'win',
+            'result_method' => 'normal', 'winner_id' => $input['team1_id'], 'batting_first_id' => $input['team1_id'],
+            'result_published_at' => now(), 'structure_locked_at' => now()])->save();
+        $unpublished = app(MatchSchedulingService::class)->create(2026, 3, $this->fixture(2026, 'Group B'));
+        $unpublished->forceFill(['status' => 'finished', 'team1_runs' => 987, 'draft_result' => ['team1_runs' => 765]])->save();
+
+        Volt::test('scorer.matches-manager')
+            ->assertSee('54')->assertSee('5.0 ov')->assertSee('Result not published yet.')
+            ->assertDontSee('987')->assertDontSee('765')
+            ->assertSet('panel', '')->call('openMatch', $published->id)->assertSet('panel', 'edit')
+            ->call('saveSchedule')->assertHasNoErrors()->assertSet('panel', '')
+            ->set('filterForm.status', 'finished')->call('applyFilters')->assertSee('Clear')
+            ->call('clearFilters')->assertSet('filters', [])->assertSet('filterForm.status', '');
+    }
+
     public function test_reviewed_version_cannot_be_changed_from_the_browser(): void
     {
         $this->scorer();

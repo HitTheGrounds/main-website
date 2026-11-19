@@ -2,6 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head', ['title' => 'Scorer portal'])
+        {{-- Livewire's base styles (hide wire:loading until a request runs). The
+             layout loads @livewireScripts by hand, which turns off auto-injection. --}}
+        @livewireStyles
     </head>
     <body class="scorer-workspace min-h-screen bg-base-100 text-base-content">
         <a href="#scorer-main" class="scorer-skip">Skip to scorer tools</a>

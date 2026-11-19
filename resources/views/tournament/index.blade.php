@@ -1,4 +1,16 @@
 <x-layouts.public title="Tournament" description="Match results, group standings, knockout bracket and player leaders for Hit the Grounds.">
+    {{-- Same-page crossfade between tournament views. Both pages must opt in, so
+         this only runs on tournament-to-tournament navigation; browsers without
+         support just load the page. --}}
+    <style>
+        @view-transition { navigation: auto; }
+        ::view-transition-group(tc-status-pill) { animation-duration: .38s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+        ::view-transition-old(tc-match-list) { animation: .18s cubic-bezier(.22, 1, .36, 1) both tc-vt-out; }
+        ::view-transition-new(tc-match-list) { animation: .32s cubic-bezier(.22, 1, .36, 1) both tc-vt-in; }
+        @keyframes tc-vt-out { to { opacity: 0; } }
+        @keyframes tc-vt-in { from { opacity: 0; transform: translateY(8px); } }
+        @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+    </style>
     <div class="tc">
         <div class="tc-masthead">
         <header class="tc-hero">
@@ -33,13 +45,15 @@
                 if (! $filterErrors && $tab === 'matches') {
                     $refreshParameters += $matchData['filters'];
                 } elseif (! $filterErrors && $tab === 'stats') {
-                    $refreshParameters += ['category' => $rankingData['category'], 'gender' => $rankingData['gender']];
+                    $refreshParameters += ['category' => $rankingData['category']];
                 }
             @endphp
-            <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">
-                <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17"/></svg>
-                Refresh
-            </a>
+            <div class="tc-head-actions">
+                <a class="tc-refresh" href="{{ route('tournament.index', $refreshParameters) }}" aria-label="Refresh {{ strtolower($tabs[$tab]['label']) }}">
+                    <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17"/></svg>
+                    Refresh
+                </a>
+            </div>
             <p class="sr-only">{{ $tabs[$tab]['description'] }}</p>
         </section>
         @if ($tab === 'matches')
@@ -54,16 +68,6 @@
         @if (! $filterErrors)
             <footer class="tc-publication">
                 <p>Refresh this page for the latest published results.</p>
-                <details>
-                    <summary>Publication details</summary>
-                    @if ($tab === 'stats')
-                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest player stats publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['player_stats']])
-                        @include('tournament.partials.publication-time', ['publicationLabel' => 'Latest match result publication (whole tournament)', 'publicationTime' => $rankingData['publication_times']['match_results']])
-                    @else
-                        @php $pageData = match ($tab) { 'matches' => $matchData, 'table' => $tableData, 'bracket' => $bracketData }; @endphp
-                        @include('tournament.partials.publication-time', ['publicationLabel' => $tab === 'matches' ? 'Latest match result publication for these filters' : 'Latest match result publication in this view', 'publicationTime' => $pageData['latest_result_published_at']])
-                    @endif
-                </details>
             </footer>
         @endif
     </div>

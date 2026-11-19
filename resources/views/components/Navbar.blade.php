@@ -11,7 +11,7 @@
 
       <!-- Logo -->
       <a href="/" class="px-1 sm:px-4 flex items-center gap-2 cursor-pointer">
-        <img src="{{ asset('navbar-logo.svg') }}" alt="HIT THE GROUNDS" class="h-8 w-16 sm:h-10 sm:w-20 md:h-12 md:w-24 object-contain block">
+        <img src="{{ asset('images/htg-logo-horizontal-orange.webp') }}" alt="HIT THE GROUNDS 2026, powered by GTN" width="900" height="481" class="h-9 w-auto sm:h-11 md:h-12 object-contain block">
       </a>
     </div>
 
@@ -19,7 +19,7 @@
     <div class="navbar-center hidden {{ $showTournament ? 'xl:flex' : 'lg:flex' }}">
       <ul class="menu menu-horizontal px-1 gap-2 xl:gap-4">
         @if ($showTournament)
-          <li><a href="{{ route('tournament.index') }}" @if(request()->routeIs('tournament.index')) aria-current="page" @endif class="font-semibold focus-visible:outline-2 focus-visible:outline-primary">Tournament</a></li>
+          <li><a href="{{ route('tournament.index') }}" @if(request()->routeIs('tournament.index')) aria-current="page" @endif class="{{ request()->routeIs('tournament.index') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }} focus-visible:outline-2 focus-visible:outline-primary">Tournament</a></li>
         @endif
         <li><a href="/" class="{{ request()->routeIs('home') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Home</a></li>
           {{-- <li><a href="{{ route("registrations") }}" class="{{ request()->routeIs('registrations') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Registrations</a></li> --}}

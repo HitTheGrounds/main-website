@@ -77,7 +77,7 @@ class TournamentUserJourneyTest extends TestCase
         foreach ($groupMatches as $match) {
             $this->publishWin($match);
         }
-        $tables = $this->anonymousPage('table')->assertSee('Group results complete')->viewData('tableData')['groups'];
+        $tables = $this->anonymousPage('table')->assertDontSee('Runner-up comparison')->viewData('tableData')['groups'];
         foreach ($tables as $table) {
             $this->assertSame([2, 0], array_column($table['teams'], 'points'));
             $this->assertSame([false, false], array_column($table['teams'], 'qualified'));

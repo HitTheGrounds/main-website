@@ -20,6 +20,9 @@ new class extends Component {
 
     public array $form = [];
     public string $notice = '';
+    // '' or 'review': drives the review popup. UI state only; publishing still
+    // requires the locked $review snapshot.
+    public string $panel = '';
 
     public function mount(int $matchId): void
     {
@@ -72,6 +75,7 @@ new class extends Component {
         $this->saveDraft();
         $this->notice = '';
         $this->review = app(MatchResultService::class)->review($this->year(), $this->matchId);
+        $this->panel = 'review';
     }
 
     public function publishResult(): void
@@ -82,8 +86,9 @@ new class extends Component {
             throw ValidationException::withMessages(['tournament' => 'Review the current result before publishing.']);
         }
         app(MatchResultService::class)->publish($this->year(), $this->matchId, $this->review['version'], $this->review['draft_hash']);
-        $this->loadSaved();
-        $this->notice = 'Team result published and group standings updated. Open Player figures, then review and publish player updates to update public Stats.';
+        // Back to the match list with a toast (rendered by the scorer layout).
+        session()->flash('scorer_toast', 'Team result published and group standings updated. Open Player figures, then review and publish player updates to update public Stats.');
+        $this->redirectRoute('scorer.dashboard');
     }
 
     public function discardDraft(): void
@@ -97,6 +102,7 @@ new class extends Component {
     public function returnToDraft(): void
     {
         $this->review = null;
+        $this->panel = '';
         $this->resetErrorBag();
     }
 
@@ -111,6 +117,7 @@ new class extends Component {
         $editor = app(MatchResultService::class)->editor($this->year(), $this->matchId);
         $this->resetErrorBag();
         $this->review = null;
+        $this->panel = '';
         $this->version = $editor['version'];
         $this->hasDraft = $editor['has_draft'];
         $this->official = $editor['official'];
@@ -145,115 +152,218 @@ new class extends Component {
     }
 }; ?>
 
-<div class="scorer-screen space-y-5">
-    <header class="scorer-heading">
-        <h1 class="text-2xl font-bold sm:text-3xl">Match result</h1>
-        <p>{{ $match->team1->team_name }} vs {{ $match->team2->team_name }} | {{ $match->group?->name ?? ['QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'][$match->stage] }}</p>
-        <p class="text-sm">{{ $match->balls_per_over }} balls per over | Five overs | Seven wickets</p>
-        <nav class="scorer-actions" aria-label="Match tools">
-            <a href="{{ route('scorer.dashboard') }}" class="link">Back to matches</a>
-            <a href="{{ route('scorer.matches.players', ['matchId' => $matchId]) }}" class="link ml-3">Player figures</a>
-        </nav>
-    </header>
+@php
+    $sides = ['team1' => $match->team1, 'team2' => $match->team2];
+    $locked = $match->structure_locked_at !== null || $match->result_published_at !== null;
+    $resultLabels = ['win' => 'Win', 'tie' => 'Tie', 'no_result' => 'No result', 'abandoned' => 'Abandoned'];
+    $methodLabels = ['normal' => 'Normal play', 'super_over' => 'Super Over', 'coin_toss' => 'Coin toss', 'official_decision' => 'Official decision', 'revised_target' => 'Revised target'];
+@endphp
+<div class="scorer-screen sr-screen" x-data="{ panel: $wire.entangle('panel') }">
+    <x-scorer.match-header :match="$match" active="result" title="Match result" />
+
     <div class="scorer-feedback" aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
-        @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
-        <p wire:loading role="status" class="text-sm">Updating result...</p>
+        {{-- Actions live in the sticky bar at the bottom, so bring errors into view. --}}
+        @if($errors->any() && $panel !== 'review')<div role="alert" class="alert alert-error sr-errors" wire:key="errors-{{ md5(implode('|', $errors->all())) }}"
+            x-data x-init="$el.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
     </div>
-    <details class="scorer-disclosure">
-        <summary id="official-result-heading">{{ $official ? 'Published result' : 'No published result' }}@if($hasDraft) <span class="scorer-draft-marker">Saved draft exists</span>@endif</summary>
-        <div class="card-body">
-            @if($official)
-                <p>{{ str_replace('_', ' ', $official['result_type']) }} @if($official['result_method']) ({{ str_replace('_', ' ', $official['result_method']) }}) @endif
-                    @if($official['winner_id']) | Winner: {{ $official['winner_id'] === $match->team1_id ? $match->team1->team_name : $match->team2->team_name }} @endif</p>
-                @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
-                    <p>{{ $name }}: {{ $official[$side.'_runs'] ?? 'Unknown' }} / {{ $official[$side.'_wickets'] ?? 'Unknown' }}
-                        ({{ $official[$side.'_overs'] ?? '?' }} overs, {{ $official[$side.'_balls'] ?? '?' }} balls)</p>
-                @endforeach
-                @if($official['result_note'])<p class="whitespace-pre-wrap break-words">{{ $official['result_note'] }}</p>@endif
-            @else<p>No team result has been published.</p>@endif
+
+    {{-- What the public currently sees. --}}
+    <section class="sr-published" aria-labelledby="official-result-heading">
+        <div class="sr-published-head">
+            <h2 id="official-result-heading">{{ $official ? 'Published result' : 'No published result' }}</h2>
+            @if($hasDraft)<span class="sr-chip">Saved draft exists</span>@endif
         </div>
-    </details>
-    <ol class="scorer-steps" aria-label="Team result workflow">
-        <li @if(!$review) aria-current="step" @endif>1. Enter figures</li>
-        <li @if($review) aria-current="step" @endif>2. Review and publish</li>
+        @if($official)
+            <dl class="sr-board">
+                @foreach($sides as $side => $team)
+                    <div @class(['sr-board-row', 'is-winner' => $official['winner_id'] === $team->id, 'is-loser' => $official['winner_id'] !== null && $official['winner_id'] !== $team->id])>
+                        <dt><x-tournament.team-badge :name="$team->team_name" /><span>{{ $team->team_name }}</span></dt>
+                        <dd><strong>{{ $official[$side.'_runs'] ?? 'Unknown' }} / {{ $official[$side.'_wickets'] ?? 'Unknown' }}</strong>
+                            <span>{{ $official[$side.'_overs'] ?? '?' }} overs, {{ $official[$side.'_balls'] ?? '?' }} balls</span></dd>
+                    </div>
+                @endforeach
+            </dl>
+            <p class="sr-published-line">
+                {{ $resultLabels[$official['result_type']] ?? str_replace('_', ' ', $official['result_type']) }}
+                @if($official['result_method']) ({{ $methodLabels[$official['result_method']] ?? str_replace('_', ' ', $official['result_method']) }})@endif
+                @if($official['winner_id']) · Winner: {{ $official['winner_id'] === $match->team1_id ? $match->team1->team_name : $match->team2->team_name }}@endif
+            </p>
+            @if($official['result_note'])<p class="sr-note-text whitespace-pre-wrap break-words">{{ $official['result_note'] }}</p>@endif
+        @else
+            <p class="sr-muted">No team result has been published.</p>
+        @endif
+    </section>
+
+    <ol class="sr-steps" aria-label="Team result workflow">
+        <li @if($panel !== 'review') aria-current="step" @endif><span>1</span> Enter figures</li>
+        <li @if($panel === 'review') aria-current="step" @endif><span>2</span> Review and publish</li>
     </ol>
-    @if(!$review)
-    <section class="card border border-base-300 bg-base-100" aria-labelledby="result-draft-heading">
-        <form wire:submit="saveDraft" class="card-body space-y-4">
-            <h2 id="result-draft-heading" class="text-xl font-bold">Result draft</h2>
-            <p class="text-sm">Save incomplete details at any time. Blank means unknown; enter 0 for a known zero. Team results do not need player figures.</p>
-            <div class="grid gap-4 sm:grid-cols-2">
+
+    <form id="result-form" wire:submit="saveDraft" class="sr-form" aria-labelledby="result-draft-heading">
+        <div class="sr-form-intro">
+            <h2 id="result-draft-heading">Result draft</h2>
+            <p>Save incomplete details at any time. Blank means unknown; enter 0 for a known zero. Team results do not need player figures.</p>
+        </div>
+
+        <section class="sr-section" aria-labelledby="sr-outcome-heading">
+            <h3 id="sr-outcome-heading" class="sr-section-title">Outcome</h3>
+            <div class="sr-grid">
                 <label><span class="label">Result</span><select wire:model.live="form.result_type" class="select w-full"><option value="">Choose result</option><option value="win">Win</option>@if($match->stage === 'G')<option value="tie">Tie</option><option value="no_result">No result</option><option value="abandoned">Abandoned</option>@endif</select></label>
                 @if(($form['result_type'] ?? null) === 'win')
                     <label><span class="label">Deciding method</span><select wire:model.live="form.result_method" class="select w-full"><option value="">Choose method</option><option value="normal">Normal play</option><option value="super_over">Super Over</option><option value="coin_toss">Coin toss</option><option value="official_decision">Official decision</option><option value="revised_target">Revised target</option></select></label>
-                    <label><span class="label">Winner</span><select wire:model="form.winner_id" class="select w-full"><option value="">Choose winner</option><option value="{{ $match->team1_id }}">{{ $match->team1->team_name }}</option><option value="{{ $match->team2_id }}">{{ $match->team2->team_name }}</option></select></label>
                 @endif
-                <label><span class="label">Batting first</span><select wire:model="form.batting_first_id" @disabled($match->structure_locked_at !== null || $match->result_published_at !== null) class="select w-full"><option value="">Unknown</option><option value="{{ $match->team1_id }}">{{ $match->team1->team_name }}</option><option value="{{ $match->team2_id }}">{{ $match->team2->team_name }}</option></select></label>
             </div>
-            @if($match->structure_locked_at !== null || $match->result_published_at !== null)<p class="text-sm">Batting order and match format are locked after publication.</p>@endif
-            <div class="scorer-instruction">For 4 overs and 3 balls, enter 4 complete overs and 3 balls in the current over. Use normal innings totals.</div>
-            <div class="grid gap-4 md:grid-cols-2">
-                @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
-                    <fieldset class="rounded-lg border border-base-300 p-4 space-y-3"><legend class="px-2 font-bold">{{ $name }}: normal innings</legend>
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach(['runs' => ['Runs', 2147483647], 'wickets' => ['Wickets', $match->max_wickets], 'overs' => ['Complete overs', 5], 'balls' => ['Balls in current over', $match->balls_per_over - 1]] as $field => [$label, $maximum])
-                                <label><span class="label">{{ $label }}</span><input type="number" min="0" max="{{ $maximum }}" step="1" wire:model="form.{{ $side }}_{{ $field }}" class="input w-full" /></label>
-                            @endforeach
+            @if(($form['result_type'] ?? null) === 'win')
+                <fieldset class="sr-winner">
+                    <legend class="label">Winner</legend>
+                    <div class="sr-winner-options">
+                        @foreach($sides as $team)
+                            <label class="sr-winner-option">
+                                <input type="radio" name="winner" value="{{ $team->id }}" wire:model="form.winner_id" class="sr-only">
+                                <x-tournament.team-badge :name="$team->team_name" />
+                                <span class="sr-winner-name">{{ $team->team_name }}</span>
+                                <x-scorer.icon name="trophy" class="sr-winner-mark" />
+                            </label>
+                        @endforeach
+                    </div>
+                </fieldset>
+            @endif
+            <div class="sr-grid">
+                <label><span class="label">Batting first</span><select wire:model.live="form.batting_first_id" @disabled($locked) class="select w-full"><option value="">Unknown</option><option value="{{ $match->team1_id }}">{{ $match->team1->team_name }}</option><option value="{{ $match->team2_id }}">{{ $match->team2->team_name }}</option></select></label>
+            </div>
+            @if($locked)<p class="sr-muted">Batting order and match format are locked after publication.</p>@endif
+        </section>
+
+        <section class="sr-section" aria-labelledby="sr-innings-heading">
+            <h3 id="sr-innings-heading" class="sr-section-title">Innings</h3>
+            <p class="sr-hint">For 4 overs and 3 balls, enter 4 complete overs and 3 balls in the current over. Use normal innings totals. Super Over figures are excluded.</p>
+            <div class="sr-innings-grid">
+                @foreach($sides as $side => $team)
+                    <fieldset class="sr-innings">
+                        <legend class="sr-innings-head">
+                            <x-tournament.team-badge :name="$team->team_name" />
+                            <span class="sr-innings-name">{{ $team->team_name }}<span class="sr-only">: normal innings</span></span>
+                            @if((string) ($form['batting_first_id'] ?? '') === (string) $team->id)<span class="sr-chip">Bats first</span>@endif
+                        </legend>
+                        <div class="sr-score-row">
+                            <label class="sr-big"><span class="label">Runs</span><input type="number" inputmode="numeric" min="0" max="2147483647" step="1" wire:model="form.{{ $side }}_runs" class="input" placeholder="-" /></label>
+                            <span class="sr-sep" aria-hidden="true">/</span>
+                            <label class="sr-big"><span class="label">Wickets</span><input type="number" inputmode="numeric" min="0" max="{{ $match->max_wickets }}" step="1" wire:model="form.{{ $side }}_wickets" class="input" placeholder="-" /></label>
+                        </div>
+                        <div class="sr-overs-row">
+                            <label><span class="label">Complete overs</span><input type="number" inputmode="numeric" min="0" max="5" step="1" wire:model="form.{{ $side }}_overs" class="input" placeholder="-" /></label>
+                            <span class="sr-sep" aria-hidden="true">.</span>
+                            <label><span class="label">Balls in current over</span><input type="number" inputmode="numeric" min="0" max="{{ $match->balls_per_over - 1 }}" step="1" wire:model="form.{{ $side }}_balls" class="input" placeholder="-" /></label>
+                            <span class="sr-unit" aria-hidden="true">ov</span>
                         </div>
                     </fieldset>
                 @endforeach
             </div>
-            <p class="text-sm">Super Over figures are excluded.</p>
+        </section>
+
+        <section class="sr-section" aria-labelledby="sr-notes-heading">
+            <h3 id="sr-notes-heading" class="sr-section-title">Notes and exceptions</h3>
             <label><span class="label">Official explanation (required for an exceptional decision)</span><textarea wire:model="form.result_note" maxlength="2000" rows="3" class="textarea w-full"></textarea></label>
             @if(($form['result_method'] ?? null) === 'revised_target')
-                <fieldset class="rounded-lg border border-base-300 p-4 space-y-4"><legend class="px-2 font-bold">Official revised-target figures</legend>
-                    <label><span class="label">Revised target</span><input type="number" min="1" wire:model="form.revised_target" class="input w-full" /></label>
-                    <label><span class="label">Include in NRR?</span><select wire:model.live="form.nrr_inputs.included" class="select w-full"><option value="">Choose official decision</option><option value="1">Yes, use official adjusted figures below</option><option value="0">No, exclude from NRR</option></select></label>
+                <fieldset class="sr-revised">
+                    <legend>Official revised-target figures</legend>
+                    <div class="sr-grid">
+                        <label><span class="label">Revised target</span><input type="number" min="1" wire:model="form.revised_target" class="input w-full" /></label>
+                        <label><span class="label">Include in NRR?</span><select wire:model.live="form.nrr_inputs.included" class="select w-full"><option value="">Choose official decision</option><option value="1">Yes, use official adjusted figures below</option><option value="0">No, exclude from NRR</option></select></label>
+                    </div>
                     <label><span class="label">Reason for adjusted NRR figures or exclusion</span><textarea wire:model="form.nrr_inputs.reason" maxlength="1000" class="textarea w-full"></textarea></label>
                     @if(in_array($form['nrr_inputs']['included'] ?? null, [true, 1, '1'], true))
-                        @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
-                            <fieldset class="grid gap-3 sm:grid-cols-3"><legend class="font-semibold">{{ $name }}: official NRR inputs</legend>
+                        @foreach($sides as $side => $team)
+                            <fieldset class="sr-grid sr-grid-3"><legend class="sr-revised-team">{{ $team->team_name }}: official NRR inputs</legend>
                                 @foreach(['runs' => 'Runs', 'overs' => 'Complete overs', 'balls' => 'Balls in current over'] as $field => $label)<label><span class="label">{{ $label }}</span><input type="number" min="0" step="1" wire:model="form.nrr_inputs.{{ $side }}.{{ $field }}" class="input w-full" /></label>@endforeach
                             </fieldset>
                         @endforeach
                     @endif
                 </fieldset>
             @endif
-            <div class="scorer-actions flex flex-wrap gap-3">
-                <button type="submit" wire:loading.attr="disabled" class="btn btn-outline">Save draft</button>
-                <button type="button" wire:click="reviewResult" wire:loading.attr="disabled" class="btn btn-primary">Review result</button>
-                <button type="button" wire:click="reloadResult" wire:confirm="Replace unsaved changes with the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost">Reload saved details</button>
-                @if($hasDraft)<button type="button" wire:click="discardDraft" wire:confirm="Discard the saved result draft? The published result will stay unchanged." wire:loading.attr="disabled" class="btn btn-ghost">Discard draft</button>@endif
-            </div>
-        </form>
-    </section>
-    @else
-        <section class="card border border-primary bg-base-100" aria-labelledby="review-result-heading" wire:key="result-review" x-data x-init="$nextTick(() => $refs.reviewHeading.focus())"><div class="card-body space-y-3">
-            <h2 id="review-result-heading" x-ref="reviewHeading" tabindex="-1" class="text-xl font-bold">Review before publishing</h2>
-            <p class="font-semibold">{{ $review['description'] }}</p>
-            @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
-                @php($deliveries = $review['result'][$side.'_deliveries'])
-                <p>{{ $name }}: {{ $review['result'][$side.'_runs'] ?? 'Unknown' }} / {{ $review['result'][$side.'_wickets'] ?? 'Unknown' }}
-                    ({{ $deliveries === null ? '?' : intdiv($deliveries, $match->balls_per_over) }} overs, {{ $deliveries === null ? '?' : $deliveries % $match->balls_per_over }} balls)</p>
-            @endforeach
-            @if($review['result']['batting_first_id'])<p>Batting first: {{ $review['result']['batting_first_id'] === $match->team1_id ? $match->team1->team_name : $match->team2->team_name }}</p>@endif
-            @if($review['result']['result_note'])<p class="whitespace-pre-wrap break-words">{{ $review['result']['result_note'] }}</p>@endif
-            @if($review['result']['nrr_inputs'])
-                <p>Revised target: {{ $review['result']['revised_target'] }}. NRR: {{ $review['result']['nrr_inputs']['included'] ? 'Included using official figures' : 'Excluded' }}.</p>
-                <p class="break-words">{{ $review['result']['nrr_inputs']['reason'] }}</p>
-                @if($review['result']['nrr_inputs']['included'])
-                    @foreach(['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name] as $side => $name)
-                        @php($adjusted = $review['result']['nrr_inputs'][$side])
-                        <p>{{ $name }} NRR inputs: {{ $adjusted['runs'] }} runs, {{ intdiv($adjusted['deliveries'], $match->balls_per_over) }} overs, {{ $adjusted['deliveries'] % $match->balls_per_over }} balls.</p>
-                    @endforeach
-                @endif
+        </section>
+    </form>
+
+    {{-- Sticky action bar: always reachable while scrolling the form. --}}
+    <div class="sr-actionbar">
+        <div class="sr-actionbar-quiet">
+            <button type="button" wire:click="reloadResult" wire:confirm="Replace unsaved changes with the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-btn-quiet">
+                <x-scorer.icon name="refresh" /> Reload saved details
+            </button>
+            @if($hasDraft)
+                <button type="button" wire:click="discardDraft" wire:confirm="Discard the saved result draft? The published result will stay unchanged." wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-btn-quiet">
+                    <x-scorer.icon name="trash" /> Discard draft
+                </button>
             @endif
-            <p class="text-sm">Publishing updates the official team result and group standings. Any earlier published result remains official until this succeeds.</p>
-            <div class="scorer-actions">
-            <button type="button" wire:click="publishResult" wire:confirm="Publish this reviewed team result and update standings?" wire:loading.attr="disabled" class="btn btn-primary">Publish team result</button>
-            <button type="button" wire:click="returnToDraft" wire:loading.attr="disabled" class="btn btn-outline">Back to draft</button>
-            </div>
-        </div></section>
-    @endif
+        </div>
+        <p wire:loading role="status" class="sr-saving">Updating result...</p>
+        <div class="sr-actionbar-main">
+            <button type="submit" form="result-form" wire:loading.attr="disabled" class="btn btn-outline">
+                <x-scorer.icon name="save" /> Save draft
+            </button>
+            <button type="button" wire:click="reviewResult" wire:loading.attr="disabled" class="btn btn-primary">
+                <x-scorer.icon name="eye" /> Review result
+            </button>
+        </div>
+    </div>
+
+    {{-- Review popup, opened by reviewResult() through "panel". --}}
+    <dialog id="review-result-dialog" class="sd-dialog" aria-labelledby="review-result-heading" wire:ignore.self
+            x-effect="panel === 'review' ? ($el.open || $el.showModal()) : ($el.open && $el.close())"
+            x-on:close="panel = ''" x-on:click.self="$el.close()">
+        <div class="sd-dialog-panel">
+            @if($review)
+                <header class="sd-dialog-head" wire:key="result-review">
+                    <div>
+                        <h2 id="review-result-heading">Review before publishing</h2>
+                        <p>Check every figure. This is what the public will see.</p>
+                    </div>
+                    <button type="button" x-on:click="$el.closest('dialog').close()" class="sd-icon-btn" aria-label="Close">
+                        <x-scorer.icon name="x" />
+                    </button>
+                </header>
+                <div class="sd-dialog-body">
+                    @if($errors->any() && $panel === 'review')<div role="alert" class="alert alert-error sr-errors" wire:key="review-errors-{{ md5(implode('|', $errors->all())) }}"
+                        x-data x-init="$el.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
+                    <p class="sr-review-result"><x-scorer.icon :name="($review['result']['result_type'] ?? null) === 'win' ? 'trophy' : 'ball'" /> {{ $review['description'] }}</p>
+                    <dl class="sr-board">
+                        @foreach($sides as $side => $team)
+                            @php($deliveries = $review['result'][$side.'_deliveries'])
+                            @php($winner = $review['result']['winner_id'] ?? null)
+                            <div @class(['sr-board-row', 'is-winner' => $winner === $team->id, 'is-loser' => $winner !== null && $winner !== $team->id])>
+                                <dt><x-tournament.team-badge :name="$team->team_name" /><span>{{ $team->team_name }}</span></dt>
+                                <dd><strong>{{ $review['result'][$side.'_runs'] ?? 'Unknown' }} / {{ $review['result'][$side.'_wickets'] ?? 'Unknown' }}</strong>
+                                    <span>{{ $deliveries === null ? '?' : intdiv($deliveries, $match->balls_per_over) }} overs, {{ $deliveries === null ? '?' : $deliveries % $match->balls_per_over }} balls</span></dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                    <ul class="sd-lock-notes">
+                        @if($review['result']['batting_first_id'])<li>Batting first: {{ $review['result']['batting_first_id'] === $match->team1_id ? $match->team1->team_name : $match->team2->team_name }}</li>@endif
+                        @if($review['result']['result_note'])<li class="whitespace-pre-wrap break-words">{{ $review['result']['result_note'] }}</li>@endif
+                        @if($review['result']['nrr_inputs'])
+                            <li>Revised target: {{ $review['result']['revised_target'] }}. NRR: {{ $review['result']['nrr_inputs']['included'] ? 'Included using official figures' : 'Excluded' }}.</li>
+                            <li class="break-words">{{ $review['result']['nrr_inputs']['reason'] }}</li>
+                            @if($review['result']['nrr_inputs']['included'])
+                                @foreach($sides as $side => $team)
+                                    @php($adjusted = $review['result']['nrr_inputs'][$side])
+                                    <li>{{ $team->team_name }} NRR inputs: {{ $adjusted['runs'] }} runs, {{ intdiv($adjusted['deliveries'], $match->balls_per_over) }} overs, {{ $adjusted['deliveries'] % $match->balls_per_over }} balls.</li>
+                                @endforeach
+                            @endif
+                        @endif
+                    </ul>
+                    <p class="sd-warning">Publishing updates the official team result and group standings. Any earlier published result remains official until this succeeds.</p>
+                </div>
+                <footer class="sd-dialog-foot">
+                    <button type="button" wire:click="returnToDraft" wire:loading.attr="disabled" class="btn btn-ghost">
+                        <x-scorer.icon name="arrow-left" /> Back to draft
+                    </button>
+                    <button type="button" wire:click="publishResult" wire:confirm="Publish this reviewed team result and update standings?" wire:loading.attr="disabled" class="btn btn-primary">
+                        <x-scorer.icon name="send" /> Publish team result
+                    </button>
+                </footer>
+            @endif
+        </div>
+    </dialog>
 </div>
+

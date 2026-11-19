@@ -18,6 +18,9 @@ new class extends Component {
     public array $schedule = [];
     public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => ''];
     public string $notice = '';
+    // Which popup is open: '' (none), 'create' or 'edit'. UI state only; the
+    // browser can change it freely, so nothing security-relevant depends on it.
+    public string $panel = '';
 
     #[Locked]
     public ?int $selectedGroupId = null;
@@ -70,6 +73,7 @@ new class extends Component {
         $setup = app(TournamentGroupService::class)->setup($this->year());
         $this->resetErrorBag();
         $this->notice = '';
+        $this->panel = 'create';
         if ($this->groupChoice === '') {
             $this->reset('selectedGroupId', 'groupVersion', 'newStructure');
             return;
@@ -90,6 +94,7 @@ new class extends Component {
     {
         $this->resetErrorBag();
         $this->notice = '';
+        $this->panel = 'create';
         if ($this->selectedGroupId === null || $this->groupVersion === null) {
             throw ValidationException::withMessages(['group_id' => 'Choose a group before creating a match.']);
         }
@@ -98,6 +103,7 @@ new class extends Component {
         $this->reset('newStructure', 'newSchedule', 'filters', 'filterForm');
         $this->resetPage();
         $this->openMatch($match->id);
+        $this->panel = '';
         $this->notice = 'Match created. Scores remain empty until results are entered and published.';
     }
 
@@ -106,6 +112,7 @@ new class extends Component {
         $match = app(MatchSchedulingService::class)->findForScheduling($this->year(), $id);
         $this->resetErrorBag();
         $this->notice = '';
+        $this->panel = 'edit';
         $this->editingId = $match->id;
         $this->editingVersion = $match->version;
         $this->statusEditable = $match->status !== 'finished'
@@ -127,6 +134,7 @@ new class extends Component {
         if ($this->editingId === null || $this->editingVersion === null) {
             throw ValidationException::withMessages(['tournament' => 'Open a match before saving.']);
         }
+        $this->panel = 'edit';
         $input = $this->scheduleInput($this->schedule);
         if (! $this->statusEditable) {
             unset($input['status']);
@@ -136,6 +144,7 @@ new class extends Component {
         }
         $match = app(MatchSchedulingService::class)->updateSchedule($this->year(), $this->editingId, $this->editingVersion, $input);
         $this->openMatch($match->id);
+        $this->panel = '';
         $this->notice = 'Match schedule saved.';
     }
 
@@ -165,9 +174,18 @@ new class extends Component {
     public function applyFilters(): void
     {
         $this->resetErrorBag();
+        $this->panel = '';
         $filters = array_map(fn ($value) => $value === '' ? null : $value, $this->filterForm);
         app(MatchSchedulingService::class)->listing($this->year(), $filters);
         $this->filters = $filters;
+        $this->resetPage();
+    }
+
+    public function clearFilters(): void
+    {
+        $this->resetErrorBag();
+        $this->panel = '';
+        $this->reset('filterForm', 'filters');
         $this->resetPage();
     }
 
@@ -187,127 +205,196 @@ new class extends Component {
     }
 }; ?>
 
-<div class="scorer-screen space-y-5">
-    <div class="scorer-heading">
-        <h1 class="text-2xl font-bold sm:text-3xl">Scorer dashboard</h1>
-        <p class="text-sm text-base-content/70">Find a fixture, open its score sheet, or update its schedule.</p>
-        <p wire:loading role="status" class="text-sm">Loading match details...</p>
-    </div>
-    <div class="scorer-feedback" aria-live="polite">
-        @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
-        @if($errors->any())
-            <div role="alert" class="alert alert-error"><ul>
-                @foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach
-            </ul></div>
-        @endif
-    </div>
-
-    <details class="scorer-disclosure" @if($errors->any() && $selectedGroupId !== null && !$editing) open @endif>
-        <summary id="create-match-heading">Create group match</summary>
-        <div class="card-body space-y-4">
-            @if($groups->isEmpty())
-                <p class="text-center">No groups are available. Create groups and assign approved teams in <a href="{{ route('scorer.groups.index') }}" class="link">Group setup</a>.</p>
-            @else
-                <label class="form-control"><span class="label">Group</span>
-                    <select wire:model.live="groupChoice" class="select w-full"><option value="">Choose a group</option>
-                        @foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }} ({{ $group['team_count'] }} teams)</option>@endforeach
-                    </select>
-                </label>
-                @if($selectedGroupId !== null)
-                    <button type="button" wire:click="chooseGroup" wire:confirm="Reload the team list? Your team selections will be cleared." wire:loading.attr="disabled" class="btn btn-ghost btn-sm">Reload group teams</button>
-                    @if($teams->count() < 2)<p class="text-center">This group needs at least two approved teams before a match can be created.</p>@endif
-                    <form wire:submit="createMatch" class="space-y-4">
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            @foreach(['team1_id' => 'Team 1', 'team2_id' => 'Team 2'] as $key => $label)
-                                <label class="form-control"><span class="label">{{ $label }}</span><select wire:model.live="newStructure.{{ $key }}" class="select w-full"><option value="">Select a team</option>
-                                    @foreach($teams as $team)<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endforeach
-                                </select></label>
-                            @endforeach
-                            <label class="form-control"><span class="label">Balls per over</span><select wire:model="newStructure.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
-                            <label class="form-control"><span class="label">Status</span><select wire:model="newSchedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>
-                            <label class="form-control"><span class="label">Scheduled time (Asia/Colombo, optional)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" class="input w-full" /></label>
-                            <label class="form-control"><span class="label">Venue (optional)</span><input wire:model="newSchedule.venue" maxlength="255" class="input w-full" /></label>
-                            <label class="form-control"><span class="label">Match number (optional)</span><input type="number" min="1" wire:model="newSchedule.display_number" class="input w-full" /></label>
-                            <label class="form-control"><span class="label">Batting first (optional)</span><select wire:model="newSchedule.batting_first_id" class="select w-full"><option value="">Not decided</option>
-                                @foreach($teams as $team)@if(in_array((string) $team['id'], [(string) ($newStructure['team1_id'] ?? ''), (string) ($newStructure['team2_id'] ?? '')], true))<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endif @endforeach
-                            </select></label>
-                        </div>
-                        <p class="text-sm">Five overs per innings. Seven wickets. No scores are added at creation.</p>
-                        <button type="submit" wire:loading.attr="disabled" @disabled($teams->count() < 2) class="btn btn-primary w-full sm:w-auto">Create match</button>
-                    </form>
-                @endif
-            @endif
+@php
+    $activeFilters = collect($filters)->filter(fn ($value) => $value !== null && $value !== '')->count();
+@endphp
+<div class="scorer-screen sd-screen space-y-5" x-data="{ panel: $wire.entangle('panel') }">
+    <header class="scorer-heading sd-heading">
+        <div class="sd-heading-copy">
+            <h1 class="text-2xl font-bold sm:text-3xl">Scorer dashboard</h1>
+            <p class="text-sm text-base-content/70">Find a fixture, open its score sheet, or update its schedule.</p>
         </div>
-    </details>
+        <button type="button" x-on:click="panel = 'create'" class="btn btn-primary sd-create-btn" aria-haspopup="dialog" aria-controls="create-match-dialog">
+            <x-scorer.icon name="plus" /> Create group match
+        </button>
+        <p wire:loading role="status" class="sd-loading">Loading match details...</p>
+    </header>
 
-    @if($editing)
-        <section class="card border border-base-300 bg-base-100 shadow-xs" aria-labelledby="edit-schedule-heading" wire:key="schedule-editor-{{ $editing->id }}" x-data x-init="$nextTick(() => $refs.scheduleHeading.focus())">
-            <div class="card-body space-y-4">
-                <h2 id="edit-schedule-heading" x-ref="scheduleHeading" tabindex="-1" class="text-xl font-bold">Edit schedule: {{ $editing->team1->team_name }} vs {{ $editing->team2->team_name }}</h2>
-                <p class="text-sm">Teams, group and match format cannot be changed in this schedule form.</p>
-                @if(!$statusEditable)<p class="text-sm">Result status is locked in the schedule form.</p>@endif
-                @if(!$battingEditable)<p class="text-sm">Batting-first team is locked after result publication.</p>@endif
-                @if($publishedResult)
-                    <div class="rounded-lg border border-base-300 p-4 space-y-3">
-                        <p class="text-sm">Reopening removes this match from standings and player totals. Saved official figures and pending drafts remain. A dependent later-round fixture can block the change.</p>
-                        @if($editing->status === 'finished')
-                            <button type="button" wire:click="changeResultStatus('live')" wire:confirm="Reopen this match as in progress and remove its contributions from standings and player totals? Official figures and drafts are retained. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline">Reopen match</button>
-                        @else
-                            <button type="button" wire:click="changeResultStatus('finished')" wire:confirm="Restore the stored official result and its summary contributions? Pending drafts will not be published. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline">Restore official result</button>
-                        @endif
-                    </div>
-                @endif
-                <button type="button" wire:click="reloadMatch" wire:confirm="Discard unsaved schedule changes and load the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost btn-sm">Reload this match</button>
-                <form wire:submit="saveSchedule" class="space-y-4">
-                    <div class="grid gap-4 sm:grid-cols-2">
-                        @if($statusEditable)<label><span class="label">Match status</span><select wire:model="schedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>@endif
-                        @if($battingEditable)<label><span class="label">Batting first</span><select wire:model="schedule.batting_first_id" class="select w-full"><option value="">Not decided</option><option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option></select></label>@endif
-                        <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" class="input w-full" /></label>
-                        <label><span class="label">Venue</span><input wire:model="schedule.venue" maxlength="255" class="input w-full" /></label>
-                        <label><span class="label">Match number</span><input type="number" min="1" wire:model="schedule.display_number" class="input w-full" /></label>
-                    </div>
-                    <button type="submit" wire:loading.attr="disabled" class="btn btn-primary w-full sm:w-auto">Save schedule</button>
-                </form>
-            </div>
-        </section>
+    @if($panel === '')
+        @include('livewire.scorer.partials.dashboard-feedback')
     @endif
 
-    <section class="card border border-base-300 bg-base-100 shadow-xs" aria-labelledby="match-list-heading">
-        <div class="card-body space-y-4">
-            <h2 id="match-list-heading" class="text-xl font-bold">Matches</h2>
-            <details class="scorer-disclosure">
-                <summary>Filter matches</summary>
-                <div class="p-3">
-            <form wire:submit="applyFilters" class="grid gap-3 sm:grid-cols-4">
-                <label><span class="label">Group filter</span><select wire:model="filterForm.group_id" class="select w-full"><option value="">All groups</option>@foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach</select></label>
-                <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option><option value="G">Group</option><option value="QF">Quarter-final</option><option value="SF">Semi-final</option><option value="F">Final</option></select></label>
-                <label><span class="label">Status filter</span><select wire:model="filterForm.status" class="select w-full"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="live">In progress</option><option value="finished">Finished</option></select></label>
-                <button type="submit" wire:loading.attr="disabled" class="btn btn-outline self-end">Apply filters</button>
-            </form>
+    {{-- Create group match popup. wire:ignore.self keeps Livewire from dropping
+         the dialog's open state on re-render; Alpine opens and closes it from "panel". --}}
+    <dialog id="create-match-dialog" class="sd-dialog" aria-labelledby="create-match-heading" wire:ignore.self
+            x-effect="panel === 'create' ? ($el.open || $el.showModal()) : ($el.open && $el.close())"
+            x-on:close="panel = ''" x-on:click.self="$el.close()">
+        <div class="sd-dialog-panel">
+            <header class="sd-dialog-head">
+                <div>
+                    <h2 id="create-match-heading">Create group match</h2>
+                    <p>Five overs per innings. Seven wickets. No scores are added at creation.</p>
                 </div>
-            </details>
-            <p class="text-sm text-base-content/70">Matches found: {{ $matches->total() }}. Newest first.</p>
-            <div class="scorer-match-list">
-                @forelse($matches as $match)
-                    <article wire:key="match-{{ $match->id }}" class="scorer-match space-y-2">
-                        <h3 class="font-bold">{{ $match->team1->team_name }} vs {{ $match->team2->team_name }}</h3>
-                        <p class="scorer-match-meta">{{ $match->group?->name ?? $match->stage }} @if($match->display_number !== null) · Match {{ $match->display_number }}@endif</p>
-                        <p><span class="badge badge-outline">{{ ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'][$match->status] }}</span></p>
-                        <p class="text-sm">{{ $match->balls_per_over }} balls per over | {{ $match->overs_per_innings }} overs | {{ $match->max_wickets }} wickets</p>
-                        <p class="text-sm">{{ $match->scheduled_at?->setTimezone(config('tournament.timezone'))->format('d M Y, H:i') ?? 'Time not set' }} | {{ $match->venue ?? 'Venue not set' }}</p>
-                        <div class="scorer-actions">
-                            <a href="{{ route('scorer.matches.result', ['matchId' => $match->id]) }}" class="btn btn-primary btn-sm">Team result</a>
-                            <a href="{{ route('scorer.matches.players', ['matchId' => $match->id]) }}" class="btn btn-outline btn-sm">Player figures</a>
-                            <button type="button" wire:click="openMatch({{ $match->id }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit schedule</button>
-                        </div>
-                    </article>
-                @empty
-                    <p class="md:col-span-2">No matches found for these filters. Change the filters or create a group match.</p>
-                @endforelse
+                <button type="button" x-on:click="$el.closest('dialog').close()" class="sd-icon-btn" aria-label="Close">
+                    <x-scorer.icon name="x" />
+                </button>
+            </header>
+            <div class="sd-dialog-body">
+                @if($panel === 'create')
+                    @include('livewire.scorer.partials.dashboard-feedback')
+                @endif
+                @if($groups->isEmpty())
+                    <p class="sd-note">No groups are available. Create groups and assign approved teams in <a href="{{ route('scorer.groups.index') }}" class="link">Group setup</a>.</p>
+                @else
+                    <div class="sd-group-row">
+                        <label class="form-control"><span class="label">Group</span>
+                            <select wire:model.live="groupChoice" class="select w-full"><option value="">Choose a group</option>
+                                @foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }} ({{ $group['team_count'] }} teams)</option>@endforeach
+                            </select>
+                        </label>
+                        @if($selectedGroupId !== null)
+                            <button type="button" wire:click="chooseGroup" wire:confirm="Reload the team list? Your team selections will be cleared." wire:loading.attr="disabled" class="btn btn-ghost sd-btn-quiet">
+                                <x-scorer.icon name="refresh" /> Reload teams
+                            </button>
+                        @endif
+                    </div>
+                    @if($selectedGroupId === null)
+                        <p class="sd-note">Choose a group to pick its teams.</p>
+                    @else
+                        @if($teams->count() < 2)<p class="sd-note">This group needs at least two approved teams before a match can be created.</p>@endif
+                        <form id="create-match-form" wire:submit="createMatch" class="sd-form-stack">
+                            <fieldset class="sd-fieldset">
+                                <legend>Teams and format</legend>
+                                <div class="sd-form-grid">
+                                    @foreach(['team1_id' => 'Team 1', 'team2_id' => 'Team 2'] as $key => $label)
+                                        <label class="form-control"><span class="label">{{ $label }}</span><select wire:model.live="newStructure.{{ $key }}" class="select w-full"><option value="">Select a team</option>
+                                            @foreach($teams as $team)<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endforeach
+                                        </select></label>
+                                    @endforeach
+                                    <label class="form-control"><span class="label">Balls per over</span><select wire:model="newStructure.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
+                                    <label class="form-control"><span class="label">Batting first (optional)</span><select wire:model="newSchedule.batting_first_id" class="select w-full"><option value="">Not decided</option>
+                                        @foreach($teams as $team)@if(in_array((string) $team['id'], [(string) ($newStructure['team1_id'] ?? ''), (string) ($newStructure['team2_id'] ?? '')], true))<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endif @endforeach
+                                    </select></label>
+                                </div>
+                            </fieldset>
+                            <fieldset class="sd-fieldset">
+                                <legend>Schedule</legend>
+                                <div class="sd-form-grid">
+                                    <label class="form-control"><span class="label">Status</span><select wire:model="newSchedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>
+                                    <label class="form-control"><span class="label">Match number (optional)</span><input type="number" min="1" wire:model="newSchedule.display_number" class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Scheduled time (Asia/Colombo, optional)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Venue (optional)</span><input wire:model="newSchedule.venue" maxlength="255" class="input w-full" /></label>
+                                </div>
+                            </fieldset>
+                        </form>
+                    @endif
+                @endif
             </div>
-            {{ $matches->links() }}
+            <footer class="sd-dialog-foot">
+                <button type="button" x-on:click="$el.closest('dialog').close()" class="btn btn-ghost">Cancel</button>
+                @if($selectedGroupId !== null && $groups->isNotEmpty())
+                    <button type="submit" form="create-match-form" wire:loading.attr="disabled" @disabled($teams->count() < 2) class="btn btn-primary">
+                        <x-scorer.icon name="plus" /> Create match
+                    </button>
+                @endif
+            </footer>
         </div>
+    </dialog>
+
+    {{-- Edit schedule popup, opened by openMatch() through "panel". --}}
+    <dialog id="edit-schedule-dialog" class="sd-dialog" aria-labelledby="edit-schedule-heading" wire:ignore.self
+            x-effect="panel === 'edit' ? ($el.open || $el.showModal()) : ($el.open && $el.close())"
+            x-on:close="panel = ''" x-on:click.self="$el.close()">
+        <div class="sd-dialog-panel">
+            @if($editing)
+                <header class="sd-dialog-head" wire:key="schedule-editor-{{ $editing->id }}">
+                    <div>
+                        <h2 id="edit-schedule-heading">Edit schedule</h2>
+                        <p>{{ $editing->team1->team_name }} vs {{ $editing->team2->team_name }}</p>
+                    </div>
+                    <button type="button" x-on:click="$el.closest('dialog').close()" class="sd-icon-btn" aria-label="Close">
+                        <x-scorer.icon name="x" />
+                    </button>
+                </header>
+                <div class="sd-dialog-body">
+                    @if($panel === 'edit')
+                        @include('livewire.scorer.partials.dashboard-feedback')
+                    @endif
+                    <ul class="sd-lock-notes">
+                        <li>Teams, group and match format cannot be changed in this schedule form.</li>
+                        @if(!$statusEditable)<li>Result status is locked in the schedule form.</li>@endif
+                        @if(!$battingEditable)<li>Batting-first team is locked after result publication.</li>@endif
+                    </ul>
+                    @if($publishedResult)
+                        <div class="sd-warning">
+                            <p>Reopening removes this match from standings and player totals. Saved official figures and pending drafts remain. A dependent later-round fixture can block the change.</p>
+                            @if($editing->status === 'finished')
+                                <button type="button" wire:click="changeResultStatus('live')" wire:confirm="Reopen this match as in progress and remove its contributions from standings and player totals? Official figures and drafts are retained. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline btn-sm">
+                                    <x-scorer.icon name="rotate-ccw" /> Reopen match
+                                </button>
+                            @else
+                                <button type="button" wire:click="changeResultStatus('finished')" wire:confirm="Restore the stored official result and its summary contributions? Pending drafts will not be published. Unsaved schedule edits will be cleared." wire:loading.attr="disabled" class="btn btn-outline btn-sm">
+                                    <x-scorer.icon name="check" /> Restore official result
+                                </button>
+                            @endif
+                        </div>
+                    @endif
+                    <form id="edit-schedule-form" wire:submit="saveSchedule">
+                        <div class="sd-form-grid">
+                            @if($statusEditable)<label><span class="label">Match status</span><select wire:model="schedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>@endif
+                            @if($battingEditable)<label><span class="label">Batting first</span><select wire:model="schedule.batting_first_id" class="select w-full"><option value="">Not decided</option><option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option></select></label>@endif
+                            <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" class="input w-full" /></label>
+                            <label><span class="label">Venue</span><input wire:model="schedule.venue" maxlength="255" class="input w-full" /></label>
+                            <label><span class="label">Match number</span><input type="number" min="1" wire:model="schedule.display_number" class="input w-full" /></label>
+                        </div>
+                    </form>
+                </div>
+                <footer class="sd-dialog-foot">
+                    <button type="button" wire:click="reloadMatch" wire:confirm="Discard unsaved schedule changes and load the latest saved details?" wire:loading.attr="disabled" class="btn btn-ghost sd-btn-quiet sd-foot-start">
+                        <x-scorer.icon name="refresh" /> Reload this match
+                    </button>
+                    <button type="button" x-on:click="$el.closest('dialog').close()" class="btn btn-ghost">Cancel</button>
+                    <button type="submit" form="edit-schedule-form" wire:loading.attr="disabled" class="btn btn-primary">
+                        <x-scorer.icon name="check" /> Save schedule
+                    </button>
+                </footer>
+            @endif
+        </div>
+    </dialog>
+
+    <section class="sd-matches" aria-labelledby="match-list-heading">
+        <div class="sd-matches-head">
+            <h2 id="match-list-heading">Matches</h2>
+            <p class="sd-count">Matches found: {{ $matches->total() }}. Newest first.</p>
+        </div>
+
+        <form wire:submit="applyFilters" class="sd-filters" aria-label="Filter matches">
+            <label><span class="label">Group filter</span><select wire:model="filterForm.group_id" class="select w-full"><option value="">All groups</option>@foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach</select></label>
+            <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option><option value="G">Group</option><option value="QF">Quarter-final</option><option value="SF">Semi-final</option><option value="F">Final</option></select></label>
+            <label><span class="label">Status filter</span><select wire:model="filterForm.status" class="select w-full"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="live">In progress</option><option value="finished">Finished</option></select></label>
+            <div class="sd-filter-actions">
+                <button type="submit" wire:loading.attr="disabled" class="btn btn-secondary">
+                    <x-scorer.icon name="filter" /> Apply filters
+                </button>
+                @if($activeFilters > 0)
+                    <button type="button" wire:click="clearFilters" wire:loading.attr="disabled" class="btn btn-ghost sd-btn-quiet">
+                        <x-scorer.icon name="x" /> Clear
+                    </button>
+                @endif
+            </div>
+        </form>
+
+        <div class="sd-match-list">
+            @forelse($matches as $match)
+                @include('livewire.scorer.partials.dashboard-match-card', ['match' => $match])
+            @empty
+                <div class="sd-empty">
+                    <x-scorer.icon name="ball" />
+                    <p>No matches found for these filters. Change the filters or create a group match.</p>
+                </div>
+            @endforelse
+        </div>
+        {{ $matches->links() }}
     </section>
-
-
 </div>
+

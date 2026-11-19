@@ -78,8 +78,22 @@
 .tc-status { display: inline-flex; align-items: center; gap: .375rem; padding: .25rem .625rem; border-radius: 999px; font-weight: 700; background: var(--color-base-200); }
 .tc-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .tc-status-live { background: var(--color-accent); color: var(--color-primary-ink); }
-.tc-scoreboard { padding: 0 1rem; }
+.tc-scoreboard { --tc-scoreboard-gutter: 1rem; padding-inline: var(--tc-scoreboard-gutter); }
 .tc-team { display: grid; grid-template-columns: minmax(0,1fr) minmax(4.5rem,auto); align-items: center; gap: .75rem; padding: .75rem 0; }
+.tc-playoffs .tc-team-eliminated { opacity: .45; }
+.tc-playoffs .tc-team-winner .tc-team-score { position: relative; }
+.tc-playoffs .tc-team-winner .tc-team-score::after {
+  content: '';
+  position: absolute;
+  right: calc(-1 * var(--tc-scoreboard-gutter));
+  top: 50%;
+  transform: translate(50%, -50%) rotate(-45deg);
+  width: min(12px, calc(var(--tc-scoreboard-gutter) * 1.125));
+  aspect-ratio: 1;
+  background: #ff6a13;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  pointer-events: none;
+}
 .tc-team + .tc-team { border-top: 1px solid var(--tc-line); }
 .tc-team dt { display: flex; align-items: center; gap: .75rem; min-width: 0; font-weight: 700; font-size: .9375rem; line-height: 1.5; overflow-wrap: anywhere; }
 .tc-team dd { text-align: right; font-variant-numeric: tabular-nums; max-width: 9rem; }
@@ -107,7 +121,6 @@
 .tc-table th[scope=row] { font-weight: 700; overflow-wrap: anywhere; }
 .tc-small-record { display: none; }
 .tc .badge { max-width: 100%; font-size: .6875rem; line-height: 1.5; border-color: var(--tc-line); background: var(--color-base-200); }
-.tc-player-leader { background: color-mix(in srgb, var(--color-accent) 40%, transparent); }
 .tc-rounds { display: grid; gap: 2rem; }
 .tc-round-head { display: flex; justify-content: center; align-items: center; gap: .75rem; margin-bottom: 1rem; }
 .tc-round-head h3 { font-size: 1.25rem; font-weight: 800; }
@@ -150,7 +163,6 @@
 .tc-table th[scope="row"] { text-align: left; }
 .tc-table thead th { text-transform: uppercase; }
 .tc-table tbody tr:nth-child(even) { background: rgb(235 230 219 / .3); }
-.tc-table tbody tr.tc-player-leader { background: color-mix(in srgb, var(--color-accent) 40%, transparent); }
 .tc-standings :is(th, td):nth-child(8),
 .tc-runners :is(th, td):nth-child(5) { color: var(--color-primary-ink); font-weight: 800; }
 
@@ -196,3 +208,74 @@
 .tc-match-live { border-color: var(--color-primary-ink); }
 .tc-match-live .tc-status { color: var(--color-secondary); }
 .tc-masthead h1 { text-wrap: balance; }
+
+.tc-playoffs { position: relative; display: grid; gap: 1.5rem; padding-inline-start: 2rem; }
+.tc-playoff-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; color: var(--color-primary-ink); }
+.tc-playoff-mirror { display: none; }
+.tc-playoffs .tc-round-head { grid-row: 1; align-self: stretch; margin: 0; }
+.tc-playoff-round[data-stage="QF"] .tc-round-head { grid-column: 1; }
+.tc-playoff-round[data-stage="SF"] .tc-round-head { grid-column: 2; }
+.tc-playoff-round[data-stage="F"] .tc-round-head { grid-column: 3; }
+.tc-playoff-matches { display: grid; gap: 1rem; }
+.tc-playoff-slot { min-width: 0; position: relative; }
+.tc-playoff-slot .tc-match { max-width: 200px; margin-inline: auto; }
+.tc-playoff-slot .tc-team { display: flex; flex-direction: column; gap: .375rem; }
+.tc-bracket-team-details { display: flex; align-items: baseline; justify-content: space-between; gap: .25rem; width: 100%; }
+.tc-bracket-team-details .tc-team-name { min-width: 0; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
+.tc-bracket-team-details .tc-team-score { max-width: 45%; text-align: right; font-variant-numeric: tabular-nums; }
+.tc-playoff-slot .tc-score { font-size: .875rem; font-weight: 400; }
+.tc-team-logo {
+  position: relative;
+  width: min(100%, 4.5rem);
+  height: 2.75rem;
+  padding: .5rem;
+  background: #fff;
+  border: 1px solid var(--tc-line);
+  border-radius: .375rem;
+  font-size: .875rem;
+}
+.tc-team-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tc-team-logo img[hidden] { display: none; }
+/* Logo box when the shared lookup returns initials or the CSE lockup. */
+.tc-team-logo-text { display: flex; align-items: center; justify-content: center; font-weight: 800; letter-spacing: .02em; line-height: 1; color: var(--color-base-content); }
+.tc-team-logo-cse { display: inline-flex; align-items: center; gap: .2rem; font-size: .75rem; letter-spacing: -.02em; color: var(--color-primary-ink); }
+.tc-team-logo-cse i { width: 2px; height: .9em; border-radius: 1px; background: var(--color-primary); }
+/* Winner of a finished knockout: tinted full-width row, bold name and score. */
+.tc-playoffs .tc-team-winner { margin-inline: calc(-1 * var(--tc-scoreboard-gutter, 1rem)); padding-inline: var(--tc-scoreboard-gutter, 1rem); background: color-mix(in srgb, var(--color-accent) 55%, white); }
+.tc-playoffs .tc-team-winner :is(.tc-team-name, .tc-score) { font-weight: 800; }
+/* Champion: cup beside the name and a badge above the final card. */
+.tc-champion-cup { display: inline-block; width: 1.05em; height: 1.05em; margin-right: .3rem; vertical-align: -.15em; color: #b8860b; }
+.tc-playoffs .tc-team-champion { background: color-mix(in srgb, #ffc440 35%, white); }
+.tc-champion-badge { position: absolute; bottom: calc(100% + .5rem); left: 50%; transform: translateX(-50%); z-index: 1; display: flex; align-items: center; justify-content: center; gap: .375rem; width: max-content; max-width: 200px; margin: 0; padding: .3rem .75rem; border-radius: 999px; background: #ffc440; color: #17120e; font-size: .75rem; font-weight: 800; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.tc-champion-badge svg { width: 1rem; height: 1rem; flex: none; }
+
+@media (min-width: 75rem) {
+  .tc-playoffs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.5rem; padding-inline-start: 0; align-items: center; }
+  .tc-playoff-round, .tc-playoff-matches { display: contents; }
+  .tc-playoff-mirror { display: flex; }
+  .tc-playoff-mirror span { font-size: 1.25rem; font-weight: 800; border-left: 3px solid var(--color-primary); padding-left: .625rem; }
+  .tc-playoff-mirror[data-stage="SF"] { grid-column: 4; }
+  .tc-playoff-mirror[data-stage="QF"] { grid-column: 5; }
+  .tc-playoff-slot { grid-column: var(--column); grid-row: var(--row); }
+}
+
+@media (width < 75rem) {
+  .tc-playoff-scroll { max-width: 100%; overflow-x: auto; }
+  .tc-playoffs {
+    width: max-content;
+    min-width: 100%;
+    grid-template-columns: repeat(3, 200px);
+    grid-template-rows: auto repeat(8, minmax(0, 1fr));
+    justify-content: center;
+    align-items: center;
+    gap: 0 40px;
+    padding: .5rem .75rem;
+  }
+  .tc-playoff-round, .tc-playoff-matches { display: contents; }
+  .tc-playoff-slot { grid-row: var(--mobile-row); padding-block: .375rem; }
+  .tc-playoff-round[data-stage="QF"] .tc-playoff-slot { grid-column: 1; }
+  .tc-playoff-round[data-stage="SF"] .tc-playoff-slot { grid-column: 2; }
+  .tc-playoff-round[data-stage="F"] .tc-playoff-slot { grid-column: 3; }
+  .tc-playoff-slot .tc-scoreboard { --tc-scoreboard-gutter: .5rem; }
+  .tc-playoff-slot .tc-empty-slot { padding: .75rem; overflow-wrap: anywhere; }
+}

@@ -29,9 +29,13 @@ class PublicTournamentController extends Controller
         $rankingData = null;
         $filterErrors = [];
         if ($tab === 'matches') {
+            // The Matches tab is split into status tabs; with no status chosen it opens on Finished.
+            $matchFilters = array_intersect_key($request->query(), array_flip(['stage', 'status', 'group_id', 'sort', 'page']));
+            if (($matchFilters['status'] ?? '') === '') {
+                $matchFilters['status'] = 'finished';
+            }
             try {
-                $matchData = $tournament->matches($year, array_intersect_key($request->query(),
-                    array_flip(['stage', 'status', 'group_id', 'sort', 'page'])));
+                $matchData = $tournament->matches($year, $matchFilters);
             } catch (ValidationException $exception) {
                 $filterErrors = $exception->errors();
             }
@@ -39,7 +43,7 @@ class PublicTournamentController extends Controller
 
         if ($tab === 'stats') {
             try {
-                $rankingData = $tournament->rankings($year, array_intersect_key($request->query(), array_flip(['category', 'gender'])));
+                $rankingData = $tournament->rankings($year, array_intersect_key($request->query(), ['category' => true]));
             } catch (ValidationException $exception) {
                 $filterErrors = $exception->errors();
             }

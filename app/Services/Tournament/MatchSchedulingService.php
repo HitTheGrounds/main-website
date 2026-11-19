@@ -69,7 +69,9 @@ class MatchSchedulingService
             ->select(['id', 'tournament_year', 'group_id', 'stage', 'bracket_position', 'team1_id', 'team2_id',
                 'balls_per_over', 'overs_per_innings', 'max_wickets', 'status', 'scheduled_at', 'venue',
                 'display_number', 'batting_first_id', 'version', 'structure_locked_at', 'result_published_at',
-                'player_stats_published_at', 'result_type', 'winner_id'])
+                'player_stats_published_at', 'result_type', 'result_method', 'winner_id',
+                // Official innings only (never draft_result), shown on finished cards once published.
+                'team1_runs', 'team1_wickets', 'team1_deliveries', 'team2_runs', 'team2_wickets', 'team2_deliveries'])
             ->with(['team1:id,team_name', 'team2:id,team_name', 'group:id,name']);
     }
 

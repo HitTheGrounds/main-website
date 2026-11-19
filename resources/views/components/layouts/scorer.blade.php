@@ -2,6 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head', ['title' => 'Scorer portal'])
+        {{-- Livewire's base styles (hide wire:loading until a request runs). The
+             layout loads @livewireScripts by hand, which turns off auto-injection. --}}
+        @livewireStyles
     </head>
     <body class="scorer-workspace min-h-screen bg-base-100 text-base-content">
         <a href="#scorer-main" class="scorer-skip">Skip to scorer tools</a>
@@ -36,6 +39,31 @@
         <main id="scorer-main" tabindex="-1" class="scorer-main">
             {{ $slot }}
         </main>
+        @if (session('scorer_toast'))
+            {{-- One-off success toast after a redirect (for example, a published result). --}}
+            <div class="scorer-toast" role="status" aria-live="polite"
+                 x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 7000)" x-transition.opacity.duration.300ms>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>
+                <p>{{ session('scorer_toast') }}</p>
+                <button type="button" x-on:click="show = false" aria-label="Dismiss">&times;</button>
+            </div>
+        @endif
         @livewireScripts
+        <script>
+            // Scorer pages: after any Livewire update, bring a new error message into
+            // view if it rendered off screen (for example, above a long form).
+            document.addEventListener('livewire:init', () => {
+                Livewire.hook('commit', ({ succeed }) => {
+                    succeed(() => requestAnimationFrame(() => {
+                        const openDialog = document.querySelector('dialog[open]');
+                        const alert = (openDialog ?? document).querySelector('[role="alert"].alert-error');
+                        if (!alert) return;
+                        const box = alert.getBoundingClientRect();
+                        if (box.top >= 0 && box.bottom <= window.innerHeight) return;
+                        alert.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+                    }));
+                });
+            });
+        </script>
     </body>
 </html>

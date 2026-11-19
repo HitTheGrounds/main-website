@@ -41,7 +41,7 @@ class TournamentGroupManagementTest extends TestCase
             ->assertSee('No groups have been created')
             ->set('newGroupName', 'Group A')->call('createGroup')->assertHasNoErrors()
             ->assertSet('newGroupName', '')->assertSet('editingVersion', 1)
-            ->assertSee('Group created.');
+            ->assertSee('Group created.')->assertSet('panel', 'manage');
         $group = TournamentGroup::firstOrFail();
         $component->assertSet('editingGroupId', $group->id)
             ->set('selectedTeamId', (string) $team->id)->call('assignTeam')
@@ -51,7 +51,7 @@ class TournamentGroupManagementTest extends TestCase
             ->set('groupName', 'Corrected name')->call('renameGroup')->assertHasNoErrors()
             ->assertSet('editingVersion', 4)->assertSee('Group name saved.')
             ->call('deleteGroup')->assertHasNoErrors()->assertSet('editingGroupId', null)
-            ->assertSee('Empty group deleted.');
+            ->assertSet('panel', '')->assertSee('Empty group deleted.');
         $this->assertDatabaseCount('tournament_groups', 0);
         $this->assertDatabaseCount('group_teams', 0);
         $this->assertSame($before, $team->fresh()->getAttributes());

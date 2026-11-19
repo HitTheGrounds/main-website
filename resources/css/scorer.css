@@ -526,6 +526,14 @@
 .ko-step { display: inline-grid; place-items: center; width: 1.375rem; height: 1.375rem; border-radius: 50%; background: var(--color-base-200); font-size: .75rem; font-weight: 800; }
 .ko-tabs .is-active .ko-step { background: var(--color-primary); color: var(--color-primary-content); }
 [x-cloak] { display: none !important; }
+
+/* Success toast after a redirect. */
+.scorer-toast { position: fixed; z-index: 30; left: 1rem; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); display: flex; align-items: flex-start; gap: .625rem; max-width: 34rem; margin-inline: auto; padding: .875rem 1rem; border-radius: .875rem; background: var(--color-secondary); color: var(--color-secondary-content); box-shadow: 0 6px 8px rgb(31 27 22 / .2); font-size: .875rem; line-height: 1.45; }
+.scorer-toast svg { width: 1.25rem; height: 1.25rem; flex: none; margin-top: .05rem; color: var(--color-primary); }
+.scorer-toast p { flex: 1; }
+.scorer-toast button { flex: none; width: 1.75rem; height: 1.75rem; margin: -.25rem -.375rem 0 0; border-radius: .5rem; font-size: 1.25rem; line-height: 1; }
+.scorer-toast button:hover { background: rgb(255 255 255 / .12); }
+@media (min-width: 1024px) { .scorer-toast { left: calc(14rem + 1rem); } }
 .sst-table tbody tr { border-bottom: 1px solid var(--scorer-line); }
 .sst-table tbody tr:last-child { border-bottom: 0; }
 .sst-table tbody tr:nth-child(even) { background: rgb(235 230 219 / .3); }

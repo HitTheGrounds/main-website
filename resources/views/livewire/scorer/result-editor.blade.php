@@ -86,8 +86,9 @@ new class extends Component {
             throw ValidationException::withMessages(['tournament' => 'Review the current result before publishing.']);
         }
         app(MatchResultService::class)->publish($this->year(), $this->matchId, $this->review['version'], $this->review['draft_hash']);
-        $this->loadSaved();
-        $this->notice = 'Team result published and group standings updated. Open Player figures, then review and publish player updates to update public Stats.';
+        // Back to the match list with a toast (rendered by the scorer layout).
+        session()->flash('scorer_toast', 'Team result published and group standings updated. Open Player figures, then review and publish player updates to update public Stats.');
+        $this->redirectRoute('scorer.dashboard');
     }
 
     public function discardDraft(): void
@@ -323,7 +324,8 @@ new class extends Component {
                     </button>
                 </header>
                 <div class="sd-dialog-body">
-                    @if($errors->any() && $panel === 'review')<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
+                    @if($errors->any() && $panel === 'review')<div role="alert" class="alert alert-error sr-errors" wire:key="review-errors-{{ md5(implode('|', $errors->all())) }}"
+                        x-data x-init="$el.scrollIntoView({ block: 'nearest', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
                     <p class="sr-review-result"><x-scorer.icon :name="($review['result']['result_type'] ?? null) === 'win' ? 'trophy' : 'ball'" /> {{ $review['description'] }}</p>
                     <dl class="sr-board">
                         @foreach($sides as $side => $team)

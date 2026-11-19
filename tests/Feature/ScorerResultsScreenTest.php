@@ -79,8 +79,8 @@ class ScorerResultsScreenTest extends TestCase
             ->set('form', $this->input($match))->call('reviewResult')->assertHasNoErrors()->assertSee('Review before publishing')
             ->assertSet('panel', 'review')->call('returnToDraft')->assertSet('panel', '')->assertSet('review', null)
             ->call('reviewResult')->assertSet('panel', 'review')
-            ->call('publishResult')->assertHasNoErrors()->assertSet('hasDraft', false)->assertSet('review', null)->assertSet('panel', '')
-            ->assertSee('Team result published');
+            ->call('publishResult')->assertHasNoErrors()->assertHasNoErrors()->assertRedirect(route('scorer.dashboard'));
+        $this->assertStringContainsString('Team result published', session('scorer_toast'));
         $this->assertSame('finished', $match->fresh()->status);
         $this->assertSame(2, GroupTeam::where('team_id', $match->team1_id)->firstOrFail()->points);
         $this->assertDatabaseCount('player_match_stats', 0);
@@ -140,7 +140,10 @@ class ScorerResultsScreenTest extends TestCase
             ->assertSet('official.team1_runs', 100)->assertSee('Batting order and match format are locked');
         $component->set('form', array_replace($this->input($match), ['team1_runs' => 103]))
             ->call('saveDraft')->assertHasNoErrors()->assertSet('official.team1_runs', 100)
-            ->call('reviewResult')->call('publishResult')->assertHasNoErrors()->assertSet('official.team1_runs', 103);
+            ->call('reviewResult')->call('publishResult')->assertHasNoErrors()->assertRedirect(route('scorer.dashboard'));
+        $this->assertSame(103, $match->fresh()->team1_runs);
+        // Publishing now leaves the page; reload the editor as the scorer would.
+        $component = Volt::test('scorer.result-editor', ['matchId' => $match->id])->assertSet('official.team1_runs', 103);
         $component->set('form.batting_first_id', $match->team2_id)->call('saveDraft')->assertHasErrors('batting_first_id');
     }
 

@@ -7,7 +7,6 @@ use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use App\Support\TeamLogo;
-use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -43,6 +42,7 @@ class PublicTournamentService
         private MatchResultDescription $descriptions,
         private GroupFixtureCoverage $coverage,
         private KnockoutEligibility $eligibility,
+        private StandingsRanker $ranker,
     ) {}
 
     public function matches(int $year, array $filters = []): array
@@ -56,12 +56,14 @@ class PublicTournamentService
             'stage' => ['nullable', 'string', Rule::in(['G', 'QF', 'SF', 'F'])],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
-            'sort' => ['nullable', 'string', Rule::in(['schedule', 'newest'])],
+            'sort' => ['nullable', 'string', Rule::in(['recent', 'schedule', 'newest'])],
             'page' => ['nullable', 'integer', 'between:1,10000'],
         ])->validate();
         $filters = ['stage' => $filters['stage'] ?? null, 'status' => $filters['status'] ?? null,
             'group_id' => isset($filters['group_id']) ? (int) $filters['group_id'] : null,
-            'sort' => $filters['sort'] ?? 'schedule', 'page' => (int) ($filters['page'] ?? 1)];
+            // Preserve old schedule-sort links while applying the current recency rule.
+            'sort' => ($filters['sort'] ?? 'recent') === 'schedule' ? 'recent' : ($filters['sort'] ?? 'recent'),
+            'page' => (int) ($filters['page'] ?? 1)];
 
         return $this->snapshots->run(function () use ($year, $filters) {
             $groups = $this->groups($year);
@@ -73,8 +75,15 @@ class PublicTournamentService
             }
             $total = (clone $query)->count();
             $latestResult = (clone $query)->where('status', 'finished')->max('result_published_at');
-            if ($filters['sort'] === 'schedule') {
-                $query->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')->orderBy('scheduled_at')->orderBy('id');
+            if ($filters['sort'] === 'recent') {
+                // A schedule edit must not bump a finished result above a more
+                // recently published match. CASE works on both supported databases.
+                $recent = "CASE WHEN status = 'finished' THEN
+                    CASE WHEN player_stats_published_at IS NULL OR result_published_at >= player_stats_published_at
+                        THEN result_published_at ELSE player_stats_published_at END
+                    ELSE updated_at END";
+                $query->orderByRaw('CASE WHEN ('.$recent.') IS NULL THEN 1 ELSE 0 END')
+                    ->orderByRaw('('.$recent.') DESC')->orderByDesc('id');
             } else {
                 $query->orderByDesc('id');
             }
@@ -295,23 +304,7 @@ class PublicTournamentService
 
     private function rank(array $entries): array
     {
-        $compare = function ($a, $b): int {
-            if ($a['points'] !== $b['points']) {
-                return $b['points'] <=> $a['points'];
-            }
-            if ($a['nrr'] === null || $b['nrr'] === null) {
-                return ($a['nrr'] === null ? 1 : 0) <=> ($b['nrr'] === null ? 1 : 0);
-            }
-
-            return BigDecimal::of($b['nrr'])->compareTo(BigDecimal::of($a['nrr']));
-        };
-        usort($entries, fn ($a, $b) => $compare($a, $b) ?: $a['id'] <=> $b['id']);
-        foreach ($entries as $index => &$entry) {
-            $entry['rank'] = $index > 0 && $compare($entries[$index - 1], $entry) === 0 ? $entries[$index - 1]['rank'] : $index + 1;
-        }
-        unset($entry);
-
-        return $entries;
+        return $this->ranker->rank($entries);
     }
 
     private function validateYear(int $year): void

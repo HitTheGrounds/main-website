@@ -23,6 +23,7 @@ class PlayerPublicationService
         private PlayerStatsValidator $validator,
         private PlayerTotalsService $totals,
         private MatchTransitionGuard $transitions,
+        private PlayerMatchConsistency $consistency,
     ) {}
 
     public function review(int $year, int $matchId): array
@@ -154,7 +155,9 @@ class PlayerPublicationService
                 'player_name' => ['required', 'string', 'max:255'], 'player_gender' => ['required', Rule::in(['Male', 'Female', 'Other'])],
                 'pending_action' => ['required', Rule::in(['replace', 'withdraw'])],
             ])->validate();
-            $this->validator->validate($draft->only([...PlayerStatsValidator::METRICS, 'batting_status']));
+            if ($draft->pending_action !== 'withdraw') {
+                $this->validator->validate($draft->only([...PlayerStatsValidator::METRICS, 'batting_status']));
+            }
             if ($official && ($official->team_id !== $draft->team_id || $official->player_name !== $draft->player_name || $official->player_gender !== $draft->player_gender)) {
                 $this->reject('A correction must preserve the published player identity. Reload and resolve the historical record.');
             }
@@ -173,6 +176,15 @@ class PlayerPublicationService
             $changes[] = ['draft' => $draft->only($fields), 'published' => $official?->only($fields),
                 'missing_metrics' => array_values(array_filter(PlayerStatsValidator::METRICS, fn ($field) => $draft->$field === null))];
         }
+        $effective = $rows->where('record_state', 'published')->keyBy('team_member_id');
+        foreach ($drafts as $draft) {
+            if ($draft->pending_action === 'withdraw') {
+                $effective->forget($draft->team_member_id);
+            } else {
+                $effective->put($draft->team_member_id, $draft);
+            }
+        }
+        $this->consistency->assertConsistent($match, $effective);
         $review = ['match_id' => $match->id, 'version' => $match->version, 'player_stats_revision' => $match->player_stats_revision, 'changes' => $changes];
         $review['receipt'] = hash('sha256', json_encode($review, JSON_THROW_ON_ERROR));
 

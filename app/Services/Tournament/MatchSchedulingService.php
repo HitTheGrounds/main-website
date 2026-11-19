@@ -72,7 +72,97 @@ class MatchSchedulingService
                 'player_stats_published_at', 'result_type', 'result_method', 'winner_id',
                 // Official innings only (never draft_result), shown on finished cards once published.
                 'team1_runs', 'team1_wickets', 'team1_deliveries', 'team2_runs', 'team2_wickets', 'team2_deliveries'])
+            ->selectRaw('CASE WHEN draft_result IS NOT NULL OR nrr_inputs IS NOT NULL OR result_note IS NOT NULL OR revised_target IS NOT NULL THEN 1 ELSE 0 END AS has_saved_result_data')
+            ->withExists('playerMatchStats')
             ->with(['team1:id,team_name', 'team2:id,team_name', 'group:id,name']);
+    }
+
+    /** No saved score sheet or published history may be silently reassigned/deleted. */
+    public function canEditFixture(TournamentMatch $match): bool
+    {
+        if ($match->status !== 'upcoming' || $match->structure_locked_at !== null
+            || $match->result_published_at !== null || $match->player_stats_published_at !== null) {
+            return false;
+        }
+        foreach (['result_type', 'result_method', 'winner_id', 'team1_runs', 'team1_wickets', 'team1_deliveries',
+            'team2_runs', 'team2_wickets', 'team2_deliveries'] as $field) {
+            if ($match->$field !== null) {
+                return false;
+            }
+        }
+        $saved = $match->getAttributes()['has_saved_result_data'] ?? ($match->draft_result !== null
+            || $match->nrr_inputs !== null || $match->result_note !== null || $match->revised_target !== null);
+        $players = $match->getAttributes()['player_match_stats_exists'] ?? $match->playerMatchStats()->exists();
+
+        return ! $saved && ! $players;
+    }
+
+    public function updateFixture(int $year, int $matchId, int $version, int $groupVersion, array $structure, array $schedule, ?string $knockoutRevision = null): TournamentMatch
+    {
+        return $this->mutate($year, function (User $actor) use ($year, $matchId, $version, $groupVersion, $structure, $schedule, $knockoutRevision) {
+            $groups = TournamentGroup::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
+            $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
+            $match = $this->unusedFixture($matches, $matchId, $version);
+            $oldGroupId = $match->group_id;
+            $data = $this->structure->validate($year, $structure, $match->id);
+            if ($data['stage'] === 'G') {
+                if ($groups->firstWhere('id', $data['group_id'])?->version !== $groupVersion) {
+                    $this->reject('tournament', 'The selected group changed. Reload the fixture before saving.');
+                }
+            } elseif ($knockoutRevision === null || ! hash_equals($this->knockoutSnapshot($year, $data['stage'])['revision'], $knockoutRevision)) {
+                $this->reject('tournament', 'Knockout selection changed. Reload the fixture before saving.');
+            }
+            Team::whereIn('id', [$match->team1_id, $match->team2_id, $data['team1_id'], $data['team2_id']])
+                ->orderBy('id')->lockForUpdate()->get();
+            // Recheck approval/membership after waiting for registration-side locks.
+            $data = $this->structure->validate($year, $structure, $match->id);
+            $details = $this->schedule($schedule, [$data['team1_id'], $data['team2_id']]);
+            foreach ($data + $details as $field => $value) {
+                $match->$field = $value;
+            }
+            if ($match->batting_first_id !== null && ! in_array($match->batting_first_id, [$match->team1_id, $match->team2_id], true)) {
+                $this->reject('batting_first_id', 'Choose a batting-first team from the updated participants.');
+            }
+            $match->version++;
+            $match->updated_by = $actor->id;
+            $match->save();
+            foreach ($groups->whereIn('id', array_unique(array_filter([$oldGroupId, $data['group_id']]))) as $group) {
+                $group->version++;
+                $group->save();
+            }
+
+            return $match->refresh();
+        });
+    }
+
+    public function deleteFixture(int $year, int $matchId, int $version): void
+    {
+        $this->mutate($year, function () use ($year, $matchId, $version) {
+            $groups = TournamentGroup::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
+            $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->lockForUpdate()->get();
+            $match = $this->unusedFixture($matches, $matchId, $version);
+            $group = $groups->firstWhere('id', $match->group_id);
+            $match->delete();
+            if ($group) {
+                $group->version++;
+                $group->save();
+            }
+
+            return $match;
+        });
+    }
+
+    private function unusedFixture($matches, int $matchId, int $version): TournamentMatch
+    {
+        $match = $matches->firstWhere('id', $matchId);
+        if (! $match || $match->version !== $version) {
+            $this->reject('tournament', 'This match changed. Reload it before editing or deleting.');
+        }
+        if (! $this->canEditFixture($match)) {
+            $this->reject('tournament', 'Only upcoming fixtures without saved result or player figures can be changed or deleted. Discard drafts first; published history is protected.');
+        }
+
+        return $match;
     }
 
     public function create(int $year, int $groupVersion, array $structure, array $schedule = [], ?string $knockoutRevision = null): TournamentMatch

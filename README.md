@@ -20,6 +20,17 @@
 
 </div>
 
+### Access development from another device
+
+Set `VITE_DEV_HOST` in `.env` to your computer's LAN IPv4 address (use
+`ipconfig` on Windows), then run `composer run dev`. On another device on the
+same network, open `http://<your-LAN-IP>:8000`.
+
+The development servers listen on ports 8000 (Laravel) and 5173 (Vite).
+Allow those ports through your firewall for your trusted local network if
+needed. Update `VITE_DEV_HOST` and restart development if your IP changes.
+Some shared Wi-Fi networks block connections between devices.
+
 ---
 
 ## ✨ About

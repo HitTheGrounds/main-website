@@ -236,6 +236,7 @@ new class extends Component {
                         @endforeach
                         @if($match['published'] && $match['status'] === 'finished' && $match['winner_id'])<p class="font-bold">{{ $stage === 'F' ? 'Champion' : 'Winner' }}: {{ $match['winner_id'] === $position['team1']['id'] ? $position['team1']['name'] : $position['team2']['name'] }}</p>@endif
                         <div class="flex flex-wrap gap-2">
+                            <a href="{{ route('scorer.dashboard', ['edit' => $match['id']]) }}" class="btn btn-outline btn-sm">Edit match</a>
                             <a href="{{ route('scorer.matches.result', ['matchId' => $match['id']]) }}" class="btn btn-primary btn-sm">Enter / review result</a>
                             <a href="{{ route('scorer.matches.players', ['matchId' => $match['id']]) }}" class="btn btn-outline btn-sm">Player figures</a>
                             <a href="{{ route('scorer.dashboard') }}" class="btn btn-ghost btn-sm">Schedule / status on dashboard</a>

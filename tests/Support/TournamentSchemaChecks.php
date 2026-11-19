@@ -22,7 +22,7 @@ trait TournamentSchemaChecks
     {
         // This class uses RefreshDatabase on a guarded synthetic target only.
         // Remove just the new schema to recreate an installation awaiting this feature.
-        $paths = array_merge(glob(database_path('migrations/2026_11_01_*.php')), glob(database_path('migrations/2026_11_14_*.php')));
+        $paths = glob(database_path('migrations/2026_11_*.php'));
         sort($paths);
         foreach (array_reverse($paths) as $path) {
             (require $path)->down();

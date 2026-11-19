@@ -118,7 +118,7 @@ new class extends Component {
                     <tbody>@forelse($group['teams'] as $team)
                         @php($adjustment = $team['points'] - $team['base_points'])
                         <tr wire:key="standing-team-{{ $group['id'] }}-{{ $team['id'] }}">
-                            <td class="sst-rank">{{ $loop->iteration }}</td>
+                            <td class="sst-rank">{{ $team['rank'] }}</td>
                             <th scope="row">
                                 <span class="tc-table-team">
                                     <x-tournament.team-badge :name="$team['name']" />

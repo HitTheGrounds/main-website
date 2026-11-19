@@ -59,6 +59,10 @@ try {
         $service->create(2026, $args['version'], $args['structure']);
     } elseif ($argv[2] === 'update') {
         $service->updateSchedule(2026, $args['match'], $args['version'], ['venue' => 'Worker venue']);
+    } elseif ($argv[2] === 'editFixture') {
+        $service->updateFixture(2026, $args['match'], $args['version'], $args['groupVersion'], $args['structure'], []);
+    } elseif ($argv[2] === 'deleteFixture') {
+        $service->deleteFixture(2026, $args['match'], $args['version']);
     } else {
         $groups = app(\App\Services\Tournament\TournamentGroupService::class);
         if ($argv[2] === 'assign') {
@@ -122,6 +126,53 @@ PHP;
         $this->assertSame('REJECTED:team2_id', $result);
         $this->assertDatabaseCount('matches', 1);
         $this->assertDatabaseHas('matches', ['team1_id' => $teams[0]->id, 'team2_id' => $teams[1]->id, 'team1_runs' => null]);
+    }
+
+    public function test_waiting_fixture_edit_and_delete_cannot_override_a_committed_update(): void
+    {
+        $this->scorer();
+        [$group, , $input] = $this->fixture();
+        $match = app(MatchSchedulingService::class)->create(2026, $group->version, $input);
+        $actor = $this->scorer(false);
+        $result = $this->compete($actor, 'editFixture', ['match' => $match->id, 'version' => 1,
+            'groupVersion' => $group->version, 'structure' => array_replace($input, ['balls_per_over' => 6])],
+            fn () => app(MatchSchedulingService::class)->updateSchedule(2026, $match->id, 1, ['venue' => 'First venue']));
+        $this->assertSame('REJECTED:tournament', $result);
+        $result = $this->compete($actor, 'deleteFixture', ['match' => $match->id, 'version' => 2],
+            fn () => app(MatchSchedulingService::class)->updateSchedule(2026, $match->id, 2, ['status' => 'live']));
+        $this->assertSame('REJECTED:tournament', $result);
+        $this->assertSame('live', $match->fresh()->status);
+        $this->assertSame(4, $match->fresh()->balls_per_over);
+    }
+
+    public function test_waiting_deletion_rechecks_player_drafts_even_without_a_match_version_change(): void
+    {
+        $this->scorer();
+        [$group, $teams, $input] = $this->fixture();
+        $match = app(MatchSchedulingService::class)->create(2026, $group->version, $input);
+        $member = \App\Models\TeamMember::factory()->create(['team_id' => $teams[0]->id]);
+        $result = $this->compete($this->scorer(false), 'deleteFixture', ['match' => $match->id, 'version' => 1],
+            fn () => app(\App\Services\Tournament\PlayerStatsService::class)->saveDraft(2026, $match->id,
+                $teams[0]->id, $member->id, ['draft' => null, 'published' => null], ['runs_scored' => 0]));
+        $this->assertSame('REJECTED:tournament', $result);
+        $this->assertSame(1, $match->fresh()->version);
+        $this->assertDatabaseCount('player_match_stats', 1);
+    }
+
+    public function test_revoked_scorer_cannot_finish_waiting_fixture_edit_or_delete(): void
+    {
+        foreach (['editFixture', 'deleteFixture'] as $action) {
+            $actor = $this->scorer();
+            if (! isset($match)) {
+                [$group, , $input] = $this->fixture();
+                $match = app(MatchSchedulingService::class)->create(2026, $group->version, $input);
+            }
+            $result = $this->compete($actor, $action, ['match' => $match->id, 'version' => 1,
+                'groupVersion' => $group->version, 'structure' => $input],
+                fn () => DB::table('users')->where('id', $actor->id)->update(['is_scorer' => false]));
+            $this->assertSame('DENIED:403', $result);
+            $this->assertNotNull($match->fresh());
+        }
     }
 
     public function test_waiting_schedule_edit_rechecks_match_version(): void

@@ -23,7 +23,8 @@ class PlayerStatsValidationTest extends TestCase
         $this->assertSame(12, $bowling['dot_balls']);
         $this->assertSame(0, $validator->validate(['runs_scored' => 0, 'fours' => 0, 'sixes' => 0])['runs_scored']);
         $this->assertSame(10, $validator->validate(['runs_scored' => 10, 'fours' => 1, 'sixes' => 1])['runs_scored']);
-        $this->assertSame(1, $validator->validate(['runs_scored' => 1, 'fours' => 2])['runs_scored']);
+        $this->assertSame(8, $validator->validate(['runs_scored' => 8, 'fours' => 2])['runs_scored']);
+        $this->assertNull($validator->validate(['runs_scored' => 8, 'fours' => 2])['sixes']);
         $this->assertSame(2147483647, $validator->validate(['runs_conceded' => '2147483647'])['runs_conceded']);
     }
 
@@ -38,6 +39,12 @@ class PlayerStatsValidationTest extends TestCase
             [['runs_scored' => '01'], 'runs_scored'], [['runs_scored' => 2147483648], 'runs_scored'],
             [['wickets_taken' => 8], 'wickets_taken'], [['dot_balls' => 4, 'bowling_balls' => 3], 'dot_balls'],
             [['runs_scored' => 9, 'fours' => 1, 'sixes' => 1], 'runs_scored'],
+            [['runs_scored' => 1, 'fours' => 2], 'runs_scored'],
+            [['runs_scored' => 5, 'sixes' => 1], 'runs_scored'],
+            [['batting_status' => 'did_not_bat', 'runs_scored' => 1], 'runs_scored'],
+            [['batting_status' => 'did_not_bat', 'balls_faced' => 1], 'balls_faced'],
+            [['batting_status' => 'did_not_bat', 'fours' => 1], 'fours'],
+            [['batting_status' => 'did_not_bat', 'sixes' => 1], 'sixes'],
             [['batting_status' => '<script>out</script>'], 'batting_status'],
             [['record_state' => 'published'], 'player'], [['player_gender' => 'Male'], 'player'],
             [['team_member_id' => 2], 'player'], [['published_by' => 1], 'player'],

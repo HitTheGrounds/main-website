@@ -23,7 +23,7 @@ class TournamentMutationSecurityTest extends TestCase
                 ['createGroup', []], ['renameGroup', []], ['assignTeam', []], ['removeTeam', [1]], ['deleteGroup', []],
             ]],
             'schedule' => ['/scorer/dashboard', 'scorer.matches-manager', [
-                ['createMatch', []], ['saveSchedule', []], ['changeResultStatus', ['live']],
+                ['createMatch', []], ['saveSchedule', []], ['deleteFixture', []], ['changeResultStatus', ['live']],
             ]],
             'results' => ['/scorer/matches/1/result', 'scorer.result-editor', [
                 ['saveDraft', []], ['reviewResult', []], ['publishResult', []], ['discardDraft', []],

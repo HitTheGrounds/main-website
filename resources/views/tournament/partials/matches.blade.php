@@ -14,7 +14,7 @@
         // Status is chosen with the tabs, so only stage, group and order count as filters here.
         $hasFilters = $filters['stage'] !== null || $filters['group_id'] !== null;
         $keptFilters = array_filter(['stage' => $filters['stage'], 'group_id' => $filters['group_id'],
-            'sort' => $filters['sort'] !== 'schedule' ? $filters['sort'] : null], fn ($value) => $value !== null);
+            'sort' => $filters['sort'] !== 'recent' ? $filters['sort'] : null], fn ($value) => $value !== null);
         $emptyStatus = ['finished' => 'No finished matches have published results yet.',
             'upcoming' => 'No upcoming matches are scheduled right now.', 'live' => 'No matches are in progress right now.'];
     @endphp
@@ -28,7 +28,7 @@
         @endforeach
     </nav>
 
-    <details class="tc-filter tc-filter-matches" @if ($hasFilters || $filters['sort'] !== 'schedule') open @endif>
+    <details class="tc-filter tc-filter-matches" @if ($hasFilters || $filters['sort'] !== 'recent') open @endif>
         <summary>
             <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
             Filter matches
@@ -58,7 +58,7 @@
             <div>
                 <label for="match-sort" class="mb-2 block font-semibold">Order</label>
                 <select id="match-sort" name="sort" class="select w-full">
-                    <option value="schedule" @selected($filters['sort'] === 'schedule')>Schedule</option>
+                    <option value="recent" @selected($filters['sort'] === 'recent')>{{ $currentStatus === 'finished' ? 'Latest published first' : 'Latest updated first' }}</option>
                     <option value="newest" @selected($filters['sort'] === 'newest')>Newest added</option>
                 </select>
             </div>

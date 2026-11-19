@@ -25,6 +25,8 @@
         <env name="TURNSTILE_SECRET_KEY" value="test-secret-key"/>
         <env name="REGISTRATION_ENABLED" value="true"/>
         <env name="TEAM_REGISTRATION_ENABLED" value="true"/>
+        <env name="TOURNAMENT_ENABLED" value="false" force="true"/>
+        <server name="TOURNAMENT_ENABLED" value="false"/>
         <env name="CACHE_STORE" value="array"/>
         <!-- Database credentials and server identity come only from the disposable runner. -->
         <env name="MAIL_MAILER" value="array"/>

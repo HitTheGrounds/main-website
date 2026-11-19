@@ -18,6 +18,7 @@ class ScorerStandingsService
         private TournamentWriteService $writes,
         private GroupStandingsCalculator $calculator,
         private GroupFixtureCoverage $coverage,
+        private StandingsRanker $ranker,
     ) {}
 
     public function listing(int $year): array
@@ -34,11 +35,11 @@ class ScorerStandingsService
             ->get()->map(fn ($group) => [
                 'id' => $group->id, 'name' => $group->name, 'version' => $group->version,
                 'coverage' => $this->coverage->calculate($group, $group->assignments, $group->matches),
-                'teams' => $group->assignments->map(fn ($row) => [
+                'teams' => $this->ranker->rank($group->assignments->map(fn ($row) => [
                     'id' => $row->team_id, 'name' => $row->team->team_name,
                     ...$row->only(['played', 'wins', 'losses', 'ties', 'no_results', 'base_points', 'points', 'nrr']),
                     'adjustments' => $row->point_adjustments ?? [],
-                ])->all(),
+                ])->all()),
             ])->all();
     }
 

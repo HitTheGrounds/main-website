@@ -9,13 +9,12 @@ use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use App\Models\User;
 use App\Support\ScorerWriteThrottle;
-use Brick\Math\BigDecimal;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class QualificationService
 {
-    public function __construct(private TournamentWriteService $writes, private GroupFixtureCoverage $coverage) {}
+    public function __construct(private TournamentWriteService $writes, private GroupFixtureCoverage $coverage, private StandingsRanker $ranker) {}
 
     /** Private guidance and an optimistic revision, not an approval stage. */
     public function selection(int $year): array
@@ -131,23 +130,7 @@ class QualificationService
 
     private function rank(array $entries): array
     {
-        $compare = function (array $a, array $b): int {
-            if ($a['points'] !== $b['points']) {
-                return $b['points'] <=> $a['points'];
-            }
-            if ($a['nrr'] === null || $b['nrr'] === null) {
-                return ($a['nrr'] === null ? 1 : 0) <=> ($b['nrr'] === null ? 1 : 0);
-            }
-
-            return BigDecimal::of($b['nrr'])->compareTo(BigDecimal::of($a['nrr']));
-        };
-        usort($entries, fn ($a, $b) => $compare($a, $b) ?: $a['id'] <=> $b['id']);
-        foreach ($entries as $index => &$entry) {
-            $entry['rank'] = $index > 0 && $compare($entries[$index - 1], $entry) === 0 ? $entries[$index - 1]['rank'] : $index + 1;
-        }
-        unset($entry);
-
-        return $entries;
+        return $this->ranker->rank($entries);
     }
 
     private function capacity(): int

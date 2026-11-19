@@ -115,14 +115,14 @@ class PublicTournamentServiceTest extends TestCase
         $this->assertSame([], $service->matches(2026, ['page' => 3])['matches']);
     }
 
-    public function test_allowlisted_filters_and_null_last_schedule_order_are_stable(): void
+    public function test_allowlisted_filters_and_null_last_update_order_are_stable(): void
     {
         [$group, $teams] = $this->fixture(4);
-        $without = $this->match($group, $teams[0]->id, $teams[1]->id);
-        $later = $this->match($group, $teams[0]->id, $teams[2]->id, ['status' => 'live', 'scheduled_at' => '2026-11-20 04:00:00']);
-        $earlier = $this->match($group, $teams[0]->id, $teams[3]->id, ['scheduled_at' => '2026-11-20 03:00:00']);
+        $without = $this->match($group, $teams[0]->id, $teams[1]->id, ['updated_at' => null]);
+        $later = $this->match($group, $teams[0]->id, $teams[2]->id, ['status' => 'live', 'updated_at' => '2026-11-20 04:00:00']);
+        $earlier = $this->match($group, $teams[0]->id, $teams[3]->id, ['updated_at' => '2026-11-20 03:00:00']);
         $service = app(PublicTournamentService::class);
-        $this->assertSame([$earlier->id, $later->id, $without->id], array_column($service->matches(2026)['matches'], 'id'));
+        $this->assertSame([$later->id, $earlier->id, $without->id], array_column($service->matches(2026)['matches'], 'id'));
         $this->assertSame([$later->id], array_column($service->matches(2026, ['status' => 'live', 'stage' => 'G', 'group_id' => $group])['matches'], 'id'));
         $this->assertSame([], $service->matches(2026, ['stage' => 'F'])['matches']);
     }
@@ -256,18 +256,18 @@ class PublicTournamentServiceTest extends TestCase
     public function test_unknown_and_zero_innings_stay_distinct_and_six_ball_matches_use_their_own_format(): void
     {
         [$group, $teams] = $this->fixture(4);
-        $this->match($group, $teams[0]->id, $teams[1]->id, $this->official(['winner_id' => $teams[0]->id, 'balls_per_over' => 6]));
-        $this->match($group, $teams[0]->id, $teams[2]->id, $this->official(['result_type' => 'tie', 'winner_id' => null,
+        $sixBall = $this->match($group, $teams[0]->id, $teams[1]->id, $this->official(['winner_id' => $teams[0]->id, 'balls_per_over' => 6]));
+        $zero = $this->match($group, $teams[0]->id, $teams[2]->id, $this->official(['result_type' => 'tie', 'winner_id' => null,
             'team1_runs' => 0, 'team2_runs' => 0, 'team1_wickets' => 0, 'team2_wickets' => 0, 'team1_deliveries' => 0, 'team2_deliveries' => 0]));
-        $this->match($group, $teams[0]->id, $teams[3]->id, $this->official(['result_type' => 'no_result', 'result_method' => null,
+        $unknown = $this->match($group, $teams[0]->id, $teams[3]->id, $this->official(['result_type' => 'no_result', 'result_method' => null,
             'team1_runs' => null, 'team2_runs' => null, 'team1_wickets' => null, 'team2_wickets' => null, 'team1_deliveries' => null, 'team2_deliveries' => null]));
-        $matches = app(PublicTournamentService::class)->matches(2026)['matches'];
-        $this->assertSame(6, $matches[0]['balls_per_over']);
-        $this->assertSame(3, $matches[0]['result']['team1']['overs']);
-        $this->assertSame(2, $matches[0]['result']['team1']['balls']);
-        $this->assertSame(['runs' => 0, 'wickets' => 0, 'overs' => 0, 'balls' => 0], $matches[1]['result']['team1']);
-        $this->assertSame(['runs' => null, 'wickets' => null, 'overs' => null, 'balls' => null], $matches[2]['result']['team1']);
-        $this->assertSame('No result.', $matches[2]['result']['description']);
+        $matches = collect(app(PublicTournamentService::class)->matches(2026)['matches'])->keyBy('id');
+        $this->assertSame(6, $matches[$sixBall->id]['balls_per_over']);
+        $this->assertSame(3, $matches[$sixBall->id]['result']['team1']['overs']);
+        $this->assertSame(2, $matches[$sixBall->id]['result']['team1']['balls']);
+        $this->assertSame(['runs' => 0, 'wickets' => 0, 'overs' => 0, 'balls' => 0], $matches[$zero->id]['result']['team1']);
+        $this->assertSame(['runs' => null, 'wickets' => null, 'overs' => null, 'balls' => null], $matches[$unknown->id]['result']['team1']);
+        $this->assertSame('No result.', $matches[$unknown->id]['result']['description']);
     }
 
     private function assertWritableConnection(): void

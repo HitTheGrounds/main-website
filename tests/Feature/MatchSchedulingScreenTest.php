@@ -76,7 +76,7 @@ class MatchSchedulingScreenTest extends TestCase
         $match = TournamentMatch::firstOrFail();
         $component->assertSet('editingId', $match->id)->set('schedule.venue', 'Corrected ground')
             ->set('schedule.scheduled_at', '2026-11-20T09:00')->call('saveSchedule')
-            ->assertHasNoErrors()->assertSet('editingVersion', 2)->assertSee('Match schedule saved.');
+            ->assertHasNoErrors()->assertSet('editingVersion', 2)->assertSee('Match details saved.');
         $this->assertSame('Corrected ground', $match->fresh()->venue);
         $this->assertSame('2026-11-20 03:30:00', $match->fresh()->scheduled_at->utc()->format('Y-m-d H:i:s'));
         $this->assertNull($match->fresh()->team1_runs);

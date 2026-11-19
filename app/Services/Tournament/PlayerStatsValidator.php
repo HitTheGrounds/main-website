@@ -49,9 +49,16 @@ class PlayerStatsValidator
         if ($data['dot_balls'] !== null && $data['bowling_balls'] !== null && $data['dot_balls'] > $data['bowling_balls']) {
             $this->reject('dot_balls', 'Dot balls cannot exceed recorded bowling deliveries.');
         }
-        if ($data['runs_scored'] !== null && $data['fours'] !== null && $data['sixes'] !== null
-            && 4 * $data['fours'] + 6 * $data['sixes'] > $data['runs_scored']) {
+        if ($data['runs_scored'] !== null
+            && 4 * ($data['fours'] ?? 0) + 6 * ($data['sixes'] ?? 0) > $data['runs_scored']) {
             $this->reject('runs_scored', 'Recorded boundary runs cannot exceed the player runs.');
+        }
+        if ($data['batting_status'] === 'did_not_bat') {
+            foreach (['runs_scored', 'balls_faced', 'fours', 'sixes'] as $field) {
+                if (($data[$field] ?? 0) > 0) {
+                    $this->reject($field, 'A player who did not bat cannot have positive batting figures.');
+                }
+            }
         }
 
         return $data;

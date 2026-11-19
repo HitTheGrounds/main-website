@@ -216,8 +216,10 @@ new class extends Component {
         @unless($data['eligible'])<p>Drafts can be saved now. Publishing requires a finished, published win or tie.</p>@endunless
     </div>
     <div class="scorer-feedback" aria-live="polite">
-        @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
-        @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
+        @if($memberId === null)
+            @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
+            @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
+        @endif
         <p wire:loading role="status" class="text-sm">Updating player figures...</p>
     </div>
     <ol class="scorer-steps" aria-label="Player figures workflow">
@@ -268,7 +270,7 @@ new class extends Component {
                 <button type="button" wire:click="cancelReview" wire:loading.attr="disabled" class="btn btn-ghost">Back to player list</button>
             </div>
         </div></section>
-    @elseif($memberId === null)
+    @else
         <div class="scorer-review-bar">
             @if(collect($data['rows'])->contains('record_state', 'draft'))
 
@@ -294,7 +296,7 @@ new class extends Component {
                         <span @class(['scorer-player-state', 'is-draft' => $draft !== null])>{{ $draft ? 'Draft changes' : ($published ? 'Published' : 'No figures') }}</span>
                         @if(($draft['pending_action'] ?? null) === 'withdraw')<span class="text-sm">Withdrawal pending</span>@endif
                     </div>
-                    <button type="button" wire:click="selectPlayer({{ $player['id'] }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm">Edit figures</button>
+                    <button type="button" wire:click="selectPlayer({{ $player['id'] }})" wire:loading.attr="disabled" class="btn btn-outline btn-sm" aria-haspopup="dialog"><x-scorer.icon name="pencil" /> Edit figures</button>
                 </div>
             @empty<p class="text-center">No players are registered for this team.</p>@endforelse
         </div></section>
@@ -308,52 +310,74 @@ new class extends Component {
             @endforeach
             <p class="text-sm">These counts do not identify the playing XI or confirm that all figures are complete.</p>
         </div></details>
-    @else
-    <div class="scorer-team-picker" role="group" aria-label="Choose team">
-        @foreach($data['teams'] as $team)
-            <button type="button" wire:click="selectTeam({{ $team['id'] }})" @if($memberId) wire:confirm="Leave this editor? Unsaved changes will be lost." @endif
-                wire:loading.attr="disabled" class="btn {{ $teamId === $team['id'] ? 'btn-primary' : 'btn-outline' }}" aria-pressed="{{ $teamId === $team['id'] ? 'true' : 'false' }}">{{ $team['team_name'] }}</button>
-        @endforeach
-    </div>
-        <section class="card border border-base-300 bg-base-100" wire:key="player-entry-{{ $memberId }}" x-data x-init="$nextTick(() => $refs.playerHeading.focus())"><form wire:submit="savePlayer" class="card-body space-y-4">
-            <h2 class="text-xl font-bold" x-ref="playerHeading" tabindex="-1">{{ collect($data['players'])->firstWhere('id', $memberId)['name'] ?? 'Player no longer available' }}</h2>
-            <p class="text-sm">Blank means unknown. Enter 0 for a known zero. Saving creates a draft for later review.</p>
-            <p wire:dirty wire:target="form" class="text-sm">You have unsaved changes.</p>
-            @if($pendingAction === 'withdraw')<p class="alert alert-warning">Withdrawal pending. Saving this form replaces the withdrawal with a correction draft.</p>@endif
-            <div class="grid gap-4 lg:grid-cols-2">
-                @foreach(['Batting' => array_slice($metrics, 0, 4, true), 'Bowling' => array_slice($metrics, 4, null, true)] as $discipline => $fields)
-                    <fieldset class="rounded-lg border border-base-300 p-3">
-                        <legend class="px-2 font-bold">{{ $discipline }}</legend>
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach($fields as $field => $label)
-                                <label><span class="label">{{ $label }}</span><input type="number" inputmode="numeric" min="0" max="{{ $field === 'wickets_taken' ? 7 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" /></label>
-                            @endforeach
-                        </div>
-                        @if($discipline === 'Batting')
-                            <div class="mt-3">
-                <label><span class="label">Batting status (optional)</span><select wire:model="form.batting_status" class="select w-full">
-                    <option value="">Unknown</option>
-                    @foreach(['out' => 'Out', 'not_out' => 'Not out', 'did_not_bat' => 'Did not bat', 'retired_hurt' => 'Retired hurt', 'retired_out' => 'Retired out'] as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
-                </select></label>
-                            </div>
-                        @endif
-                    </fieldset>
-                @endforeach
-            </div>
-            @if($official !== null)
-                <details class="rounded-lg border border-base-300 p-3"><summary class="cursor-pointer font-semibold">Current official figures</summary>
-                    <dl class="grid gap-2 pt-3 sm:grid-cols-2">@foreach($metrics as $field => $label)<div><dt>{{ $label }}</dt><dd>{{ $official[$field] ?? 'Unknown' }}</dd></div>@endforeach
-                        <div><dt>Batting status</dt><dd>{{ str_replace('_', ' ', $official['batting_status'] ?? 'Unknown') }}</dd></div></dl>
-                </details>
-            @endif
-            <div class="scorer-actions flex flex-wrap gap-3">
-                <button type="submit" wire:loading.attr="disabled" class="btn btn-primary">Save and return</button>
-                <button type="button" wire:click="savePlayer(true)" wire:loading.attr="disabled" class="btn btn-outline">Save and next player</button>
-                <button type="button" wire:click="returnToList" wire:confirm="Return to the player list? Unsaved changes will be lost." wire:loading.attr="disabled" class="btn btn-ghost">Back to player list</button>
-                <button type="button" wire:click="reloadPlayer" wire:confirm="Load the latest saved figures? Unsaved changes will be lost." wire:loading.attr="disabled" class="btn btn-ghost">Reload saved figures</button>
-                @if($expected['draft'] !== null)<button type="button" wire:click="discardDraft" wire:confirm="Discard this saved draft and unsaved changes? Official figures will stay unchanged." wire:loading.attr="disabled" class="btn btn-outline">Discard draft</button>@endif
-                @if($official !== null && $pendingAction !== 'withdraw')<button type="button" wire:click="stageWithdrawal" wire:confirm="Prepare withdrawal of these official figures? This replaces pending edits; figures remain official until published." wire:loading.attr="disabled" class="btn btn-outline">Prepare withdrawal</button>@endif
-            </div>
-        </form></section>
     @endif
+
+    {{-- Edit figures popup. Opens while a player is selected ($memberId) and
+         closes when the editor is closed on the server. Esc and the backdrop
+         ask before discarding unsaved changes. --}}
+    <dialog id="player-figures-dialog" class="sd-dialog sp-dialog" aria-labelledby="player-figures-heading" wire:ignore.self
+            x-data
+            x-effect="$wire.memberId !== null ? ($el.open || $el.showModal()) : ($el.open && $el.close())"
+            x-on:cancel.prevent="if (confirm('Return to the player list? Unsaved changes will be lost.')) $wire.returnToList()"
+            x-on:click.self="if (confirm('Return to the player list? Unsaved changes will be lost.')) $wire.returnToList()">
+        <div class="sd-dialog-panel">
+            @if($memberId !== null)
+                @php($teamName = collect($data['teams'])->firstWhere('id', $teamId)['team_name'] ?? '')
+                <header class="sd-dialog-head" wire:key="player-entry-{{ $memberId }}">
+                    <div class="sp-dialog-title">
+                        <x-tournament.team-badge :name="$teamName" />
+                        <div>
+                            <h2 id="player-figures-heading" tabindex="-1" x-init="$nextTick(() => $el.focus())">{{ collect($data['players'])->firstWhere('id', $memberId)['name'] ?? 'Player no longer available' }}</h2>
+                            <p>{{ $teamName }} · Blank means unknown. Enter 0 for a known zero. Saving creates a draft for later review.</p>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="returnToList" wire:confirm="Return to the player list? Unsaved changes will be lost." class="sd-icon-btn" aria-label="Close">
+                        <x-scorer.icon name="x" />
+                    </button>
+                </header>
+                <div class="sd-dialog-body">
+                    <div class="scorer-feedback" aria-live="polite">
+                        @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif
+                        @if($errors->any())<div role="alert" class="alert alert-error"><ul>@foreach($errors->all() as $message)<li>{{ $message }}</li>@endforeach</ul></div>@endif
+                    </div>
+                    <p wire:dirty wire:target="form" class="sr-chip sp-dirty">You have unsaved changes.</p>
+                    @if($pendingAction === 'withdraw')<p class="alert alert-warning">Withdrawal pending. Saving this form replaces the withdrawal with a correction draft.</p>@endif
+                    <form id="player-figures-form" wire:submit="savePlayer" class="sp-form">
+                        @foreach(['Batting' => array_slice($metrics, 0, 4, true), 'Bowling' => array_slice($metrics, 4, null, true)] as $discipline => $fields)
+                            <fieldset class="sp-group">
+                                <legend>{{ $discipline }}</legend>
+                                <div class="sp-fields">
+                                    @foreach($fields as $field => $label)
+                                        <label><span class="label">{{ $label }}</span><input type="number" inputmode="numeric" min="0" max="{{ $field === 'wickets_taken' ? 7 : 2147483647 }}" step="1" wire:model="form.{{ $field }}" class="input w-full" placeholder="-" /></label>
+                                    @endforeach
+                                </div>
+                                @if($discipline === 'Batting')
+                                    <label class="sp-status"><span class="label">Batting status (optional)</span><select wire:model="form.batting_status" class="select w-full">
+                                        <option value="">Unknown</option>
+                                        @foreach(['out' => 'Out', 'not_out' => 'Not out', 'did_not_bat' => 'Did not bat', 'retired_hurt' => 'Retired hurt', 'retired_out' => 'Retired out'] as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
+                                    </select></label>
+                                @endif
+                            </fieldset>
+                        @endforeach
+                    </form>
+                    @if($official !== null)
+                        <details class="sp-official"><summary>Current official figures</summary>
+                            <dl>@foreach($metrics as $field => $label)<div><dt>{{ $label }}</dt><dd>{{ $official[$field] ?? 'Unknown' }}</dd></div>@endforeach
+                                <div><dt>Batting status</dt><dd>{{ str_replace('_', ' ', $official['batting_status'] ?? 'Unknown') }}</dd></div></dl>
+                        </details>
+                    @endif
+                    <div class="sp-secondary">
+                        <button type="button" wire:click="reloadPlayer" wire:confirm="Load the latest saved figures? Unsaved changes will be lost." wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-btn-quiet"><x-scorer.icon name="refresh" /> Reload saved figures</button>
+                        @if($expected['draft'] !== null)<button type="button" wire:click="discardDraft" wire:confirm="Discard this saved draft and unsaved changes? Official figures will stay unchanged." wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-btn-quiet"><x-scorer.icon name="trash" /> Discard draft</button>@endif
+                        @if($official !== null && $pendingAction !== 'withdraw')<button type="button" wire:click="stageWithdrawal" wire:confirm="Prepare withdrawal of these official figures? This replaces pending edits; figures remain official until published." wire:loading.attr="disabled" class="btn btn-ghost btn-sm sd-btn-quiet"><x-scorer.icon name="rotate-ccw" /> Prepare withdrawal</button>@endif
+                    </div>
+                </div>
+                <footer class="sd-dialog-foot">
+                    <button type="button" wire:click="returnToList" wire:confirm="Return to the player list? Unsaved changes will be lost." wire:loading.attr="disabled" class="btn btn-ghost sd-foot-start">Back to player list</button>
+                    <button type="button" wire:click="savePlayer(true)" wire:loading.attr="disabled" class="btn btn-outline"><x-scorer.icon name="save" /> Save and next player</button>
+                    <button type="submit" form="player-figures-form" wire:loading.attr="disabled" class="btn btn-primary"><x-scorer.icon name="check" /> Save and return</button>
+                </footer>
+            @endif
+        </div>
+    </dialog>
 </div>

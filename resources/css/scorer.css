@@ -503,3 +503,41 @@
 .sg-danger p { color: color-mix(in srgb, var(--color-base-content) 72%, transparent); }
 .sd-dialog .form-control .label { color: var(--color-base-content); font-size: .8125rem; }
 @media (prefers-reduced-motion: reduce) { .sg-card { transition: none; } }
+
+/* Scorer standings: same look as the public Table tab, plus scorer columns. Prefix sst-. */
+.sst-jump { display: flex; flex-wrap: wrap; gap: .375rem; }
+.sst-jump a { display: inline-flex; align-items: center; min-height: 2.5rem; padding: .375rem .875rem; border: 1px solid var(--scorer-line); border-radius: .625rem; background: var(--color-base-200); font-size: .875rem; font-weight: 700; }
+.sst-jump a:hover { border-color: var(--color-base-content); }
+.sst-groups { display: grid; gap: 1.25rem; }
+.sst-panel { min-width: 0; border: 1px solid var(--scorer-line); border-radius: 1rem; background: color-mix(in srgb, var(--color-base-100) 40%, white); overflow: hidden; }
+.sst-panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding: 1rem 1rem .75rem; }
+.sst-panel-head h2 { font-size: 1.375rem; font-weight: 800; letter-spacing: -.03em; scroll-margin-top: 1rem; }
+.sst-chip-done { background: color-mix(in srgb, var(--color-success) 16%, white); color: var(--color-success); }
+.sst-scroll { overflow-x: auto; }
+.sst-table { width: 100%; border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.sst-table :is(th, td) { padding: .75rem .5rem; text-align: center; vertical-align: middle; }
+.sst-table thead th { background: var(--color-base-200); font-size: .6875rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.sst-table thead abbr { text-decoration: none; }
+.sst-table thead th:nth-child(2) { text-align: left; }
+.sst-table tbody tr { border-bottom: 1px solid var(--scorer-line); }
+.sst-table tbody tr:last-child { border-bottom: 0; }
+.sst-table tbody tr:nth-child(even) { background: rgb(235 230 219 / .3); }
+.sst-table th[scope="row"] { min-width: 11rem; text-align: left; font-weight: 700; }
+.sst-rank { width: 2.5rem; font-weight: 800; color: color-mix(in srgb, var(--color-base-content) 70%, transparent); }
+.sst-team-name { overflow-wrap: anywhere; }
+.sst-small-record { display: none; }
+.sst-points { font-weight: 800; color: var(--color-primary-ink); font-size: 1rem; }
+.sst-adjusted { font-weight: 800; color: var(--color-primary-ink); }
+.sst-action { width: 1%; white-space: nowrap; text-align: right !important; }
+.sst-table .scorer-record { display: none; }
+.scorer-screen .sst-action .btn { white-space: nowrap; }
+.sst-foot { display: grid; gap: .25rem; padding: .5rem 1rem .875rem; border-top: 1px dashed var(--scorer-line); }
+.sst-history { display: grid; gap: .375rem; padding-bottom: .5rem; font-size: .8125rem; }
+@media (max-width: 767px) {
+  .sst-table .sst-detail { display: none; }
+  .sst-table :is(th, td) { padding: .625rem .3rem; }
+  .sst-table th[scope="row"] { min-width: 0; }
+  .sst-small-record { display: block; margin-top: .125rem; font-size: .6875rem; font-weight: 600; color: color-mix(in srgb, var(--color-base-content) 70%, transparent); }
+  .sst-action-label { display: none; }
+  .sst-table .sst-action .btn { padding-inline: .5rem; }
+}

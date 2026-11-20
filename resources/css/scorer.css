@@ -1,3 +1,31 @@
+/* Venue screen: preserve the physical LED wall's 14:7 ratio at any resolution. */
+.led-viewport {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+.led-stage {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  width: min(100vw, 200dvh);
+  height: min(100dvh, 50vw);
+  padding: 1.5vh 1.5vw;
+  gap: 1.2vh;
+}
+.led-groups {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1.2cqh 1cqw;
+}
+.led-group { grid-column: span 3; }
+.led-group:nth-child(n+5) { grid-column: span 4; }
+
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);
   --scorer-paper: color-mix(in srgb, var(--color-base-100) 32%, white);

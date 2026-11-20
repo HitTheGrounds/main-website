@@ -75,7 +75,7 @@ new class extends Component {
             <p class="text-sm">Published results, ranked by points then net run rate. Equal records remain tied.</p>
         </div>
         <div class="sg-heading-actions">
-            <a href="{{ route('scorer.screen') }}" target="_blank" class="btn btn-ghost sd-btn-quiet">LED screen <span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span></a>
+            <a href="{{ route('scorer.screen.group_stage') }}" target="_blank" class="btn btn-ghost sd-btn-quiet">LED screen <span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span></a>
             <a href="{{ route('scorer.knockouts') }}" class="btn btn-ghost sd-btn-quiet"><x-scorer.icon name="trophy" /> Choose advancing teams</a>
             <button type="button" wire:click="$refresh" wire:loading.attr="disabled" class="btn btn-outline"><x-scorer.icon name="refresh" /> Refresh standings</button>
         </div>

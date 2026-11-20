@@ -26,7 +26,7 @@ Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'scorer'])
         Route::view('/dashboard', 'scorer.dashboard')->name('dashboard');
         Route::view('/groups', 'scorer.groups.index')->name('groups.index');
         Route::view('/standings', 'scorer.standings')->name('standings');
-        Route::view('/screen', 'scorer.screen')->name('screen');
+        Route::view('/screen/group_stage', 'scorer.screen.group_stage')->name('screen.group_stage');
         Route::view('/knockouts', 'scorer.knockouts')->name('knockouts');
         Route::view('/matches/{matchId}/result', 'scorer.result')->whereNumber('matchId')->name('matches.result');
         Route::view('/matches/{matchId}/players', 'scorer.players')->whereNumber('matchId')->name('matches.players');

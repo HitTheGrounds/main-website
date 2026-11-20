@@ -98,6 +98,23 @@ class PublicTournamentService
         });
     }
 
+    public function scorecard(int $year, int $matchId): array
+    {
+        return $this->snapshots->run(function () use ($year, $matchId) {
+            $match = $this->visibleMatches($year)->where('status', 'finished')->whereNotNull('result_published_at')
+                ->select([...self::MATCH_FIELDS, 'player_stats_published_at'])->findOrFail($matchId);
+            $teams = $this->teams([$match->team1_id, $match->team2_id]);
+            $players = $match->player_stats_published_at === null ? collect() : DB::table('player_match_stats')
+                ->where('match_id', $matchId)->where('record_state', 'published')->whereNotNull('published_at')
+                ->whereIn('team_id', [$match->team1_id, $match->team2_id])->orderBy('player_name')->orderBy('id')
+                ->get(['team_id', 'player_name', 'batting_status', 'runs_scored', 'balls_faced', 'fours', 'sixes',
+                    'bowling_balls', 'runs_conceded', 'wickets_taken', 'dot_balls'])->groupBy('team_id');
+
+            return ['match' => $this->presentMatch($match, $teams, collect()), 'players' => $players,
+                'sides' => $match->batting_first_id === $match->team2_id ? ['team2', 'team1'] : ['team1', 'team2']];
+        });
+    }
+
     public function standings(int $year): array
     {
         $this->validateYear($year);

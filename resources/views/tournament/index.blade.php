@@ -57,12 +57,15 @@
             </footer>
         @endif
     </div>
+    @if ($tab === 'matches' && ! $filterErrors)
+        @include('tournament.partials.scorecard-dialog')
+    @endif
     @if (! $filterErrors)
         <script>
             (() => {
                 let rev = @js($rev);
                 setInterval(async () => {
-                    if (document.hidden) return;
+                    if (document.hidden || document.querySelector('#match-scorecard[open]')) return;
                     try {
                         const next = (await (await fetch(@js(route('tournament.rev')))).json()).rev;
                         if (rev !== null && next !== rev) {

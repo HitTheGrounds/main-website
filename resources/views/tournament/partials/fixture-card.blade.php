@@ -59,4 +59,8 @@
             Yet to start. Scores appear after the result is published.
         @endif
     </p>
+    @if ($result !== null && $match['status'] === 'finished')
+        <button type="button" class="tc-scorecard-open" data-scorecard="{{ route('tournament.scorecard', $match['id']) }}"
+                aria-haspopup="dialog" aria-label="View scorecard for {{ $match['team1']['name'] }} vs {{ $match['team2']['name'] }}">View scorecard &rsaquo;</button>
+    @endif
 </article>

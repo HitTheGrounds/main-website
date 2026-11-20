@@ -11,6 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class PublicTournamentController extends Controller
 {
+    public function scorecard(int $matchId, PublicTournamentService $tournament): Response
+    {
+        $data = $tournament->scorecard(config('tournament.year'), $matchId);
+
+        return response()->view('tournament.partials.scorecard', $data);
+    }
+
     public function __invoke(Request $request, PublicTournamentService $tournament): Response
     {
         $tabs = [

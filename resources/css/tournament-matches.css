@@ -111,8 +111,15 @@
 .tc-stats-score img { flex: none; width: 2rem; height: 2rem; object-fit: contain; }
 .tc-stats-leaderboard thead { font-size: .8125rem; }
 .tc-stats-leaderboard tbody th { width: 100%; overflow-wrap: anywhere; }
-.tc-stats-logo .tc-badge { width: 4rem; height: auto; padding: 0; background: none; box-shadow: none; }
-.tc-stats-logo img { display: block; width: 100%; height: auto; }
+/* Same bordered white tile as the Table tab's team badges. */
+.tc-stats-logo .tc-badge { width: 2.25rem; height: 1.625rem; padding: .15rem; border-radius: .4rem; }
+.tc-stats-logo .tc-badge-cse { gap: .12rem; font-size: .5rem; }
+.tc-stats-logo .tc-badge-initials { font-size: .625rem; }
+@media (min-width: 768px) {
+  .tc-stats-logo .tc-badge { width: 2.75rem; height: 2rem; padding: .2rem; border-radius: .5rem; }
+  .tc-stats-logo .tc-badge-cse { font-size: .625rem; }
+  .tc-stats-logo .tc-badge-initials { font-size: .6875rem; }
+}
 .tc-stats-team { display: block; margin-top: .25rem; font-size: .8125rem; font-weight: 400; }
 
 /* Qualified teams: a "Q" marker after the name. */

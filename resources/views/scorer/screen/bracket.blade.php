@@ -3,12 +3,18 @@
     <head>
         @include('partials.head', ['title' => 'Bracket screen'])
     </head>
-    <body class="min-h-screen bg-base-100 text-base-content">
+    {{-- Knockout subpage for the venue LED screen: same frame and palette as the group stage screen. --}}
+    <body class="led-body min-h-screen">
         <div class="led-viewport">
             <main class="tc led-stage led-bracket" aria-labelledby="bracket-screen-heading">
-                <header class="flex shrink-0 items-center justify-between border-b-2 border-primary pb-[.8cqh]">
-                    <img src="{{ asset('images/htg-logo-horizontal.webp') }}" alt="Hit the Grounds {{ $year }}, powered by GTN" width="900" height="481" class="h-[6cqh] w-auto">
-                    <h1 id="bracket-screen-heading" class="text-[3.4cqh] font-extrabold uppercase text-primary-ink">Knockout bracket</h1>
+                <header class="led-header">
+                    <div class="led-logo">
+                        <img src="{{ asset('images/htg-logo-horizontal.webp') }}" alt="Hit the Grounds {{ $year }}, powered by GTN" width="900" height="481">
+                    </div>
+                    <div class="led-title">
+                        <span class="led-live">Live</span>
+                        <h1 id="bracket-screen-heading">Knockout <span>bracket</span></h1>
+                    </div>
                 </header>
                 @include('tournament.partials.bracket')
             </main>

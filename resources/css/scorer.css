@@ -114,19 +114,19 @@
 .led-empty { grid-column: 1 / -1; align-self: center; text-align: center; font-size: 4cqh; font-weight: 800; color: var(--led-muted); }
 @media (prefers-reduced-motion: reduce) { .led-live::before { animation: none; } }
 
-/* Reuse the public bracket, keeping its mirrored desktop layout on the LED wall. */
-.tc.led-bracket { max-width: none; padding: 1.5vh 1.5vw; }
+/* Knockout screen: reuses the public bracket markup, restyled here only, in the group stage screen's palette. */
+.tc.led-bracket { max-width: none; margin: 0; padding: 1.5vh 1.5vw; }
 .led-bracket .tc-playoff-scroll { flex: 1; min-height: 0; overflow: visible; }
 .led-bracket .tc-playoffs {
   width: 100%;
   min-width: 0;
   height: 100%;
-  grid-template-columns: repeat(5, minmax(0, 14cqw));
-  grid-template-rows: auto repeat(2, auto);
-  gap: 3cqh 2cqw;
-  padding: 0;
-  justify-content: space-between;
-  align-content: center;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 2.4cqh 7cqh; /* room for the connector lines and arrows between rounds */
+  padding: 1cqh 0 0;
+  align-content: stretch;
   align-items: center;
 }
 .led-bracket .tc-playoff-round,
@@ -135,14 +135,44 @@
 .led-bracket .tc-playoff-mirror[data-stage="SF"] { grid-column: 4; }
 .led-bracket .tc-playoff-mirror[data-stage="QF"] { grid-column: 5; }
 .led-bracket .tc-playoff-round .tc-playoff-slot { grid-column: var(--column); grid-row: var(--row); padding: 0; }
-.led-bracket .tc-playoff-slot .tc-match { max-width: none; }
-.led-bracket .tc-round-head :is(h3, span) { font-size: 2.4cqh; }
-.led-bracket .tc-bracket-team-details .tc-team-name,
-.led-bracket .tc-playoff-slot .tc-score { font-size: 2cqh; }
-.led-bracket .tc-team-logo { width: 10cqh; height: 6cqh; padding: .8cqh; }
-.led-bracket .tc-empty-slot { padding: 2cqh 1cqw; }
-.led-bracket .tc-empty-slot h4 { font-size: 2.6cqh; }
-.led-bracket .tc-empty-slot p { font-size: 2cqh; }
+
+/* Round labels: the public bracket's orange bar and underline, sized for the wall. */
+.led-bracket .tc-playoffs .tc-round-head { justify-content: flex-start; align-self: end; margin: 0; padding: 0 0 1cqh; border-bottom: .3cqh solid var(--led-line); }
+.led-bracket .tc-round-head :is(h3, span) { margin: 0; padding: 0 0 0 1.2cqh; border-left: .55cqh solid var(--led-orange); border-radius: 0; background: none; color: var(--led-text); font-size: 2.8cqh; font-weight: 800; line-height: 1.1; }
+
+/* Orange connector lines as on the public bracket, thickened for distance. */
+.led-bracket .tc-playoff-lines { color: var(--led-orange-ink); --bracket-line-width: 2.5; }
+
+/* Match cards: the public layout (logo tile above name and score), enlarged. */
+.led-bracket .tc-playoff-slot .tc-match { max-width: none; margin: 0; border: 1px solid var(--led-line); border-radius: 1.6cqh; background: var(--led-card); box-shadow: 0 .6cqh 2cqh rgb(3 22 47 / .08); }
+/* Rows run edge to edge with their own padding, so winner and loser rows get the same width. */
+.led-bracket .tc-scoreboard { padding-inline: 0; }
+.led-bracket .tc-playoff-slot .tc-team { gap: 1.2cqh; margin-inline: 0; padding: 1.8cqh 1.8cqh; }
+.led-bracket .tc-team + .tc-team { border-top-color: var(--led-line); }
+.led-bracket .tc-team-logo { width: 12cqh; height: 7cqh; padding: .9cqh; border-color: var(--led-line); border-radius: 1cqh; font-size: 2cqh; }
+.led-bracket .tc-team-logo-cse { font-size: 1.9cqh; }
+.led-bracket .tc-bracket-team-details { align-items: baseline; gap: 1cqh; }
+.led-bracket .tc-bracket-team-details .tc-team-name { font-size: 2.5cqh; font-weight: 800; line-height: 1.15; letter-spacing: 0; color: var(--led-text); }
+.led-bracket .tc-playoff-slot .tc-score { font-size: 2.7cqh; font-weight: 700; color: var(--led-text); }
+.led-bracket .tc-unknown { font-size: 1.5cqh; }
+
+/* Winner: peach row, bold, score in deep orange. Loser: readable grey instead of the public 45% fade. */
+.led-bracket .tc-playoffs .tc-team-winner { background: color-mix(in srgb, var(--color-accent) 85%, white); }
+.led-bracket .tc-playoffs .tc-team-winner .tc-score { color: var(--led-orange-ink); font-weight: 900; }
+.led-bracket .tc-playoffs .tc-team-eliminated { opacity: 1; }
+.led-bracket .tc-playoffs .tc-team-eliminated :is(.tc-team-name, .tc-score) { color: var(--led-muted); font-weight: 700; }
+.led-bracket .tc-playoffs .tc-team-eliminated .tc-team-logo { opacity: .6; }
+
+/* Final: gold champion row from the public bracket, with a larger badge above. */
+.led-bracket .tc-playoffs .tc-team-champion { background: color-mix(in srgb, #ffc440 45%, white); box-shadow: inset 0 0 0 .35cqh #e8a317; }
+.led-bracket .tc-champion-badge { bottom: calc(100% + 1.6cqh); max-width: none; gap: .9cqh; padding: 1cqh 2.4cqh; font-size: 2.2cqh; box-shadow: 0 .4cqh 1.2cqh rgb(3 22 47 / .12); }
+.led-bracket .tc-champion-badge svg { width: 2.6cqh; height: 2.6cqh; }
+.led-bracket .tc-champion-cup-logo { top: -1.2cqh; left: -1.2cqh; width: 3.4cqh; height: 3.4cqh; padding: .6cqh; }
+
+/* Slots without a fixture yet. */
+.led-bracket .tc-empty-slot { padding: 2.4cqh 1.6cqh; border: .3cqh dashed var(--led-line); border-radius: 1.4cqh; background: rgb(255 255 255 / .55); }
+.led-bracket .tc-empty-slot h4 { font-family: inherit; font-size: 2.3cqh; font-weight: 800; color: var(--led-text); }
+.led-bracket .tc-empty-slot p { margin-top: .8cqh; font-size: 1.9cqh; color: var(--led-muted); }
 
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);

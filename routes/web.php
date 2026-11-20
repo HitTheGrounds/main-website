@@ -7,7 +7,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/sitemap.xml', function () {
-    $urls = collect(config('seo.indexable'))->map(fn ($name) => route($name));
+    $urls = collect(config('seo.indexable'))
+        ->reject(fn ($name) => $name === 'timeline' && config('tournament.enabled') === true)
+        ->map(fn ($name) => route($name));
     if (config('tournament.enabled') === true && Route::has('tournament.index')) {
         $urls->push(route('tournament.index'));
     }
@@ -34,6 +36,8 @@ Route::get('/partners', function () {
 })->name('partners');
 
 Route::get('/timeline', function () {
+    abort_if(config('tournament.enabled') === true, 404);
+
     return view('timeine');
 })->name('timeline');
 

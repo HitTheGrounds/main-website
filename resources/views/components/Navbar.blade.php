@@ -24,7 +24,9 @@
         <li><a href="/" class="{{ request()->routeIs('home') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Home</a></li>
           {{-- <li><a href="{{ route("registrations") }}" class="{{ request()->routeIs('registrations') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Registrations</a></li> --}}
           <li><a href="{{ route("rules") }}" class="{{ request()->routeIs('rules') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Rules</a></li>
-          <li><a href="{{ route("timeline") }}" class="{{ request()->routeIs('timeline') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Timeline</a></li>
+          @if (config('tournament.enabled') !== true)
+            <li><a href="{{ route("timeline") }}" class="{{ request()->routeIs('timeline') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Timeline</a></li>
+          @endif
           <li><a href="{{ route("awards") }}" class="{{ request()->routeIs('awards') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Awards</a></li>
           <li><a href="{{ route("seasons") }}" class="{{ request()->routeIs('seasons') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Past Seasons</a></li>
           {{-- <li><a href="{{ route("partners") }}" class="{{ request()->routeIs('partners') ? 'active font-bold underline decoration-primary decoration-[3px] underline-offset-8 bg-transparent' : 'text-base-content font-semibold' }}">Partners</a></li> --}}
@@ -62,6 +64,9 @@
   {{-- Mobile menu: a small card under the top bar --}}
   @php
     $menu = ['home' => 'Home', 'rules' => 'Rules', 'timeline' => 'Timeline', 'awards' => 'Awards', 'seasons' => 'Past Seasons', 'memories' => 'Memories', 'about' => 'About'];
+    if (config('tournament.enabled') === true) {
+        unset($menu['timeline']);
+    }
     if ($showTournament) {
         $menu = ['tournament.index' => 'Tournament', ...$menu];
     }

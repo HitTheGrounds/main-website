@@ -25,7 +25,7 @@ if (bracket) {
     }
 
     if (context) {
-        const observer = new ResizeObserver(() => {
+        const draw = () => {
             const bounds = bracket.getBoundingClientRect();
             const scale = window.devicePixelRatio || 1;
             canvas.width = Math.round(bounds.width * scale);
@@ -58,7 +58,12 @@ if (bracket) {
                     // End at the row where that team appears in the next card, when known.
                     const landingRow = cardOf(target).querySelector(`.tc-team[data-from="${id}"]`);
                     const endFraction = entersFinal || sources.length === 1 ? .5 : (index + 1) / 3;
-                    const endY = landingRow ? middle(landingRow.getBoundingClientRect()) : to.top + to.height * endFraction - bounds.top;
+                    let endY = landingRow ? middle(landingRow.getBoundingClientRect()) : to.top + to.height * endFraction - bounds.top;
+                    // Into the Final: run straight across from the semi-final winner, on
+                    // both halves, as long as that height still meets the Final card.
+                    if (entersFinal && startY > to.top - bounds.top + 8 && startY < to.bottom - bounds.top - 8) {
+                        endY = startY;
+                    }
                     const lane = (start + end) / 2 - bounds.left;
                     const startX = start - bounds.left;
                     const endX = end - bounds.left;
@@ -77,8 +82,16 @@ if (bracket) {
             }
 
             context.stroke();
-        });
+        };
+        // Redraw on size changes and also on load, when the tab becomes visible
+        // and after logos load: a ResizeObserver alone never fires if the page
+        // first renders while hidden, which left the canvas blank.
+        const observer = new ResizeObserver(draw);
         observer.observe(bracket);
+        window.addEventListener('load', draw);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) draw(); });
+        for (const image of bracket.querySelectorAll('img')) image.addEventListener('load', draw, { once: true });
+        requestAnimationFrame(draw);
         for (const slot of slots) observer.observe(slot);
     }
 }

@@ -58,7 +58,7 @@ class TeamLogo
     private static function initials(string $teamName): string
     {
         $initials = collect(preg_split('/\s+/u', trim($teamName)))
-            ->filter()->take(2)->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('');
+            ->filter(fn ($word) => preg_match('/[\p{L}\p{N}]/u', $word))->take(2)->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))->implode('');
 
         return $initials !== '' ? $initials : '?';
     }

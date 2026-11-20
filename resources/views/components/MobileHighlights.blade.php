@@ -16,9 +16,11 @@
 
 {{-- Mobile only: on larger screens these live on their own pages. --}}
 <div class="lg:hidden" data-mobile-only>
+    @if (config('tournament.enabled') !== true)
     <section id="timeline" class="scroll-mt-24">
         <x-TimelineFull />
     </section>
+    @endif
 
     <section id="awards" class="bg-base-100">
         <x-PageContainer class="!pb-6">

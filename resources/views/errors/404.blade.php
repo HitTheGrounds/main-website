@@ -98,9 +98,11 @@
                             <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                         </span>
                     </a>
+                    @if (config('tournament.enabled') !== true)
                     <a href="{{ route('timeline') }}" class="inline-flex items-center rounded-full border-2 border-base-content/20 px-7 py-3 text-[17px] font-bold text-base-content transition hover:-translate-y-0.5 hover:border-primary hover:text-primary-ink">
                         View timeline
                     </a>
+                    @endif
                 </div>
             </div>
         </x-PageContainer>

@@ -18,6 +18,31 @@ class TournamentSiteIntegrationTest extends TestCase
         Route::getRoutes()->refreshNameLookups();
     }
 
+    public function test_timeline_is_public_only_before_the_tournament_is_enabled(): void
+    {
+        foreach ([false, true, false] as $enabled) {
+            config(['tournament.enabled' => $enabled]);
+            $home = $this->get('/')->assertOk();
+            $sitemap = $this->get('/sitemap.xml')->assertOk();
+            $timeline = $this->get('/timeline');
+            $notFound = $this->get('/missing-public-page')->assertNotFound();
+
+            if ($enabled) {
+                $home->assertDontSee('href="'.route('timeline').'"', false)
+                    ->assertDontSee('id="timeline"', false);
+                $sitemap->assertDontSee(route('timeline'), false);
+                $timeline->assertNotFound();
+                $notFound->assertDontSee('href="'.route('timeline').'"', false);
+            } else {
+                $this->assertSame(3, substr_count($home->getContent(), 'href="'.route('timeline').'"'));
+                $home->assertSee('id="timeline"', false);
+                $sitemap->assertSee('<loc>'.route('timeline').'</loc>', false);
+                $timeline->assertOk();
+                $notFound->assertSee('href="'.route('timeline').'"', false);
+            }
+        }
+    }
+
     public function test_disabled_feature_has_no_tournament_navigation_or_sitemap_entry(): void
     {
         config(['tournament.enabled' => false]);

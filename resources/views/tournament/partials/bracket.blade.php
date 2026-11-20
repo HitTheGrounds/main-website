@@ -5,16 +5,38 @@
     $sources = [];
     $quarterColumns = [];
     $quarterSourceRows = [];
+    // Which row of the next-round card each match feeds ('top' = team1, 'bottom' = team2).
+    // The winner is drawn on that same side so every connector has the same shape.
+    $feedsSide = [];
+    // The Final first, so each semi-final knows its side; quarter-finals are set
+    // below from the semi-final as drawn (it may be flipped).
+    foreach (['F'] as $nextStage) {
+        foreach ($bracketData['rounds'][$nextStage] ?? [] as $next) {
+            foreach (['team1' => 'top', 'team2' => 'bottom'] as $nextSide => $placement) {
+                if (($source = $next[$nextSide]['source_match_id'] ?? null) !== null) {
+                    $feedsSide[$source] = $placement;
+                }
+            }
+        }
+    }
     $remainingColumns = [1, 1, 5, 5];
     foreach ($bracketData['rounds']['SF'] as $semi) {
         $column = $semi['position'] === 1 ? 1 : 5;
+        // A semi-final is drawn flipped when its winner is shown on the side
+        // opposite their team1/team2 slot (see $feedsSide). Its feeders follow
+        // the drawn order, so their lines stay parallel instead of crossing.
+        $semiWinner = $semi['match']['result']['winner_id'] ?? null;
+        $semiFeeds = $semi['match'] !== null ? ($feedsSide[$semi['match']['id']] ?? null) : null;
+        $flipped = $semiWinner !== null && $semiFeeds !== null
+            && (($semi['match']['team1']['id'] === $semiWinner) !== ($semiFeeds === 'top'));
         foreach (['team1', 'team2'] as $side) {
             $source = $semi[$side]['source_match_id'] ?? null;
             if ($source !== null) {
                 $quarterColumns[$source] = $column;
                 // Stack each quarter-final level with the semi-final row it feeds,
-                // so connector lines never cross (team1's source on top).
-                $quarterSourceRows[$source] = $side === 'team1' ? 2 : 3;
+                // so connector lines never cross (team1's source on top unless flipped).
+                $quarterSourceRows[$source] = ($side === 'team1') !== $flipped ? 2 : 3;
+                $feedsSide[$source] = ($side === 'team1') !== $flipped ? 'top' : 'bottom';
                 unset($remainingColumns[array_search($column, $remainingColumns, true)]);
             }
         }
@@ -79,7 +101,7 @@
                                         Champion: {{ $position['match']['team1']['id'] === $championId ? $position['match']['team1']['name'] : $position['match']['team2']['name'] }}
                                     </p>
                                 @endif
-                                @include('tournament.partials.match-card', ['match' => $position['match'], 'bracketCard' => true, 'bracketTeams' => $position])
+                                @include('tournament.partials.match-card', ['match' => $position['match'], 'bracketCard' => true, 'bracketTeams' => $position, 'winnerSide' => $feedsSide[$matchId] ?? null])
                             @else
                                 <div class="tc-empty-slot">
                                     <h4 class="font-heading text-2xl">{{ $stages[$stage] }} {{ $position['position'] }}</h4>

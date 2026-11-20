@@ -586,3 +586,89 @@ html { scroll-padding-top: 5.5rem; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
 [x-cloak] { display: none !important; }
+
+.ground-plan-decoration { display: none; }
+@media (min-width: 1280px) {
+  .ground-plan-decoration { display: block; position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+  .ground-plan-orbit { position: absolute; top: 26%; height: 66%; width: 24%; color: var(--color-primary); opacity: .46; }
+  .ground-plan-orbit-left { left: -3%; transform: rotate(-18deg); }
+  .ground-plan-orbit-right { right: -3%; transform: rotate(18deg); }
+  .ground-plan-extra { position: absolute; width: clamp(75px, 7vw, 130px); color: var(--color-primary-ink); opacity: .55; }
+  .ground-plan-bat { left: 15%; top: 19%; }
+  .ground-plan-doodle { position: absolute; width: clamp(65px, 6vw, 115px); height: auto; color: var(--color-primary-ink); opacity: .6; }
+  .ground-plan-doodle-2 { left: 19%; top: 40%; width: 70px; }
+  .ground-plan-doodle-3 { left: 12%; bottom: 9%; rotate: 8deg; }
+  .ground-plan-doodle-4 { left: 2%; bottom: 3%; width: 80px; }
+  .ground-plan-doodle-5 { right: 10%; top: 12%; rotate: -10deg; }
+  .ground-plan-doodle-6 { right: 2%; bottom: 9%; rotate: 20deg; }
+  .ground-plan-doodle-7 { right: 22%; top: 5%; width: 65px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ground-plan-ball { animation: ground-plan-bowl 12s ease-in-out infinite alternate; }
+  .ground-plan-ring { transform-origin: 160px 265px; animation: ground-plan-turn 24s ease-in-out infinite alternate; }
+  .ground-plan-trail { animation: ground-plan-dash 12s ease-in-out infinite alternate; }
+  .ground-plan-extra { animation: ground-plan-float 10s ease-in-out infinite alternate; }
+  .ground-plan-doodle { animation: ground-plan-float 10s ease-in-out infinite alternate; }
+  .ground-plan-doodle:nth-child(even) { animation-delay: -5s; animation-duration: 12s; }
+  #ground-plan .ground-plan-bat,
+  #ground-plan .ground-plan-doodle-6 {
+    animation: ground-plan-bat-sway 10s ease-in-out infinite alternate;
+  }
+  #ground-plan .ground-plan-doodle-6 { animation-delay: -5s; }
+}
+@keyframes ground-plan-bat-sway {
+  from { transform: translate(-6px, 5px) rotate(-4deg); }
+  to { transform: translate(6px, -5px) rotate(4deg); }
+}
+@keyframes ground-plan-float {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-18px) rotate(-6deg); }
+}
+@keyframes ground-plan-bowl {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to { transform: translate(165px, -335px) rotate(12deg); }
+}
+@keyframes ground-plan-turn {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(180deg); }
+}
+@keyframes ground-plan-dash {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -102; }
+}
+
+/* Desktop: "framed poster". Centred heading, then the plan mounted like a print:
+   an off-white mat with a hairline border, and a caption bar holding the venue
+   and the Maps link. Tablet and phone keep their own layout. */
+.ground-plan-caption { display: none; }
+@media (min-width: 1024px) {
+  #ground-plan .ground-plan-container { padding-block: clamp(4rem, 9vh, 6.5rem); }
+  .ground-plan-heading { margin-bottom: clamp(2rem, 5vh, 3rem); }
+  .ground-plan-heading-cta { display: none; }
+  .ground-plan-image {
+    max-width: 1040px;
+    margin-inline: auto;
+    padding: .75rem;
+    border: 1px solid var(--color-base-300);
+    border-radius: 1.25rem;
+    background: color-mix(in srgb, var(--color-base-100) 35%, white);
+    box-shadow: 0 1px 2px rgb(31 27 22 / .04);
+  }
+  .ground-plan-image img { border-radius: .75rem; }
+  .ground-plan-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: .875rem .375rem .125rem;
+  }
+  .ground-plan-caption-place { display: flex; align-items: center; gap: .625rem; font-size: .9375rem; color: color-mix(in srgb, var(--color-base-content) 70%, transparent); }
+  .ground-plan-caption-place svg { width: 1.125rem; height: 1.125rem; flex: none; color: var(--color-primary); }
+  .ground-plan-caption-place strong { margin-right: .375rem; font-weight: 700; color: var(--color-base-content); }
+  .ground-plan-caption-link { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 1rem; border: 1px solid var(--color-base-300); border-radius: .625rem; font-size: .875rem; font-weight: 700; color: var(--color-base-content); transition: border-color .2s cubic-bezier(.22, 1, .36, 1), background-color .2s cubic-bezier(.22, 1, .36, 1); }
+  .ground-plan-caption-link:hover { border-color: var(--color-base-content); background: var(--color-base-100); }
+  .ground-plan-caption-link svg { width: 1rem; height: 1rem; color: var(--color-primary-ink); }
+  .ground-plan-caption-link:focus-visible { outline: 2px solid var(--color-primary-ink); outline-offset: 3px; }
+  .ground-plan-decoration { display: none !important; }
+}
+

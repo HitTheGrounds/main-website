@@ -21,6 +21,7 @@ new class extends Component {
 
     public array $selected = [];
     public array $fixture = ['team1_id' => '', 'team2_id' => '', 'bracket_position' => '', 'balls_per_over' => '4'];
+    public array $schedule = ['scheduled_at' => '', 'venue' => ''];
     public string $notice = '';
 
     public function mount(): void
@@ -62,7 +63,7 @@ new class extends Component {
         $round = app(MatchSchedulingService::class)->knockoutOptions($this->year(), $stage);
         $this->stage = $stage;
         $this->round = $round;
-        $this->reset('fixture', 'moveReview', 'notice');
+        $this->reset('fixture', 'schedule', 'moveReview', 'notice');
         $key = ['QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$stage];
         $this->fixture['balls_per_over'] = (string) config('tournament.default_balls_per_over.'.$key);
         $this->resetErrorBag();
@@ -80,7 +81,7 @@ new class extends Component {
         // Server-held stage and revision cannot be replaced by browser fields.
         // Unknown fixture fields are rejected by the existing structure validator.
         $structure = array_merge($this->fixture, ['stage' => $this->stage, 'group_id' => null]);
-        $match = app(MatchSchedulingService::class)->create($this->year(), 0, $structure, [], $this->round['revision']);
+        $match = app(MatchSchedulingService::class)->create($this->year(), 0, $structure, array_filter($this->schedule), $this->round['revision']);
         $this->chooseRound($this->stage);
         $this->notice = 'Knockout match #'.$match->id.' created. Open its result or player figures below.';
     }
@@ -268,8 +269,10 @@ new class extends Component {
                     @endforeach
                     <label><span class="label">Bracket position</span><select wire:model="fixture.bracket_position" class="select w-full"><option value="">Choose a position</option>@foreach($round['positions'] as $position)@if($position['match_id'] === null)<option value="{{ $position['position'] }}">{{ $stage }} {{ $position['position'] }}</option>@endif @endforeach</select></label>
                     <label><span class="label">Balls per over</span><select wire:model="fixture.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
+                    <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" required class="input w-full" /></label>
+                    <label><span class="label">Venue</span><select wire:model="schedule.venue" required class="select w-full"><option value="">Choose a venue</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
                 </div>
-                <p class="text-sm">Five overs per innings. Seven wickets. Creates an upcoming match without scores. Schedule and batting-first details can be entered on the dashboard.</p>
+                <p class="text-sm">Five overs per innings. Seven wickets. Creates an upcoming match without scores. Batting-first details can be entered on the dashboard.</p>
                 <button type="submit" wire:loading.attr="disabled" @disabled($available->count() < 2) class="btn btn-primary">Create knockout match</button>
             </form>
         @else<p class="text-center">All positions in this round are filled.</p>@endif

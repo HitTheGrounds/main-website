@@ -169,10 +169,19 @@ class PublicTournamentMatchesTest extends TestCase
             ->assertDontSee($venue, false)->assertDontSee('PRIVATE-');
     }
 
+    public function test_venue_filter_shows_only_matches_at_that_venue(): void
+    {
+        [$group, $teams] = $this->fixture(3);
+        $atOne = $this->match($group, $teams[0]->id, $teams[1]->id, ['status' => 'upcoming', 'venue' => 'Ground 1']);
+        $atTwo = $this->match($group, $teams[0]->id, $teams[2]->id, ['status' => 'upcoming', 'venue' => 'Ground 2']);
+        $this->get('/tournament?status=upcoming&venue=Ground+1')->assertOk()->assertSee('<option value="Ground 1" selected', false)
+            ->assertSee('match-'.$atOne.'-heading', false)->assertDontSee('match-'.$atTwo.'-heading', false);
+    }
+
     public static function invalidFilters(): array
     {
         return [[['stage' => ['G']]], [['status' => ['live']]], [['sort' => ['schedule']]],
-            [['group_id' => ['1']]], [['page' => 0]], [['sort' => 'id desc; DROP TABLE users']], [['status' => 'draft']]];
+            [['group_id' => ['1']]], [['page' => 0]], [['sort' => 'id desc; DROP TABLE users']], [['status' => 'draft']], [['venue' => 'Ground 9']]];
     }
 
     #[DataProvider('invalidFilters')]

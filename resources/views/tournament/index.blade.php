@@ -27,7 +27,9 @@
                         @elseif ($key === 'table')
                             <path d="M4 5h16M4 12h16M4 19h16M8 5v14m8-14v14"/>
                         @elseif ($key === 'bracket')
-                            <path d="M3 3v6h5V6h8v3h5V3M3 15v6h5v-3h8v3h5v-6M12 6v12"/>
+                            {{-- Tabler "tournament" icon (MIT): four entrants join through two rounds into one winner. --}}
+                            <circle cx="4" cy="4" r="2"/><circle cx="20" cy="10" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="4" cy="20" r="2"/>
+                            <path d="M6 12h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6M6 4h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2M14 10h4"/>
                         @else
                             <path d="M5 20v-6h4v6m2 0V9h4v11m2 0V4h4v16M3 20h19"/>
                         @endif

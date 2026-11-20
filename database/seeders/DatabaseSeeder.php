@@ -39,5 +39,12 @@ class DatabaseSeeder extends Seeder
             'email' => 'devil@hell.com',
             'company_id' => $company->id,
         ]);
+
+        // Dedicated scorer: no company and not an admin, as ScorerAccountService expects.
+        User::factory()->create([
+            'name' => 'Scorer User',
+            'email' => 'scorer@example.com',
+            'is_scorer' => true,
+        ]);
     }
 }

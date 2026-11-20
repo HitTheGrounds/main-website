@@ -25,13 +25,28 @@
                             @else
                                 <table class="tc-stats-leaderboard led-cap-table">
                                     <caption class="sr-only">{{ $board['cap'] }} Cap leaderboard, top five players by {{ $board['category'] }}</caption>
-                                    {{-- Fixed layout takes widths from the first row, which is the hidden header,
-                                         so the columns are sized here: rank, team logo, player, score. --}}
+                                    @php
+                                        // Secondary stat beside the main figure: strike rate for runs, economy for wickets.
+                                        // MOCK values for layout only: replace with real figures once balls faced / runs conceded are recorded.
+                                        $secondary = match ($board['category']) {
+                                            'runs' => ['title' => 'Strike rate', 'mock' => ['182.40', '165.00', '158.33', '149.67', '141.18']],
+                                            'wickets' => ['title' => 'Economy', 'mock' => ['5.25', '6.10', '6.75', '7.00', '7.40']],
+                                            default => null,
+                                        };
+                                    @endphp
+                                    {{-- Columns: rank, team logo, player, [secondary stat,] score. --}}
                                     <colgroup>
-                                        <col style="width: 10%"><col style="width: 16%"><col><col style="width: 20%">
+                                        <col style="width: 9%"><col style="width: 15%"><col>
+                                        @if ($secondary)<col style="width: 19%">@endif
+                                        <col style="width: {{ $secondary ? 17 : 20 }}%">
                                     </colgroup>
-                                    <thead class="sr-only"><tr>
-                                        <th scope="col">Rank</th><th scope="col">Team</th><th scope="col">Player</th><th scope="col">{{ ucfirst($board['category']) }}</th>
+                                    {{-- Only the stat columns get visible titles; rank, team and player stay for screen readers. --}}
+                                    <thead class="led-cap-head"><tr>
+                                        <th scope="col"><span class="sr-only">Rank</span></th>
+                                        <th scope="col"><span class="sr-only">Team</span></th>
+                                        <th scope="col"><span class="sr-only">Player</span></th>
+                                        @if ($secondary)<th scope="col" class="led-cap-sr-head">{{ $secondary['title'] }}</th>@endif
+                                        <th scope="col">{{ ucfirst($board['category']) }}</th>
                                     </tr></thead>
                                     <tbody>
                                         @foreach ($board['entries'] as $entry)
@@ -42,6 +57,9 @@
                                                     {{ $entry['player_name'] }}
                                                     <span class="tc-stats-team">{{ $entry['team_name'] }}</span>
                                                 </th>
+                                                @if ($secondary)
+                                                    <td class="led-cap-sr tabular-nums">{{ $secondary['mock'][$loop->index] ?? '–' }}</td>
+                                                @endif
                                                 <td class="font-bold tabular-nums">
                                                     <span class="tc-stats-score">
                                                         @if (in_array($entry['player_id'], $board['leader_ids'], true))

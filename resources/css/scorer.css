@@ -201,6 +201,11 @@
 .led-leaderboard .led-cap-table :is(th, td):last-child { width: auto; padding-right: 1.5cqw; }
 .led-leaderboard .led-cap-table tbody tr:last-child :is(th, td) { border-bottom: 0; }
 .led-leaderboard .led-cap-table .tc-badge { width: 100%; max-width: 12cqh; }
+/* Column titles row: small muted labels over the stat columns only. */
+.led-leaderboard .led-cap-table thead.led-cap-head th { height: 1px; padding-block: 1.2cqh; border-bottom: .25cqh solid var(--tc-line); background: rgb(255 255 255 / .5); color: rgb(31 27 22 / .74); font-size: 1.8cqh; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; text-align: end; }
+/* Strike rate: title and values centred on the same axis (the title is wider than the numbers). */
+.led-leaderboard .led-cap-table .led-cap-sr { text-align: center; color: rgb(31 27 22 / .74); font-size: 3cqh; font-weight: 700; }
+.led-leaderboard .led-cap-table thead.led-cap-head th.led-cap-sr-head { text-align: center; }
 /* Stats screen: three narrower panels, so tighter cell padding matching its 1cqw heading inset. */
 .led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td) { height: auto; padding: 1.2cqh .9cqh; }
 .led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td):first-child { padding-left: 1cqw; }

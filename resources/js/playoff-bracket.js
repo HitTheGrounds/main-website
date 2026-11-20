@@ -25,7 +25,7 @@ if (bracket) {
     }
 
     if (context) {
-        const observer = new ResizeObserver(() => {
+        const draw = () => {
             const bounds = bracket.getBoundingClientRect();
             const scale = window.devicePixelRatio || 1;
             canvas.width = Math.round(bounds.width * scale);
@@ -82,8 +82,16 @@ if (bracket) {
             }
 
             context.stroke();
-        });
+        };
+        // Redraw on size changes and also on load, when the tab becomes visible
+        // and after logos load: a ResizeObserver alone never fires if the page
+        // first renders while hidden, which left the canvas blank.
+        const observer = new ResizeObserver(draw);
         observer.observe(bracket);
+        window.addEventListener('load', draw);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) draw(); });
+        for (const image of bracket.querySelectorAll('img')) image.addEventListener('load', draw, { once: true });
+        requestAnimationFrame(draw);
         for (const slot of slots) observer.observe(slot);
     }
 }

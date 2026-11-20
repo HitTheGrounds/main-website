@@ -220,7 +220,7 @@
 .tc-playoff-slot .tc-match { max-width: 200px; margin-inline: auto; }
 .tc-playoff-slot .tc-team { display: flex; flex-direction: column; gap: .375rem; }
 .tc-bracket-team-details { display: flex; align-items: baseline; justify-content: space-between; gap: .25rem; width: 100%; }
-.tc-bracket-team-details .tc-team-name { min-width: 0; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
+.tc-bracket-team-details .tc-team-name { min-width: 0; font-size: .875rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
 .tc-bracket-team-details .tc-team-score { max-width: 45%; text-align: right; font-variant-numeric: tabular-nums; }
 .tc-playoff-slot .tc-score { font-size: .875rem; font-weight: 400; }
 .tc-team-logo {
@@ -240,12 +240,24 @@
 .tc-team-logo-cse { display: inline-flex; align-items: center; gap: .2rem; font-size: .75rem; letter-spacing: -.02em; color: var(--color-primary-ink); }
 .tc-team-logo-cse i { width: 2px; height: .9em; border-radius: 1px; background: var(--color-primary); }
 /* Winner of a finished knockout: tinted full-width row, bold name and score. */
-.tc-playoffs .tc-team-winner { margin-inline: calc(-1 * var(--tc-scoreboard-gutter, 1rem)); padding-inline: var(--tc-scoreboard-gutter, 1rem); background: color-mix(in srgb, var(--color-primary) 35%, #ffc440); }
+.tc-playoffs .tc-team-winner { margin-inline: calc(-1 * var(--tc-scoreboard-gutter, 1rem)); padding-inline: var(--tc-scoreboard-gutter, 1rem); background: color-mix(in srgb, var(--color-accent) 85%, white); }
 .tc-playoffs .tc-team-winner :is(.tc-team-name, .tc-score) { font-weight: 800; }
 /* Champion: cup beside the name and a badge above the final card. */
-.tc-champion-cup { display: inline-block; width: 1.05em; height: 1.05em; margin-right: .3rem; vertical-align: -.15em; color: #b8860b; }
-.tc-playoffs .tc-team-champion { background: color-mix(in srgb, #ffc440 78%, white); }
-.tc-champion-badge { position: absolute; bottom: calc(100% + .5rem); left: 50%; transform: translateX(-50%); z-index: 1; display: flex; align-items: center; justify-content: center; gap: .375rem; width: max-content; max-width: 200px; margin: 0; padding: .3rem .75rem; border-radius: 999px; background: #ffc440; color: #17120e; font-size: .75rem; font-weight: 800; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
+.tc-champion-cup { display: inline-block; width: .95em; height: .95em; margin-right: .2rem; vertical-align: -.1em; color: #b8860b; }
+/* Scores stay compact so long team names keep one line. */
+.tc-bracket-team-details .tc-team-score { flex: none; white-space: nowrap; }
+.tc-bracket-team-details .tc-team-name { flex: 1; letter-spacing: -.015em; }
+/* Champion: a soft gold wash, a shade apart from the peach of other winners. */
+.tc-playoffs .tc-team-champion { background: color-mix(in srgb, #ffc440 45%, white); }
+/* Champion row: gold outline instead of the winner triangle. */
+.tc-playoffs .tc-team-champion { box-shadow: inset 0 0 0 2px #e8a317; border-radius: .5rem; }
+/* The card clips its corners (1rem radius, 1px border), so match them on the
+   row's outer corners or the gold outline gets cut off. */
+.tc-playoffs .tc-team-champion:first-child { border-top-left-radius: calc(1rem - 1px); border-top-right-radius: calc(1rem - 1px); }
+.tc-playoffs .tc-team-champion:last-child { border-bottom-left-radius: calc(1rem - 1px); border-bottom-right-radius: calc(1rem - 1px); }
+/* No triangle marker on winners: the tint and bold text already mark them. */
+.tc-playoffs .tc-team-winner .tc-team-score::after { content: none; }
+.tc-champion-badge { position: absolute; bottom: calc(100% + .5rem); left: 50%; transform: translateX(-50%); z-index: 1; display: flex; align-items: center; justify-content: center; gap: .375rem; width: max-content; max-width: 260px; white-space: nowrap; margin: 0; padding: .3rem .75rem; border-radius: 999px; background: #ffc440; color: #17120e; font-size: .75rem; font-weight: 800; line-height: 1.3; text-align: center; overflow-wrap: anywhere; }
 .tc-champion-badge svg { width: 1rem; height: 1rem; flex: none; }
 
 @media (min-width: 75rem) {
@@ -278,3 +290,6 @@
   .tc-playoff-slot .tc-scoreboard { --tc-scoreboard-gutter: .5rem; }
   .tc-playoff-slot .tc-empty-slot { padding: .75rem; overflow-wrap: anywhere; }
 }
+
+/* Champion cup sits on the logo tile's corner, so the name keeps the full row. */
+.tc-champion-cup-logo { position: absolute; top: -.5rem; left: -.5rem; width: 1.5rem; height: 1.5rem; margin: 0; padding: .25rem; border-radius: 50%; background: #ffc440; color: #17120e; box-shadow: 0 0 0 2px #fff; }

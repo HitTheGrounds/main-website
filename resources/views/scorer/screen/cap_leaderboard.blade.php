@@ -23,8 +23,13 @@
                             @if ($board['entries'] === [])
                                 <p class="led-cap-empty">No published {{ $board['category'] }} figures yet.</p>
                             @else
-                                <table class="tc-stats-leaderboard">
+                                <table class="tc-stats-leaderboard led-cap-table">
                                     <caption class="sr-only">{{ $board['cap'] }} Cap leaderboard, top five players by {{ $board['category'] }}</caption>
+                                    {{-- Fixed layout takes widths from the first row, which is the hidden header,
+                                         so the columns are sized here: rank, team logo, player, score. --}}
+                                    <colgroup>
+                                        <col style="width: 10%"><col style="width: 16%"><col><col style="width: 20%">
+                                    </colgroup>
                                     <thead class="sr-only"><tr>
                                         <th scope="col">Rank</th><th scope="col">Team</th><th scope="col">Player</th><th scope="col">{{ ucfirst($board['category']) }}</th>
                                     </tr></thead>

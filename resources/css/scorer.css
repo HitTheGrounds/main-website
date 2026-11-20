@@ -193,6 +193,18 @@
 .led-leaderboard .tc-badge { width: 6cqw; max-width: 100%; height: 5cqh; padding: .5cqh; font-size: 1.7cqh; }
 .led-leaderboard .tc-stats-score { gap: .5cqw; font-size: 3.5cqh; }
 .led-leaderboard .tc-stats-score img { width: 3.5cqh; height: 3.5cqh; }
+/* Cap screen table: even padding, edges lined up with the panel heading, rows filling the panel. */
+.led-cap-panel:has(.led-cap-table) { display: flex; flex-direction: column; }
+.led-cap-panel .led-cap-table { flex: 1 1 0; height: 100%; min-height: 0; }
+.led-leaderboard .led-cap-table :is(th, td) { width: auto; height: auto; padding: 1.2cqh 1.4cqh; }
+.led-leaderboard .led-cap-table :is(th, td):first-child { width: auto; padding-left: 1.5cqw; }
+.led-leaderboard .led-cap-table :is(th, td):last-child { width: auto; padding-right: 1.5cqw; }
+.led-leaderboard .led-cap-table tbody tr:last-child :is(th, td) { border-bottom: 0; }
+.led-leaderboard .led-cap-table .tc-badge { width: 100%; max-width: 12cqh; }
+/* Stats screen: three narrower panels, so tighter cell padding matching its 1cqw heading inset. */
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td) { height: auto; padding: 1.2cqh .9cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td):first-child { padding-left: 1cqw; }
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td):last-child { padding-right: 1cqw; }
 .led-cap-empty { padding: 5cqh 2cqw; font-size: 2.7cqh; text-align: center; }
 .led-cap-note { padding: 1cqh 1cqw; font-size: 1.8cqh; }
 .led-stats-columns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2cqw; }
@@ -201,6 +213,8 @@
 .led-stat-dot_balls { --cap-color: #305d97; --cap-tint: #e1eaf8; }
 .led-stats-leaderboard .led-cap-heading { min-height: 13cqh; padding-inline: 1cqw; }
 .led-stats-leaderboard .led-cap-heading h2 { font-size: 3cqh; }
+/* Category illustration: a fixed box so the wide (fours) and compact (dot ball) art line up. */
+.led-stats-leaderboard .led-cap-heading > .led-stat-icon { flex: none; width: 14cqh; height: 8.5cqh; object-fit: contain; object-position: center; }
 .led-stats-leaderboard .tc-stats-leaderboard { font-size: 2.4cqh; }
 .led-stats-leaderboard .tc-stats-leaderboard :is(th, td) { padding-inline: .4cqw; height: 11cqh; }
 .led-stats-leaderboard .tc-stats-leaderboard :is(th, td):first-child { width: 9%; padding-left: .6cqw; }

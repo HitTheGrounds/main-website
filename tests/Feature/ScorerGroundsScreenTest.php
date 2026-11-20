@@ -46,6 +46,23 @@ class ScorerGroundsScreenTest extends TestCase
         $this->signedIn($company)->get('/scorer/screen/grounds')->assertForbidden();
     }
 
+    public function test_local_screen_does_not_invent_fixtures_when_no_matches_exist(): void
+    {
+        $scorer = User::factory()->create(['is_admin' => false, 'company_id' => null, 'is_scorer' => true]);
+        $this->app->instance('env', 'local');
+
+        try {
+            $this->signedIn($scorer)->get('/scorer/screen/grounds')->assertOk()
+                ->assertSee('Ground available')
+                ->assertSee('No upcoming matches')
+                ->assertDontSee('Next match:')
+                ->assertDontSee('DEMO 2026')
+                ->assertDontSee('led-sched-item-matchup');
+        } finally {
+            $this->app->instance('env', 'testing');
+        }
+    }
+
     public function test_screen_renders_four_grounds_and_matches_without_navbars(): void
     {
         $team1 = Team::factory()->create(['team_name' => 'Alpha Titans', 'approved' => true]);

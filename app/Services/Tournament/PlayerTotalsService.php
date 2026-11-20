@@ -43,7 +43,7 @@ class PlayerTotalsService
                 ->whereHas('tournamentMatch', fn ($query) => $query->where('tournament_year', $year)
                     ->where('status', 'finished')->whereNotNull('result_published_at')
                     ->whereIn('result_type', ['win', 'tie'])->whereIn('stage', app(PlayoffFeature::class)->stages($year)))
-                ->with('tournamentMatch:id,team1_id,team2_id')->orderBy('match_id')->orderBy('id')->get();
+                ->with('tournamentMatch:id,team1_id,team2_id,balls_per_over')->orderBy('match_id')->orderBy('id')->get();
             $calculated = [];
             foreach ($sources as $source) {
                 $id = $source->team_member_id;
@@ -57,7 +57,8 @@ class PlayerTotalsService
                     // Earliest eligible match supplies the display name, never
                     // a mutable registration profile. Gender/team must agree.
                     $calculated[$id] = ['tournament_year' => $year, 'team_member_id' => $id, 'team_id' => $source->team_id,
-                        ...$identity, 'highest_score' => null, 'highest_score_match_id' => null];
+                        ...$identity, 'highest_score' => null, 'highest_score_match_id' => null,
+                        'bowling_overs_units' => null, 'strike_rate_complete' => true, 'economy_complete' => true];
                     foreach (PlayerStatsValidator::METRICS as $metric) {
                         $calculated[$id][$metric] = null;
                         $calculated[$id][$metric.'_recorded_count'] = 0;
@@ -66,6 +67,28 @@ class PlayerTotalsService
                     $this->reject('Published player performances have conflicting team or gender snapshots. Resolve the historical classification before recalculating.');
                 }
                 $figures = $this->validator->validate($source->only([...PlayerStatsValidator::METRICS, 'batting_status']));
+                // Check paired inputs per match: equal recorded counts alone
+                // cannot prove the numerator and denominator cover the same rows.
+                if ($figures['batting_status'] !== 'did_not_bat'
+                    && ($figures['runs_scored'] === null || $figures['balls_faced'] === null)) {
+                    $calculated[$id]['strike_rate_complete'] = false;
+                }
+                if ($figures['runs_conceded'] === null || $figures['bowling_balls'] === null) {
+                    $calculated[$id]['economy_complete'] = false;
+                }
+                if ($figures['bowling_balls'] !== null) {
+                    $ballsPerOver = $source->tournamentMatch->balls_per_over;
+                    if (! in_array($ballsPerOver, [4, 6], true)) {
+                        $this->reject('Published bowling figures require a supported balls-per-over format.');
+                    }
+                    $units = BigInteger::of($figures['bowling_balls'])
+                        ->multipliedBy(intdiv(PlayerTournamentStat::BOWLING_OVER_UNITS, $ballsPerOver))
+                        ->plus($calculated[$id]['bowling_overs_units'] ?? 0);
+                    if ($units->isGreaterThan('9223372036854775807')) {
+                        $this->reject('Calculated bowling overs exceed their supported storage range.');
+                    }
+                    $calculated[$id]['bowling_overs_units'] = $units->toInt();
+                }
                 foreach (PlayerStatsValidator::METRICS as $metric) {
                     if ($figures[$metric] === null) {
                         continue;

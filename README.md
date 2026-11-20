@@ -128,6 +128,24 @@ The site is served at **http://localhost:8000**.
 | Run tests | `composer test` (or `php artisan test`) |
 | Build production assets | `npm run build` |
 
+Tournament cap rankings use total runs followed by higher strike rate, and total
+wickets followed by lower economy. Economy uses each match's four- or six-ball
+over length; partial overs are calculated from legal balls without rounding.
+Equal rates remain joint ranks. If any player in a tied-total group has incomplete
+rate inputs, that group remains tied until the figures are complete.
+
+After applying the player ranking rates migration to an existing installation,
+rebuild the derived summaries for each existing tournament year before serving
+the updated stats (use the intended database configuration):
+
+```bash
+php artisan migrate
+php artisan tournament:rebuild-summaries 2026 --apply
+npm run build
+```
+
+New publications, corrections, and withdrawals recalculate these summaries automatically.
+
 ---
 
 ## Optional tournament Playoffs

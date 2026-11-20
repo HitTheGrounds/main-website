@@ -10,6 +10,7 @@
         $figures = ['runs' => 'Runs', 'wickets' => 'Wickets', 'sixes' => 'Sixes', 'fours' => 'Fours',
             'dot_balls' => 'Dot balls', 'highest_innings' => 'Runs in one innings'];
         $category = $rankingData['category'];
+        $rateLabel = match ($category) { 'runs' => 'Strike rate', 'wickets' => 'Economy', default => null };
     @endphp
     <nav aria-label="Stats category" class="tc-status-tabs tc-stats-categories">
         @foreach (['runs' => 'Runs', 'wickets' => 'Wickets', 'sixes' => 'Sixes', 'fours' => 'Fours',
@@ -20,7 +21,6 @@
     </nav>
 
     <section aria-labelledby="player-ranking-heading" class="tc-panel tc-stats-panel">
-
         @if ($rankingData['entries'] === [])
             <p class="mt-6 text-center">No published figures are available for this selection yet.</p>
         @else
@@ -30,12 +30,15 @@
             <div role="region" aria-label="Player rankings" tabindex="0" class="overflow-x-auto">
                 <table class="tc-stats-leaderboard">
                     <caption class="sr-only">{{ $categories[$category] }}, All players</caption>
-                    <thead class="sr-only">
+                    <thead>
                         <tr>
-                            <th scope="col">Rank</th>
-                            <th scope="col">Team</th>
+                            <th scope="col"><span class="sr-only">Rank</span></th>
+                            <th scope="col" class="tc-stats-logo"><span class="sr-only">Team</span></th>
                             <th scope="col">Player</th>
-                            <th scope="col">{{ $categories[$category] }}</th>
+                            @if ($rateLabel)
+                                <th scope="col" class="tc-stats-rate">{{ $rateLabel }}</th>
+                            @endif
+                            <th scope="col" class="tc-stats-total">{{ $figures[$category] }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,7 +61,10 @@
                                     {{ $entry['player_name'] }}
                                     <span class="tc-stats-team">{{ $entry['team_name'] }}</span>
                                 </th>
-                                <td class="text-xl font-bold tabular-nums">
+                                @if ($rateLabel)
+                                    <td class="tc-stats-rate tabular-nums">{{ $entry['rate'] ?? '—' }}</td>
+                                @endif
+                                <td class="tc-stats-total text-xl font-bold tabular-nums">
                                     <span class="tc-stats-score">
                                         @if ($cap)
                                             <img src="{{ asset('award/'.strtolower($cap).'_cap.avif') }}" alt="{{ $cap }} Cap" width="32" height="32">

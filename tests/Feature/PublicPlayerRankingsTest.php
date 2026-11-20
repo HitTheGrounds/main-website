@@ -114,6 +114,98 @@ class PublicPlayerRankingsTest extends TestCase
         $this->assertSame(9007199254740993, $result['entries'][0]['value']);
     }
 
+    public function test_equal_runs_use_higher_strike_rate_and_preserve_exact_rate_ties(): void
+    {
+        $slow = $this->summary(100, changes: ['balls_faced' => 80, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $fast = $this->summary(100, changes: ['balls_faced' => 50, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $joint = $this->summary(100, changes: ['balls_faced' => 50, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $lower = $this->summary(90, changes: ['balls_faced' => 10, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $result = app(PublicTournamentService::class)->rankings(2026);
+        $this->assertSame([$fast, $joint, $slow, $lower], array_column($result['entries'], 'player_id'));
+        $this->assertSame([1, 1, 3, 4], array_column($result['entries'], 'rank'));
+        $this->assertSame(['200.00', '200.00', '125.00', '900.00'], array_column($result['entries'], 'rate'));
+        $this->assertSame([$fast, $joint], $result['leader_ids']);
+    }
+
+    public function test_equal_wickets_use_lower_economy_including_a_genuine_zero(): void
+    {
+        $base = ['wickets_taken' => 5, 'wickets_taken_recorded_count' => 1,
+            'runs_conceded_recorded_count' => 1, 'bowling_overs_units' => 48, 'economy_complete' => true];
+        $expensive = $this->summary(0, changes: [...$base, 'runs_conceded' => 40]);
+        $cheap = $this->summary(0, changes: [...$base, 'runs_conceded' => 24]);
+        $zero = $this->summary(0, changes: [...$base, 'runs_conceded' => 0]);
+        $result = app(PublicTournamentService::class)->rankings(2026, ['category' => 'wickets']);
+        $this->assertSame([$zero, $cheap, $expensive], array_column($result['entries'], 'player_id'));
+        $this->assertSame(['0.00', '6.00', '10.00'], array_column($result['entries'], 'rate'));
+        $this->assertSame([$zero], $result['leader_ids']);
+    }
+
+    public function test_rates_are_compared_before_rounding_and_without_integer_overflow(): void
+    {
+        $slow = $this->summary(9007199254740993, changes: ['balls_faced' => 9007199254740993,
+            'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $fast = $this->summary(9007199254740993, changes: ['balls_faced' => 9007199254740992,
+            'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $result = app(PublicTournamentService::class)->rankings(2026);
+        $this->assertSame([$fast, $slow], array_column($result['entries'], 'player_id'));
+        $this->assertSame([1, 2], array_column($result['entries'], 'rank'));
+        $this->assertSame(['100.00', '100.00'], array_column($result['entries'], 'rate'));
+        $this->assertSame([$fast], $result['leader_ids']);
+    }
+
+    public function test_equal_economy_fractions_share_a_rank_and_nearby_rates_do_not(): void
+    {
+        $base = ['wickets_taken' => 4, 'wickets_taken_recorded_count' => 1,
+            'runs_conceded_recorded_count' => 1, 'economy_complete' => true];
+        $expensive = $this->summary(0, changes: [...$base, 'runs_conceded' => 20001, 'bowling_overs_units' => 40000]);
+        $cheap = $this->summary(0, changes: [...$base, 'runs_conceded' => 1, 'bowling_overs_units' => 2]);
+        $joint = $this->summary(0, changes: [...$base, 'runs_conceded' => 2, 'bowling_overs_units' => 4]);
+        $result = app(PublicTournamentService::class)->rankings(2026, ['category' => 'wickets']);
+        $this->assertSame([$cheap, $joint, $expensive], array_column($result['entries'], 'player_id'));
+        $this->assertSame([1, 1, 3], array_column($result['entries'], 'rank'));
+        $this->assertSame(['6.00', '6.00', '6.00'], array_column($result['entries'], 'rate'));
+        $this->assertSame([$cheap, $joint], $result['leader_ids']);
+    }
+
+    public function test_missing_economy_inputs_and_zero_overs_do_not_become_zero_economy(): void
+    {
+        $base = ['wickets_taken' => 4, 'wickets_taken_recorded_count' => 1,
+            'runs_conceded_recorded_count' => 1, 'economy_complete' => true];
+        $this->summary(0, changes: [...$base, 'runs_conceded' => 0, 'bowling_overs_units' => 0]);
+        $this->summary(0, changes: [...$base, 'runs_conceded' => 0, 'bowling_overs_units' => null]);
+        $this->summary(0, changes: [...$base, 'runs_conceded' => null, 'runs_conceded_recorded_count' => 0, 'bowling_overs_units' => 12]);
+        $this->summary(0, changes: [...$base, 'runs_conceded' => 10, 'bowling_overs_units' => 12, 'economy_complete' => false]);
+        $result = app(PublicTournamentService::class)->rankings(2026, ['category' => 'wickets']);
+        $this->assertSame([null, null, null, null], array_column($result['entries'], 'rate'));
+        $this->assertSame([1, 1, 1, 1], array_column($result['entries'], 'rank'));
+    }
+
+    public function test_cutoff_is_applied_after_rate_sorting_and_keeps_true_fifth_place_ties(): void
+    {
+        foreach ([200, 180, 160, 140] as $runs) {
+            $this->summary($runs);
+        }
+        $this->summary(100, changes: ['balls_faced' => 80, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $fast = $this->summary(100, changes: ['balls_faced' => 40, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $joint = $this->summary(100, changes: ['balls_faced' => 40, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $result = app(PublicTournamentService::class)->rankings(2026);
+        $this->assertCount(6, $result['entries']);
+        $this->assertSame([$fast, $joint], array_slice(array_column($result['entries'], 'player_id'), 4));
+        $this->assertSame([1, 2, 3, 4, 5, 5], array_column($result['entries'], 'rank'));
+    }
+
+    public function test_missing_or_zero_denominator_rates_leave_the_whole_total_group_tied(): void
+    {
+        $known = $this->summary(100, changes: ['balls_faced' => 50, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $unknown = $this->summary(100);
+        $zero = $this->summary(100, changes: ['balls_faced' => 0, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $incomplete = $this->summary(100, changes: ['balls_faced' => 20, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => false]);
+        $result = app(PublicTournamentService::class)->rankings(2026);
+        $this->assertSame([1, 1, 1, 1], array_column($result['entries'], 'rank'));
+        $this->assertSame(['200.00', null, null, null], array_column($result['entries'], 'rate'));
+        $this->assertSame([$known, $unknown, $zero, $incomplete], $result['leader_ids']);
+    }
+
     public function test_read_projection_is_private_field_free_without_source_joins_or_writes(): void
     {
         $this->summary(10);
@@ -127,7 +219,7 @@ class PublicPlayerRankingsTest extends TestCase
             $this->assertStringNotContainsString($private, $sql);
         }
         $this->assertStringNotContainsString('PRIVATE-', json_encode($result));
-        $this->assertSame(['rank', 'player_id', 'player_name', 'team_id', 'team_name', 'value', 'recorded_count'], array_keys($result['entries'][0]));
+        $this->assertSame(['rank', 'player_id', 'player_name', 'team_id', 'team_name', 'value', 'recorded_count', 'rate'], array_keys($result['entries'][0]));
     }
 
     public static function invalidFilters(): array

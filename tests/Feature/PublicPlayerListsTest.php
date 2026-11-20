@@ -96,6 +96,45 @@ class PublicPlayerListsTest extends TestCase
             ->assertDontSee('Orange Cap')->assertDontSee('Leader (provisional)');
     }
 
+    public function test_runs_show_strike_rates_and_award_only_the_faster_tied_scorer(): void
+    {
+        $this->summary('Slower scorer', 100, changes: ['balls_faced' => 80, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $this->summary('Faster scorer', 100, changes: ['balls_faced' => 50, 'balls_faced_recorded_count' => 1, 'strike_rate_complete' => true]);
+        $response = $this->get('/tournament?tab=stats')->assertOk()
+            ->assertSeeInOrder(['Faster scorer', '200.00', 'Slower scorer', '125.00'])
+            ->assertSee('Strike rate')->assertDontSee('Equal runs are ranked by higher strike rate.')
+            ->assertDontSee('Players remain tied if a rate is unavailable or their rates are equal.');
+        $this->assertSame(1, substr_count($response->getContent(), 'award/orange_cap.avif'));
+        $document = new \DOMDocument;
+        @$document->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+        $xpath = new \DOMXPath($document);
+        $this->assertSame('Strike rate', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/thead/tr/th[4])')));
+        $this->assertSame('Runs', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/thead/tr/th[5])')));
+        $this->assertSame(0, $xpath->query('//table[@class="tc-stats-leaderboard"]/thead[contains(@class,"sr-only")]')->length);
+        $this->assertSame('200.00', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/tbody/tr[1]/*[4])')));
+        $this->assertSame(5, $xpath->query('//table[@class="tc-stats-leaderboard"]/tbody/tr[1]/*')->length);
+    }
+
+    public function test_wickets_show_economy_and_missing_rates_are_unavailable(): void
+    {
+        $base = ['wickets_taken' => 3, 'wickets_taken_recorded_count' => 1];
+        $this->summary('Economical bowler', 0, changes: [...$base, 'runs_conceded' => 24,
+            'runs_conceded_recorded_count' => 1, 'bowling_overs_units' => 48, 'economy_complete' => true]);
+        $this->summary('Unknown economy', 0, changes: $base);
+        $response = $this->get('/tournament?tab=stats&category=wickets')->assertOk()
+            ->assertSee('Economy')->assertSee('6.00')->assertSee('—')
+            ->assertDontSee('Equal wickets are ranked by lower economy')
+            ->assertDontSee('Players remain tied if a rate is unavailable or their rates are equal.');
+        $this->assertSame(2, substr_count($response->getContent(), 'award/purple_cap.avif'));
+        $document = new \DOMDocument;
+        @$document->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+        $xpath = new \DOMXPath($document);
+        $this->assertSame('Economy', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/thead/tr/th[4])')));
+        $this->assertSame('Wickets', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/thead/tr/th[5])')));
+        $this->assertSame('6.00', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/tbody/tr[1]/*[4])')));
+        $this->assertSame('—', trim($xpath->evaluate('string(//table[@class="tc-stats-leaderboard"]/tbody/tr[2]/*[4])')));
+    }
+
     public function test_names_and_teams_are_escaped_and_no_full_player_data_is_rendered(): void
     {
         $player = '<script>alert("player")</script>';

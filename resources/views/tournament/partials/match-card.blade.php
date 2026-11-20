@@ -4,11 +4,20 @@
     $scoreboardTag = $bracketCard ? 'div' : 'dl';
     $nameTag = $bracketCard ? 'span' : 'dt';
     $scoreTag = $bracketCard ? 'div' : 'dd';
+    // Bracket only: draw the winner on the side facing the next round's card.
+    $winnerSide ??= null;
+    $sideOrder = ['team1', 'team2'];
+    $bracketWinnerId = $bracketCard ? ($match['result']['winner_id'] ?? null) : null;
+    if ($bracketWinnerId !== null && $winnerSide !== null) {
+        $winnerKey = $match['team1']['id'] === $bracketWinnerId ? 'team1' : 'team2';
+        $loserKey = $winnerKey === 'team1' ? 'team2' : 'team1';
+        $sideOrder = $winnerSide === 'top' ? [$winnerKey, $loserKey] : [$loserKey, $winnerKey];
+    }
 @endphp
 <article aria-labelledby="match-{{ $match['id'] }}-heading" @class(['tc-match', 'tc-match-live' => $match['status'] === 'live', 'tc-match-published' => $match['result'] !== null])>
     <{{ $headingTag }} id="match-{{ $match['id'] }}-heading" tabindex="-1" class="tc-match-heading sr-only">{{ $match['team1']['name'] }} vs {{ $match['team2']['name'] }}</{{ $headingTag }}>
     <{{ $scoreboardTag }} class="tc-scoreboard">
-        @foreach (['team1', 'team2'] as $side)
+        @foreach ($sideOrder as $side)
             @php
                 $innings = $match['result'][$side] ?? null;
                 $winnerId = $match['result']['winner_id'] ?? null;

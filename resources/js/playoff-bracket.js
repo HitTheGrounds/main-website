@@ -58,7 +58,12 @@ if (bracket) {
                     // End at the row where that team appears in the next card, when known.
                     const landingRow = cardOf(target).querySelector(`.tc-team[data-from="${id}"]`);
                     const endFraction = entersFinal || sources.length === 1 ? .5 : (index + 1) / 3;
-                    const endY = landingRow ? middle(landingRow.getBoundingClientRect()) : to.top + to.height * endFraction - bounds.top;
+                    let endY = landingRow ? middle(landingRow.getBoundingClientRect()) : to.top + to.height * endFraction - bounds.top;
+                    // Into the Final: run straight across from the semi-final winner, on
+                    // both halves, as long as that height still meets the Final card.
+                    if (entersFinal && startY > to.top - bounds.top + 8 && startY < to.bottom - bounds.top - 8) {
+                        endY = startY;
+                    }
                     const lane = (start + end) / 2 - bounds.left;
                     const startX = start - bounds.left;
                     const endX = end - bounds.left;

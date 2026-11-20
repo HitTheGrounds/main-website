@@ -637,14 +637,38 @@ html { scroll-padding-top: 5.5rem; }
   to { stroke-dashoffset: -102; }
 }
 
-/* Desktop: centred heading, then the map at full content width. The section
-   is no longer locked to one screen height, so the map is not squeezed. */
+/* Desktop: "framed poster". Centred heading, then the plan mounted like a print:
+   an off-white mat with a hairline border, and a caption bar holding the venue
+   and the Maps link. Tablet and phone keep their own layout. */
+.ground-plan-caption { display: none; }
 @media (min-width: 1024px) {
-  .ground-plan-image { max-width: 1080px; margin-inline: auto; }
+  #ground-plan .ground-plan-container { padding-block: clamp(4rem, 9vh, 6.5rem); }
+  .ground-plan-heading { margin-bottom: clamp(2rem, 5vh, 3rem); }
+  .ground-plan-heading-cta { display: none; }
+  .ground-plan-image {
+    max-width: 1040px;
+    margin-inline: auto;
+    padding: .75rem;
+    border: 1px solid var(--color-base-300);
+    border-radius: 1.25rem;
+    background: color-mix(in srgb, var(--color-base-100) 35%, white);
+    box-shadow: 0 1px 2px rgb(31 27 22 / .04);
+  }
+  .ground-plan-image img { border-radius: .75rem; }
+  .ground-plan-caption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: .875rem .375rem .125rem;
+  }
+  .ground-plan-caption-place { display: flex; align-items: center; gap: .625rem; font-size: .9375rem; color: color-mix(in srgb, var(--color-base-content) 70%, transparent); }
+  .ground-plan-caption-place svg { width: 1.125rem; height: 1.125rem; flex: none; color: var(--color-primary); }
+  .ground-plan-caption-place strong { margin-right: .375rem; font-weight: 700; color: var(--color-base-content); }
+  .ground-plan-caption-link { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 1rem; border: 1px solid var(--color-base-300); border-radius: .625rem; font-size: .875rem; font-weight: 700; color: var(--color-base-content); transition: border-color .2s cubic-bezier(.22, 1, .36, 1), background-color .2s cubic-bezier(.22, 1, .36, 1); }
+  .ground-plan-caption-link:hover { border-color: var(--color-base-content); background: var(--color-base-100); }
+  .ground-plan-caption-link svg { width: 1rem; height: 1rem; color: var(--color-primary-ink); }
+  .ground-plan-caption-link:focus-visible { outline: 2px solid var(--color-primary-ink); outline-offset: 3px; }
+  .ground-plan-decoration { display: none !important; }
 }
-@media (min-width: 1280px) {
-  /* Quieter, fewer doodles: only those that stay clear of the wide map. */
-  .ground-plan-bat, .ground-plan-doodle-2, .ground-plan-doodle-7 { display: none; }
-  .ground-plan-orbit { opacity: .25; }
-  .ground-plan-doodle { opacity: .35; }
-}
+

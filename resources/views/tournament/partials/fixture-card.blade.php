@@ -14,6 +14,16 @@
         </span>
         <span class="tc-fixture-status tc-fixture-status-{{ $match['status'] }}">{{ $statuses[$match['status']] }}</span>
     </header>
+    @if ($match['scheduled_at'] !== null || $match['venue'] !== null)
+        <div class="tc-fixture-meta">
+            @if ($match['scheduled_at'] !== null)
+                <p><x-scorer.icon name="clock" /><time datetime="{{ $match['scheduled_at'] }}">{{ \Carbon\CarbonImmutable::parse($match['scheduled_at'])->setTimezone(config('tournament.timezone'))->format('D, j M Y · g:i A') }}</time></p>
+            @endif
+            @if ($match['venue'] !== null)
+                <p><x-scorer.icon name="pin" /><span>{{ $match['venue'] }}</span></p>
+            @endif
+        </div>
+    @endif
     <h3 id="match-{{ $match['id'] }}-heading" tabindex="-1" class="tc-fixture-heading sr-only">{{ $match['team1']['name'] }} vs {{ $match['team2']['name'] }}</h3>
     <dl class="tc-fixture-board">
         @foreach (['team1', 'team2'] as $side)

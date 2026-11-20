@@ -163,7 +163,11 @@ new class extends Component {
     </div>
     <section id="ko-panel-qualify" role="tabpanel" aria-labelledby="ko-tab-qualify" x-show="tab === 'qualify'" class="card border border-base-300 bg-base-100"><div class="card-body space-y-4">
         <h2 id="qualification-heading" tabindex="-1" class="text-xl font-bold">Advancing teams</h2>
-        <p class="scorer-instruction" aria-live="polite">{{ count($selected) }} of {{ $selection['capacity'] }} places selected in this form. Saved: {{ count($selection['selected']) }}.</p>
+        @if($selection['capacity'] === null)
+            <p class="scorer-instruction" aria-live="polite">{{ count($selected) }} teams selected in this form. Saved: {{ count($selection['selected']) }}. No qualification limit while Playoffs is enabled.</p>
+        @else
+            <p class="scorer-instruction" aria-live="polite">{{ count($selected) }} of {{ $selection['capacity'] }} places selected in this form. Saved: {{ count($selection['selected']) }}.</p>
+        @endif
         <p class="text-sm">Table position is guidance. You may select any approved team, including more than one from a group.</p>
         @if($selection['unequal_groups'])<p class="text-sm">Group sizes differ. Compare runner-up figures with care.</p>@endif
         <form wire:submit="saveSelection" class="space-y-4">
@@ -229,9 +233,9 @@ new class extends Component {
         <h3 class="text-lg font-bold">{{ $roundNames[$stage] }}</h3>
         <button type="button" wire:click="reloadRound" wire:confirm="Load the latest round? Unsaved fixture choices and position reviews will be cleared." wire:loading.attr="disabled" class="btn btn-outline btn-sm">Reload round</button>
         @if($stage === 'PO')
-            <p class="text-sm">Choose from all saved group qualifiers. Teams may play more than one Playoff. Only published Playoff winners can advance to quarter-finals.</p>
+            <p class="text-sm">Choose from all saved group qualifiers. Teams may play more than one Playoff. Saved group qualifiers and published Playoff winners are eligible for quarter-finals.</p>
         @else
-            <p class="text-sm">{{ $stage === 'QF' && !app(\App\Services\Tournament\PlayoffFeature::class)->enabled($selection['year']) ? 'Choose from saved advancing teams.' : 'Choose only published winners from the preceding round.' }} Teams already scheduled in this round are excluded from new choices.</p>
+            <p class="text-sm">{{ $stage === 'QF' ? (app(\App\Services\Tournament\PlayoffFeature::class)->enabled($selection['year']) ? 'Choose from saved group qualifiers or published Playoff winners.' : 'Choose from saved advancing teams.') : 'Choose only published winners from the preceding round.' }} Teams already scheduled in this round are excluded from new choices.</p>
         @endif
         <div class="grid gap-4 md:grid-cols-2">
             @foreach($round['positions'] as $position)

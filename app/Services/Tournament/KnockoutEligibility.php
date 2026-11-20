@@ -26,12 +26,12 @@ class KnockoutEligibility
             if (! $team->approved || ! $assignment) {
                 continue;
             }
-            $fromGroups = $stage === 'PO' || ($stage === 'QF' && ! $playoffsEnabled);
-            if ($fromGroups ? ! $assignment->qualified : ! isset($sources[$team->id])) {
+            $fromGroups = in_array($stage, ['PO', 'QF'], true) && $assignment->qualified;
+            if (! $fromGroups && ! isset($sources[$team->id])) {
                 continue;
             }
             $candidates[$team->id] = ['id' => $team->id, 'name' => $team->team_name,
-                'source_match_id' => $fromGroups ? null : $sources[$team->id]];
+                'source_match_id' => $sources[$team->id] ?? null];
         }
         // Stable presentation only, never a seed, pairing or tie-break.
         ksort($candidates);

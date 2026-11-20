@@ -16,7 +16,7 @@ class MatchTransitionGuard
         private MatchResultValidator $results,
     ) {}
 
-    public function assertScheduleStatusChange(TournamentMatch $match, string $status, iterable $matches): void
+    public function assertScheduleStatusChange(TournamentMatch $match, string $status, iterable $matches, iterable $assignments = []): void
     {
         if ($status === $match->status) {
             return;
@@ -29,7 +29,7 @@ class MatchTransitionGuard
             }
             $proposed = clone $match;
             $proposed->status = $status;
-            $this->dependencies->assertChange($match, $proposed, $matches);
+            $this->dependencies->assertChange($match, $proposed, $matches, $assignments);
 
             return;
         }
@@ -43,9 +43,9 @@ class MatchTransitionGuard
         }
     }
 
-    public function assertResultPublication(TournamentMatch $before, TournamentMatch $proposed, iterable $matches): void
+    public function assertResultPublication(TournamentMatch $before, TournamentMatch $proposed, iterable $matches, iterable $assignments = []): void
     {
-        $this->dependencies->assertChange($before, $proposed, $matches);
+        $this->dependencies->assertChange($before, $proposed, $matches, $assignments);
     }
 
     public function assertParticipants(TournamentMatch $match, iterable $teams, iterable $assignments, iterable $matches): void

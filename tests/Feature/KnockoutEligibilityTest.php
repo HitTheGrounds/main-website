@@ -38,6 +38,21 @@ class KnockoutEligibilityTest extends TestCase
             $this->match(13, 'QF', 5, 6, 5, 3), $this->match(14, 'QF', 7, 8, 7, 4)];
     }
 
+    public function test_playoff_quarters_combine_group_qualifiers_and_published_winners_while_disabled_rounds_keep_group_rules(): void
+    {
+        [$teams, $assignments] = $this->teams();
+        foreach (array_slice($assignments, 2) as $row) {
+            $row->qualified = false;
+        }
+        $matches = [$this->match(11, 'PO', 3, 4, 3),
+            $this->match(12, 'PO', 5, 6, 5, 1, ['result_published_at' => null]),
+            $this->match(13, 'PO', 7, 8, 7, 1, ['tournament_year' => 2025])];
+        $engine = app(KnockoutEligibility::class);
+        $this->assertSame([1, 2, 3], array_column($engine->candidates(2026, 'QF', $teams, $assignments, $matches, true), 'id'));
+        $this->assertSame([1, 2], array_column($engine->candidates(2026, 'QF', $teams, $assignments, $matches, false), 'id'));
+        $this->assertSame([1, 2], array_column($engine->candidates(2026, 'PO', $teams, $assignments, $matches, true), 'id'));
+    }
+
     private function rejected(callable $action): void
     {
         try {

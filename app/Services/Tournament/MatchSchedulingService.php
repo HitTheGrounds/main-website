@@ -248,7 +248,7 @@ class MatchSchedulingService
                 $this->reject('batting_first_id', 'The batting-first team is locked after result publication.');
             }
             if (isset($details['status'])) {
-                $this->transitions->assertScheduleStatusChange($match, $details['status'], $matches);
+                $this->transitions->assertScheduleStatusChange($match, $details['status'], $matches, $assignments);
             }
             foreach ($details as $field => $value) {
                 $match->$field = $value;

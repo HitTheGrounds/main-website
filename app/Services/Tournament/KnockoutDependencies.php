@@ -8,13 +8,20 @@ use Illuminate\Validation\ValidationException;
 /** Read-only actual-fixture checks; caller authorizes and locks the year snapshot. */
 class KnockoutDependencies
 {
-    public function assertChange(TournamentMatch $before, TournamentMatch $proposed, iterable $matches): void
+    public function assertChange(TournamentMatch $before, TournamentMatch $proposed, iterable $matches, iterable $assignments = []): void
     {
         if ($before->id !== $proposed->id || $before->tournament_year !== $proposed->tournament_year || $before->stage !== $proposed->stage) {
             throw ValidationException::withMessages(['tournament' => 'A result correction must retain its match identity, year and stage.']);
         }
         $next = ['PO' => 'QF', 'QF' => 'SF', 'SF' => 'F'][$before->stage] ?? null;
         if ($before->stage === 'PO') {
+            // A saved group qualifier remains eligible even if its Playoff win changes.
+            foreach ($assignments as $assignment) {
+                if ($assignment->tournament_year === $before->tournament_year
+                    && $assignment->team_id === $before->winner_id && $assignment->qualified) {
+                    return;
+                }
+            }
             // Repeated Playoff wins are allowed. Another official win preserves eligibility.
             foreach ($matches as $match) {
                 if ($match->id !== $before->id && $match->tournament_year === $before->tournament_year

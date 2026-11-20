@@ -16,6 +16,7 @@ use App\Services\Tournament\PlayerPublicationService;
 use App\Services\Tournament\PlayerStatsService;
 use App\Services\Tournament\PlayoffFeature;
 use App\Services\Tournament\PublicTournamentService;
+use App\Services\Tournament\QualificationService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -57,10 +58,10 @@ class TournamentPlayoffsTest extends TestCase
         parent::tearDown();
     }
 
-    private function teams()
+    private function teams(int $count = 5)
     {
         $group = DB::table('tournament_groups')->insertGetId(['name' => 'Playoff group', 'tournament_year' => 2026]);
-        $teams = Team::factory()->count(5)->create(['approved' => true]);
+        $teams = Team::factory()->count($count)->create(['approved' => true]);
         foreach ($teams as $index => $team) {
             DB::table('group_teams')->insert(['group_id' => $group, 'tournament_year' => 2026,
                 'team_id' => $team->id, 'qualified' => $index < 4]);
@@ -128,6 +129,66 @@ class TournamentPlayoffsTest extends TestCase
         Volt::test('scorer.knockouts-manager')->assertDontSee('Playoffs');
     }
 
+    public function test_playoffs_remove_the_group_qualification_limit_in_the_service_and_scorer_form(): void
+    {
+        $teams = $this->teams(12);
+        $this->toggle(true);
+        $service = app(QualificationService::class);
+        $this->assertNull($service->selection(2026)['capacity']);
+        $this->assertSame(8, $service->selection(2027)['capacity']);
+        Livewire::withCookie('company_token', (new JWTService)->generateToken($this->scorer));
+        Volt::test('scorer.knockouts-manager')->assertSet('selection.capacity', null)
+            ->assertSee('No qualification limit while Playoffs is enabled.')
+            ->set('selected', $teams->pluck('id')->all())->call('saveSelection')->assertHasNoErrors()
+            ->assertSet('selection.selected', $teams->pluck('id')->all())
+            ->assertSee('12 teams selected in this form. Saved: 12.');
+        $this->assertCount(12, app(MatchSchedulingService::class)->knockoutOptions(2026, 'PO')['candidates']);
+    }
+
+    public function test_disabling_requires_at_most_eight_saved_qualifiers_and_restores_the_limit(): void
+    {
+        $teams = $this->teams(12);
+        $this->toggle(true);
+        $service = app(QualificationService::class);
+        $ids = $teams->pluck('id')->all();
+        $saved = $service->save(2026, $ids, $service->selection(2026)['revision']);
+        try {
+            $this->toggle(false);
+            $this->fail('Playoffs disabled with more than eight saved qualifiers.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('playoffs', $exception->errors());
+        }
+        $this->assertTrue(app(PlayoffFeature::class)->enabled(2026));
+        $this->actAs($this->scorer);
+        $this->assertSame($ids, $service->selection(2026)['selected']);
+        $eight = array_slice($ids, 0, 8);
+        $service->save(2026, $eight, $saved['revision']);
+        $this->toggle(false);
+        $state = $service->selection(2026);
+        $this->assertSame(8, $state['capacity']);
+        $this->assertSame($eight, $state['selected']);
+        try {
+            $service->save(2026, array_slice($ids, 0, 9), $state['revision']);
+            $this->fail('More than eight qualifiers saved while Playoffs was disabled.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('teamIds', $exception->errors());
+        }
+        $this->assertSame($eight, $service->selection(2026)['selected']);
+    }
+
+    public function test_qualification_revision_is_invalidated_when_the_playoff_limit_changes(): void
+    {
+        $teams = $this->teams(12);
+        $service = app(QualificationService::class);
+        $off = $service->selection(2026);
+        $this->toggle(true);
+        $this->rejected(fn () => $service->save(2026, $teams->pluck('id')->all(), $off['revision']));
+        $on = $service->selection(2026);
+        $this->toggle(false);
+        $this->rejected(fn () => $service->save(2026, $teams->pluck('id')->all(), $on['revision']));
+        $this->assertCount(4, $service->selection(2026)['selected']);
+    }
+
     public function test_admin_dashboard_toggle_is_persisted_year_specific_and_rejects_stale_or_scorer_writes(): void
     {
         try {
@@ -166,22 +227,44 @@ class TournamentPlayoffsTest extends TestCase
         $this->assertSame(7, TournamentMatch::where('stage', 'PO')->count());
     }
 
-    public function test_enabled_quarters_accept_only_published_playoff_winners_including_repeat_winners(): void
+    public function test_enabled_quarters_accept_all_group_qualifiers_including_playoff_losers_and_repeat_winners(): void
     {
         $teams = $this->teams();
         $this->toggle(true);
         $service = app(MatchSchedulingService::class);
-        $this->assertSame([], $service->knockoutOptions(2026, 'QF')['candidates']);
+        $this->assertCount(4, $service->knockoutOptions(2026, 'QF')['candidates']);
         $first = $this->schedule($teams[0]->id, $teams[1]->id);
-        $this->assertSame([], $service->knockoutOptions(2026, 'QF')['candidates']);
+        $this->assertCount(4, $service->knockoutOptions(2026, 'QF')['candidates']);
         $this->publish($first);
         $this->publish($this->schedule($teams[0]->id, $teams[1]->id));
         $this->publish($this->schedule($teams[2]->id, $teams[3]->id));
-        $this->assertSame([$teams[0]->id, $teams[2]->id], array_column($service->knockoutOptions(2026, 'QF')['candidates'], 'id'));
-        $this->rejected(fn () => $this->schedule($teams[1]->id, $teams[2]->id, 'QF'));
-        $quarter = $this->schedule($teams[0]->id, $teams[2]->id, 'QF');
+        $this->assertSame($teams->take(4)->pluck('id')->all(), array_column($service->knockoutOptions(2026, 'QF')['candidates'], 'id'));
+        $this->rejected(fn () => $this->schedule($teams[4]->id, $teams[2]->id, 'QF'));
+        $quarter = $this->schedule($teams[1]->id, $teams[2]->id, 'QF');
         $this->publish($quarter);
-        $this->assertSame([$teams[0]->id], array_column($service->knockoutOptions(2026, 'SF')['candidates'], 'id'));
+        $this->assertSame([$teams[1]->id], array_column($service->knockoutOptions(2026, 'SF')['candidates'], 'id'));
+    }
+
+    public function test_scorer_can_schedule_and_edit_group_qualifiers_in_quarters_before_any_playoffs(): void
+    {
+        $teams = $this->teams(12);
+        $this->toggle(true);
+        $qualification = app(QualificationService::class);
+        $qualification->save(2026, $teams->pluck('id')->all(), $qualification->selection(2026)['revision']);
+        Livewire::withCookie('company_token', (new JWTService)->generateToken($this->scorer));
+        Volt::test('scorer.knockouts-manager')->call('chooseRound', 'QF')
+            ->assertSee('Choose from saved group qualifiers or published Playoff winners.')
+            ->set('fixture.team1_id', (string) $teams[8]->id)->set('fixture.team2_id', (string) $teams[11]->id)
+            ->set('fixture.bracket_position', '1')->call('createMatch')->assertHasNoErrors();
+        $quarter = TournamentMatch::where('stage', 'QF')->sole();
+        $service = app(MatchSchedulingService::class);
+        $updated = $service->updateFixture(2026, $quarter->id, $quarter->version, 0,
+            ['stage' => 'QF', 'group_id' => null, 'bracket_position' => 1, 'team1_id' => $teams[9]->id,
+                'team2_id' => $teams[10]->id, 'balls_per_over' => 4], [], $service->knockoutOptions(2026, 'QF')['revision']);
+        $this->assertSame($teams[9]->id, $updated->team1_id);
+        $this->assertSame($teams[10]->id, $updated->team2_id);
+        $this->publish($updated);
+        $this->assertSame(0, TournamentMatch::where('stage', 'PO')->count());
     }
 
     public function test_public_matches_filters_and_stats_include_playoffs_but_tables_and_bracket_do_not(): void
@@ -243,7 +326,7 @@ class TournamentPlayoffsTest extends TestCase
         $this->assertCount(4, $service->knockoutOptions(2026, 'QF')['candidates']);
     }
 
-    public function test_last_playoff_win_cannot_be_reversed_after_quarter_scheduling_but_another_win_preserves_eligibility(): void
+    public function test_group_qualification_preserves_quarter_eligibility_after_playoff_win_corrections_and_reopening(): void
     {
         $teams = $this->teams();
         $this->toggle(true);
@@ -252,8 +335,12 @@ class TournamentPlayoffsTest extends TestCase
         $this->publish($this->schedule($teams[2]->id, $teams[3]->id));
         $this->schedule($teams[0]->id, $teams[2]->id, 'QF');
         $this->publish($first, true);
-        $this->rejected(fn () => $this->publish($second, true));
-        $this->assertSame($teams[0]->id, $second->fresh()->winner_id);
+        $corrected = $this->publish($second, true);
+        $this->assertSame($teams[1]->id, $corrected->winner_id);
+        $service = app(MatchSchedulingService::class);
+        $service->updateSchedule(2026, $corrected->id, $corrected->version, ['status' => 'live']);
+        $quarter = TournamentMatch::where('stage', 'QF')->sole();
+        $this->assertSame($teams[0]->id, $this->publish($quarter)->winner_id);
     }
 
     public function test_disabling_removes_only_playoff_figures_from_shared_player_totals(): void

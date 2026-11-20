@@ -100,7 +100,7 @@ class MatchResultService
             $match->result_published_at = now();
             $match->published_by = $actor->id;
             $match->draft_result = null;
-            $this->transitions->assertResultPublication($before, $match, $matches);
+            $this->transitions->assertResultPublication($before, $match, $matches, $assignments);
             $this->save($match, $actor);
 
             // The collection contains this same model instance with its new values.

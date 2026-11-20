@@ -3,6 +3,7 @@
 namespace App\Services\Tournament;
 
 use App\Helpers\CompanyAuth;
+use App\Models\GroupTeam;
 use App\Models\PlayerMatchStat;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -49,6 +50,12 @@ class PlayoffFeature
             $current = $this->settings($year);
             if ($current['version'] !== $version) {
                 throw ValidationException::withMessages(['playoffs' => 'Tournament settings changed. Reload before saving.']);
+            }
+            $capacity = 2 * (int) config('tournament.knockout_slots.QF');
+            if (! $enabled && GroupTeam::where('tournament_year', $year)->where('qualified', true)->count() > $capacity) {
+                throw ValidationException::withMessages([
+                    'playoffs' => 'Reduce the saved group qualifiers to '.$capacity.' or fewer before disabling Playoffs. No teams have been removed.',
+                ]);
             }
             $values = ['playoffs_enabled' => $enabled, 'version' => $version + 1, 'updated_at' => now()];
             if ($version === 0) {

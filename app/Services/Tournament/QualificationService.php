@@ -30,7 +30,7 @@ class QualificationService
             $this->reject('Supply a list of selected team IDs.');
         }
         Validator::make(compact('teamIds', 'revision'), [
-            'teamIds' => ['array', 'max:'.$this->capacity()], 'teamIds.*' => ['integer', 'min:1', 'distinct'],
+            'teamIds' => ['array'], 'teamIds.*' => ['integer', 'min:1', 'distinct'],
             'revision' => ['regex:/\A[a-f0-9]{64}\z/'],
         ])->validate();
         $teamIds = array_map('intval', $teamIds);
@@ -40,6 +40,10 @@ class QualificationService
             $current = $this->snapshot($year, $groups, $matches, $teams, $rows);
             if (! hash_equals($current['revision'], $revision)) {
                 $this->reject('Qualification guidance or selections changed. Reload the latest choices before saving.');
+            }
+            // Read the current limit under the same year lock as admin flag changes.
+            if ($current['capacity'] !== null) {
+                Validator::make(compact('teamIds'), ['teamIds' => ['array', 'max:'.$current['capacity']]])->validate();
             }
             foreach ($teamIds as $id) {
                 if (! $rows->contains('team_id', $id) || ! $teams->firstWhere('id', $id)?->approved) {
@@ -122,7 +126,7 @@ class QualificationService
         }
         $selected = $rows->where('qualified', true)->pluck('team_id')->sort()->values()->all();
         $snapshot = ['year' => $year, 'groups' => $result, 'runner_up_guidance' => $this->rank($runners),
-            'unequal_groups' => $sizes->count() > 1, 'capacity' => $this->capacity(), 'selected' => $selected];
+            'unequal_groups' => $sizes->count() > 1, 'capacity' => $this->capacity($year), 'selected' => $selected];
         $snapshot['revision'] = hash('sha256', json_encode([$snapshot, $matches->map->only(['id', 'version'])->all()], JSON_THROW_ON_ERROR));
 
         return $snapshot;
@@ -133,9 +137,9 @@ class QualificationService
         return $this->ranker->rank($entries);
     }
 
-    private function capacity(): int
+    private function capacity(int $year): ?int
     {
-        return 2 * (int) config('tournament.knockout_slots.QF');
+        return app(PlayoffFeature::class)->enabled($year) ? null : 2 * (int) config('tournament.knockout_slots.QF');
     }
 
     private function authorize(bool $lock = false): void

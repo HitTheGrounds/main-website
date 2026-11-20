@@ -3,7 +3,7 @@
      Styles: resources/css/scorer.css (sd-card-*). --}}
 @php
     $statusLabels = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
-    $stageLabels = ['G' => 'Group', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'];
+    $stageLabels = $stageLabels ?? app(\App\Services\Tournament\PlayoffFeature::class)->labels($match->tournament_year);
     $published = $match->status === 'finished' && $match->result_published_at !== null;
     $names = ['team1' => $match->team1->team_name, 'team2' => $match->team2->team_name];
     $description = $published && $match->result_type !== null

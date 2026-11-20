@@ -13,7 +13,16 @@ class KnockoutDependencies
         if ($before->id !== $proposed->id || $before->tournament_year !== $proposed->tournament_year || $before->stage !== $proposed->stage) {
             throw ValidationException::withMessages(['tournament' => 'A result correction must retain its match identity, year and stage.']);
         }
-        $next = ['QF' => 'SF', 'SF' => 'F'][$before->stage] ?? null;
+        $next = ['PO' => 'QF', 'QF' => 'SF', 'SF' => 'F'][$before->stage] ?? null;
+        if ($before->stage === 'PO') {
+            // Repeated Playoff wins are allowed. Another official win preserves eligibility.
+            foreach ($matches as $match) {
+                if ($match->id !== $before->id && $match->tournament_year === $before->tournament_year
+                    && $match->stage === 'PO' && $this->officialWin($match) && $match->winner_id === $before->winner_id) {
+                    return;
+                }
+            }
+        }
         if ($next === null || ! $this->officialWin($before)
             || ($this->officialWin($proposed) && $before->winner_id === $proposed->winner_id)) {
             return;

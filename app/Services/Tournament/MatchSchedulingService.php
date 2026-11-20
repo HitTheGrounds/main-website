@@ -33,7 +33,7 @@ class MatchSchedulingService
             $this->reject('tournament', 'Select valid match filters.');
         }
         $filters = Validator::make($filters, [
-            'stage' => ['nullable', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['nullable', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', Rule::in(['upcoming', 'live', 'finished'])],
             // A removed/other-year group simply has no matching fixtures. Do not
             // break an open dashboard if an unused group is deleted elsewhere.
@@ -65,7 +65,7 @@ class MatchSchedulingService
         abort_unless($id && User::whereKey($id)->where('is_scorer', true)->exists(), 403);
         Validator::make(['year' => $year], ['year' => ['required', 'integer', 'between:1,9999']])->validate();
 
-        return TournamentMatch::where('tournament_year', $year)
+        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year))
             ->select(['id', 'tournament_year', 'group_id', 'stage', 'bracket_position', 'team1_id', 'team2_id',
                 'balls_per_over', 'overs_per_innings', 'max_wickets', 'status', 'scheduled_at', 'venue',
                 'display_number', 'batting_first_id', 'version', 'structure_locked_at', 'result_published_at',
@@ -158,6 +158,9 @@ class MatchSchedulingService
         if (! $match || $match->version !== $version) {
             $this->reject('tournament', 'This match changed. Reload it before editing or deleting.');
         }
+        if (! in_array($match->stage, app(PlayoffFeature::class)->stages($match->tournament_year), true)) {
+            $this->reject('tournament', 'This match stage is disabled. Reload the match list.');
+        }
         if (! $this->canEditFixture($match)) {
             $this->reject('tournament', 'Only upcoming fixtures without saved result or player figures can be changed or deleted. Discard drafts first; published history is protected.');
         }
@@ -211,7 +214,7 @@ class MatchSchedulingService
             // The common year lock serializes feature writes. Lock the current
             // group before the match, following the shared table lock order.
             $reference = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->first();
-            if (! $reference) {
+            if (! $reference || ! in_array($reference->stage, app(PlayoffFeature::class)->stages($year), true)) {
                 $this->reject('tournament', 'Select an existing match in this tournament year.');
             }
             $group = $reference->group_id === null ? null : TournamentGroup::whereKey($reference->group_id)
@@ -277,12 +280,15 @@ class MatchSchedulingService
 
     private function knockoutSnapshot(int $year, string $stage): array
     {
+        $feature = app(PlayoffFeature::class);
+        Validator::make(compact('stage'), ['stage' => ['required', Rule::in(array_values(array_diff($feature->stages($year), ['G'])))]])->validate();
+        $playoffsEnabled = $feature->enabled($year);
         $assignments = GroupTeam::where('tournament_year', $year)->orderBy('id')->get();
         $teams = Team::whereIn('id', $assignments->pluck('team_id'))->orderBy('id')->get();
         $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->get();
-        $candidates = $this->eligibility->candidates($year, $stage, $teams, $assignments, $matches);
-        $positions = $this->eligibility->round($year, $stage, $teams, $assignments, $matches);
-        $revision = hash('sha256', json_encode([$year, $stage,
+        $candidates = $this->eligibility->candidates($year, $stage, $teams, $assignments, $matches, $playoffsEnabled);
+        $positions = $this->eligibility->round($year, $stage, $teams, $assignments, $matches, $playoffsEnabled);
+        $revision = hash('sha256', json_encode([$year, $stage, $playoffsEnabled,
             $assignments->map->only(['id', 'version', 'team_id', 'group_id', 'qualified'])->all(),
             $teams->map->only(['id', 'approved'])->all(),
             $matches->map->only(['id', 'version', 'stage', 'status', 'bracket_position', 'team1_id', 'team2_id', 'winner_id', 'result_type', 'result_published_at'])->all(),

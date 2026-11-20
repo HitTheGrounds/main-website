@@ -5,7 +5,7 @@
     </div>
 @else
     @php
-        $stages = ['G' => 'Group stage', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'];
+        $stages = array_replace(app(\App\Services\Tournament\PlayoffFeature::class)->labels($year), ['G' => 'Group stage']);
         $statuses = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
         $statusTabs = ['finished' => 'Finished', 'upcoming' => 'Upcoming', 'live' => 'In progress'];
         $filters = $matchData['filters'];

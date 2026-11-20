@@ -32,11 +32,15 @@ new class extends Component {
     public function with(): array
     {
         $this->authorizeScorer();
-        $reserved = collect($this->round['positions'])->whereNotNull('match_id')
+        if ($this->stage === 'PO' && ! app(\App\Services\Tournament\PlayoffFeature::class)->enabled($this->year())) {
+            $this->chooseRound('QF');
+        }
+        $reserved = $this->stage === 'PO' ? [] : collect($this->round['positions'])->whereNotNull('match_id')
             ->flatMap(fn ($position) => [$position['team1']['id'], $position['team2']['id']])->all();
 
         return ['available' => collect($this->round['candidates'])->whereNotIn('id', $reserved),
-            'roundNames' => ['QF' => 'Quarter-finals', 'SF' => 'Semi-finals', 'F' => 'Final']];
+            'roundNames' => [...(app(\App\Services\Tournament\PlayoffFeature::class)->enabled($this->year()) ? ['PO' => 'Playoffs'] : []),
+                'QF' => 'Quarter-finals', 'SF' => 'Semi-finals', 'F' => 'Final']];
     }
 
     public function reloadSelection(): void
@@ -63,7 +67,7 @@ new class extends Component {
         $this->stage = $stage;
         $this->round = $round;
         $this->reset('fixture', 'moveReview', 'notice');
-        $key = ['QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$stage];
+        $key = ['PO' => 'playoff', 'QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$stage];
         $this->fixture['balls_per_over'] = (string) config('tournament.default_balls_per_over.'.$key);
         $this->resetErrorBag();
     }
@@ -80,6 +84,9 @@ new class extends Component {
         // Server-held stage and revision cannot be replaced by browser fields.
         // Unknown fixture fields are rejected by the existing structure validator.
         $structure = array_merge($this->fixture, ['stage' => $this->stage, 'group_id' => null]);
+        if ($this->stage === 'PO') {
+            $structure['bracket_position'] = null;
+        }
         $match = app(MatchSchedulingService::class)->create($this->year(), 0, $structure, [], $this->round['revision']);
         $this->chooseRound($this->stage);
         $this->notice = 'Knockout match #'.$match->id.' created. Open its result or player figures below.';
@@ -221,7 +228,11 @@ new class extends Component {
         </nav>
         <h3 class="text-lg font-bold">{{ $roundNames[$stage] }}</h3>
         <button type="button" wire:click="reloadRound" wire:confirm="Load the latest round? Unsaved fixture choices and position reviews will be cleared." wire:loading.attr="disabled" class="btn btn-outline btn-sm">Reload round</button>
-        <p class="text-sm">{{ $stage === 'QF' ? 'Choose from saved advancing teams.' : 'Choose only published winners from the preceding round.' }} Teams already scheduled in this round are excluded from new choices.</p>
+        @if($stage === 'PO')
+            <p class="text-sm">Choose from all saved group qualifiers. Teams may play more than one Playoff. Only published Playoff winners can advance to quarter-finals.</p>
+        @else
+            <p class="text-sm">{{ $stage === 'QF' && !app(\App\Services\Tournament\PlayoffFeature::class)->enabled($selection['year']) ? 'Choose from saved advancing teams.' : 'Choose only published winners from the preceding round.' }} Teams already scheduled in this round are excluded from new choices.</p>
+        @endif
         <div class="grid gap-4 md:grid-cols-2">
             @foreach($round['positions'] as $position)
                 @php($match = collect($round['fixtures'])->firstWhere('id', $position['match_id']))
@@ -231,7 +242,7 @@ new class extends Component {
                         <p class="font-semibold">{{ $position['team1']['name'] ?? 'Team unavailable' }} vs {{ $position['team2']['name'] ?? 'Team unavailable' }}</p>
                         <p>{{ ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'][$match['status']] }} | Match #{{ $match['id'] }}</p>
                         @foreach(['team1', 'team2'] as $side)
-                            @if($position[$side]['source_match_id'])<p class="text-sm">{{ $position[$side]['name'] }}: winner of {{ $stage === 'SF' ? 'QF' : 'SF' }} match #{{ $position[$side]['source_match_id'] }}</p>@endif
+                            @if($position[$side]['source_match_id'])<p class="text-sm">{{ $position[$side]['name'] }}: winner of {{ ['QF' => 'Playoff', 'SF' => 'QF', 'F' => 'SF'][$stage] ?? 'Playoff' }} match #{{ $position[$side]['source_match_id'] }}</p>@endif
                             @if(!$position[$side]['eligible'])<p class="text-sm">{{ $position[$side]['name'] }} is currently ineligible. Reload and check approval or the preceding result.</p>@endif
                         @endforeach
                         @if($match['published'] && $match['status'] === 'finished' && $match['winner_id'])<p class="font-bold">{{ $stage === 'F' ? 'Champion' : 'Winner' }}: {{ $match['winner_id'] === $position['team1']['id'] ? $position['team1']['name'] : $position['team2']['name'] }}</p>@endif
@@ -258,7 +269,7 @@ new class extends Component {
                 <button type="button" wire:click="cancelMove" wire:loading.attr="disabled" class="btn btn-ghost">Cancel</button>
             </div>
         @endif
-        @if(collect($round['positions'])->contains(fn ($position) => $position['match_id'] === null))
+        @if($stage === 'PO' || collect($round['positions'])->contains(fn ($position) => $position['match_id'] === null))
             <form wire:submit="createMatch" class="rounded-lg border border-base-300 p-4 space-y-4">
                 <h3 class="font-bold">Create {{ $stage }} match</h3>
                 @if($available->count() < 2)<p class="text-center">At least two eligible, unscheduled teams are needed. Save advancing teams or publish preceding-round results, then reload this round.</p>@endif
@@ -266,7 +277,7 @@ new class extends Component {
                     @foreach(['team1_id' => 'Team 1', 'team2_id' => 'Team 2'] as $key => $label)
                         <label><span class="label">{{ $label }}</span><select wire:model="fixture.{{ $key }}" class="select w-full"><option value="">Choose a team</option>@foreach($available as $team)<option value="{{ $team['id'] }}">{{ $team['name'] }}</option>@endforeach</select></label>
                     @endforeach
-                    <label><span class="label">Bracket position</span><select wire:model="fixture.bracket_position" class="select w-full"><option value="">Choose a position</option>@foreach($round['positions'] as $position)@if($position['match_id'] === null)<option value="{{ $position['position'] }}">{{ $stage }} {{ $position['position'] }}</option>@endif @endforeach</select></label>
+                    @if($stage !== 'PO')<label><span class="label">Bracket position</span><select wire:model="fixture.bracket_position" class="select w-full"><option value="">Choose a position</option>@foreach($round['positions'] as $position)@if($position['match_id'] === null)<option value="{{ $position['position'] }}">{{ $stage }} {{ $position['position'] }}</option>@endif @endforeach</select></label>@endif
                     <label><span class="label">Balls per over</span><select wire:model="fixture.balls_per_over" class="select w-full"><option value="4">4</option><option value="6">6</option></select></label>
                 </div>
                 <p class="text-sm">Five overs per innings. Seven wickets. Creates an upcoming match without scores. Schedule and batting-first details can be entered on the dashboard.</p>

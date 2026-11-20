@@ -56,8 +56,10 @@ class MatchTransitionGuard
         if ($match->group_id !== null) {
             throw ValidationException::withMessages(['tournament' => 'A knockout match cannot belong to a group.']);
         }
-        $this->eligibility->pair($match->tournament_year, $match->stage, $match->team1_id, $match->team2_id, $teams, $assignments, $matches);
-        $this->integrity->assertFixture($match->tournament_year, $match->stage, (int) $match->bracket_position,
-            $match->team1_id, $match->team2_id, $matches, $match->id);
+        $this->eligibility->pair($match->tournament_year, $match->stage, $match->team1_id, $match->team2_id, $teams, $assignments, $matches, app(PlayoffFeature::class)->enabled($match->tournament_year));
+        if ($match->stage !== 'PO') {
+            $this->integrity->assertFixture($match->tournament_year, $match->stage, (int) $match->bracket_position,
+                $match->team1_id, $match->team2_id, $matches, $match->id);
+        }
     }
 }

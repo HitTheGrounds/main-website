@@ -47,7 +47,7 @@ class QualificationService
                 }
             }
             $removed = array_diff($current['selected'], $teamIds);
-            foreach ($matches->whereIn('stage', ['QF', 'SF', 'F']) as $match) {
+            foreach ($matches->whereIn('stage', ['PO', 'QF', 'SF', 'F']) as $match) {
                 if (in_array($match->team1_id, $removed, true) || in_array($match->team2_id, $removed, true)) {
                     $this->reject('A selected team already appears in a knockout fixture. Resolve that fixture before removing its qualification.');
                 }

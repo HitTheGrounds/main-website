@@ -5,6 +5,10 @@
             <p class="mt-2 text-base-content/70">Manage companies, teams, and users</p>
         </div>
 
+        @if(config('tournament.enabled') === true)
+            <livewire:admin.playoff-settings />
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Companies Card -->
             <a href="{{ route('admin.companies') }}" class="card bg-base-100 border-base-300 border-2 hover:shadow-md transition">

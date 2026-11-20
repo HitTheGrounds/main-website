@@ -30,9 +30,9 @@ class MatchStructureValidator
 
         Validator::make(['year' => $year], ['year' => ['required', 'integer', 'between:1,9999']])->validate();
         $data = Validator::make($input + ['overs_per_innings' => 5, 'max_wickets' => 7], [
-            'stage' => ['required', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['required', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'group_id' => ['required_if:stage,G', 'nullable', 'integer', 'min:1'],
-            'bracket_position' => ['required_unless:stage,G', 'nullable', 'integer', 'min:1'],
+            'bracket_position' => ['required_if:stage,QF,SF,F', 'nullable', 'integer', 'min:1'],
             'team1_id' => ['required', 'integer', 'min:1'],
             'team2_id' => ['required', 'integer', 'min:1', 'different:team1_id'],
             'balls_per_over' => ['required', 'integer', Rule::in([4, 6])],
@@ -50,14 +50,22 @@ class MatchStructureValidator
             if (($data['group_id'] ?? null) !== null) {
                 $this->reject('group_id', 'Knockout matches cannot belong to a group.');
             }
-            $slots = config('tournament.knockout_slots.'.$data['stage'], 0);
-            if ($data['bracket_position'] > $slots) {
+            if ($data['stage'] === 'PO') {
+                if (($data['bracket_position'] ?? null) !== null) {
+                    $this->reject('bracket_position', 'Playoff matches do not have a bracket position.');
+                }
+            } elseif ($data['bracket_position'] > config('tournament.knockout_slots.'.$data['stage'], 0)) {
                 $this->reject('bracket_position', 'Select a valid position for this knockout round.');
             }
             $matches = TournamentMatch::where('tournament_year', $year)->orderBy('id')->get();
             $teams = Team::whereIn('id', [$data['team1_id'], $data['team2_id']])->orderBy('id')->get();
             $assignments = GroupTeam::where('tournament_year', $year)->orderBy('id')->get();
-            $this->eligibility->pair($year, $data['stage'], (int) $data['team1_id'], (int) $data['team2_id'], $teams, $assignments, $matches);
+            $this->eligibility->pair($year, $data['stage'], (int) $data['team1_id'], (int) $data['team2_id'], $teams, $assignments, $matches, app(PlayoffFeature::class)->enabled($year));
+            if ($data['stage'] === 'PO') {
+                return ['stage' => 'PO', 'group_id' => null, 'bracket_position' => null,
+                    'team1_id' => (int) $data['team1_id'], 'team2_id' => (int) $data['team2_id'],
+                    'balls_per_over' => (int) $data['balls_per_over'], 'overs_per_innings' => 5, 'max_wickets' => 7];
+            }
             $this->integrity->assertFixture($year, $data['stage'], (int) $data['bracket_position'], (int) $data['team1_id'], (int) $data['team2_id'], $matches, $currentMatchId);
 
             return ['stage' => $data['stage'], 'group_id' => null, 'bracket_position' => (int) $data['bracket_position'],

@@ -130,6 +130,30 @@ The site is served at **http://localhost:8000**.
 
 ---
 
+## Optional tournament Playoffs
+
+Run `php artisan migrate` when deploying this change. Playoffs default to off
+for every tournament year. With the tournament enabled, an admin can use
+**Admin Dashboard > Tournament: Playoffs > Enable Playoffs > Save tournament settings**.
+
+When enabled, scorers can select **Playoffs** under **Qualification & bracket**
+and schedule any number of matches between saved group qualifiers, including
+repeat appearances. Only teams with a published, finished Playoff win are
+eligible for quarter-finals. Semi-finals and the final follow the existing rules.
+
+Playoffs appear in the public Matches tab and stage filters, and published player
+figures contribute to Stats. They do not appear in group tables or the public
+bracket. Turning the switch off restores direct group-qualifier eligibility for
+quarter-finals, hides Playoff fixtures and controls, blocks their scoring actions,
+and excludes their figures from derived player totals. Saved matches and player
+figures are retained and included again when enabled. Settings changes refresh
+public pages through the existing tournament revision polling.
+
+The migration refuses rollback while Playoff match history exists; use the
+dashboard switch to disable the feature without discarding history.
+
+---
+
 <div align="center">
 
 Made with ❤️ for **CSE Hit The Grounds**

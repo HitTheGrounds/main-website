@@ -42,7 +42,7 @@ class PlayerTotalsService
             $sources = PlayerMatchStat::whereIn('team_member_id', $memberIds)->where('record_state', 'published')
                 ->whereHas('tournamentMatch', fn ($query) => $query->where('tournament_year', $year)
                     ->where('status', 'finished')->whereNotNull('result_published_at')
-                    ->whereIn('result_type', ['win', 'tie'])->whereIn('stage', ['G', 'QF', 'SF', 'F']))
+                    ->whereIn('result_type', ['win', 'tie'])->whereIn('stage', app(PlayoffFeature::class)->stages($year)))
                 ->with('tournamentMatch:id,team1_id,team2_id')->orderBy('match_id')->orderBy('id')->get();
             $calculated = [];
             foreach ($sources as $source) {

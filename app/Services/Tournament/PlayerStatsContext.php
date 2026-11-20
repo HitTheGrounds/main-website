@@ -36,7 +36,7 @@ class PlayerStatsContext
             $actor = User::whereKey(CompanyAuth::user()?->id)->sharedLock()->first();
             abort_unless($actor && $actor->is_scorer, 403);
             $reference = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->first();
-            if (! $reference || ! in_array($reference->stage, ['G', 'QF', 'SF', 'F'], true)) {
+            if (! $reference || ! in_array($reference->stage, app(PlayoffFeature::class)->stages($year), true)) {
                 $this->reject('Select a match in this tournament year.');
             }
             $group = $reference->group_id === null ? null : TournamentGroup::whereKey($reference->group_id)->where('tournament_year', $year)->lockForUpdate()->first();

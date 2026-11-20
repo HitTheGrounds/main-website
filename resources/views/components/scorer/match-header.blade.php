@@ -2,7 +2,7 @@
 {{-- Shared header for a match's scorer pages (Team result, Player figures):
      back link, match strip and tabs between the two pages. --}}
 @php
-    $stageLabels = ['G' => 'Group', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'];
+    $stageLabels = app(\App\Services\Tournament\PlayoffFeature::class)->labels($match->tournament_year);
     $statusLabels = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
     $tabs = [
         'result' => ['scorer.matches.result', 'Team result', 'scoreboard'],

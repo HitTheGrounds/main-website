@@ -637,20 +637,14 @@ html { scroll-padding-top: 5.5rem; }
   to { stroke-dashoffset: -102; }
 }
 
+/* Desktop: centred heading, then the map at full content width. The section
+   is no longer locked to one screen height, so the map is not squeezed. */
 @media (min-width: 1024px) {
-  #ground-plan .ground-plan-container {
-    height: calc(100dvh - 5.5rem);
-    padding-block: clamp(1rem, 3dvh, 2rem);
-  }
-  .ground-plan-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-height: 0;
-  }
-  .ground-plan-heading { flex-shrink: 0; gap: 1rem; margin-bottom: 1rem; }
-  .ground-plan-heading h2 { font-size: clamp(2.2rem, 6dvh, 3.5rem); }
-  .ground-plan-heading p { margin-top: .5rem; }
-  .ground-plan-image { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 0; border: 0; background: transparent; }
-  .ground-plan-image img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+  .ground-plan-image { max-width: 1080px; margin-inline: auto; }
+}
+@media (min-width: 1280px) {
+  /* Quieter, fewer doodles: only those that stay clear of the wide map. */
+  .ground-plan-bat, .ground-plan-doodle-2, .ground-plan-doodle-7 { display: none; }
+  .ground-plan-orbit { opacity: .25; }
+  .ground-plan-doodle { opacity: .35; }
 }

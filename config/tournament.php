@@ -10,12 +10,16 @@ return [
 
     'timezone' => 'Asia/Colombo',
 
+    // Scorer venue dropdown and public venue filter.
+    'venues' => ['Ground 1', 'Ground 2', 'Ground 3', 'Ground 4'],
+
     // Shared by scorer mutation actions, in addition to the existing network limit.
     'writes_per_minute' => 30,
 
     // Creation defaults only; the scorer selects four or six for each match.
     'default_balls_per_over' => [
         'group' => 4,
+        'playoff' => 4,
         'quarter_final' => 4,
         'semi_final' => 6,
         'final' => 6,

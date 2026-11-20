@@ -5,15 +5,15 @@
     </div>
 @else
     @php
-        $stages = ['G' => 'Group stage', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'];
+        $stages = array_replace(app(\App\Services\Tournament\PlayoffFeature::class)->labels($year), ['G' => 'Group stage']);
         $statuses = ['upcoming' => 'Upcoming', 'live' => 'In progress', 'finished' => 'Finished'];
         $statusTabs = ['finished' => 'Finished', 'upcoming' => 'Upcoming', 'live' => 'In progress'];
         $filters = $matchData['filters'];
         $pagination = $matchData['pagination'];
         $currentStatus = $filters['status'] ?? 'finished';
-        // Status is chosen with the tabs, so only stage, group and order count as filters here.
-        $hasFilters = $filters['stage'] !== null || $filters['group_id'] !== null;
-        $keptFilters = array_filter(['stage' => $filters['stage'], 'group_id' => $filters['group_id'],
+        // Status is chosen with the tabs, so only stage, group, venue and order count as filters here.
+        $hasFilters = $filters['stage'] !== null || $filters['group_id'] !== null || $filters['venue'] !== null;
+        $keptFilters = array_filter(['stage' => $filters['stage'], 'group_id' => $filters['group_id'], 'venue' => $filters['venue'],
             'sort' => $filters['sort'] !== 'recent' ? $filters['sort'] : null], fn ($value) => $value !== null);
         $emptyStatus = ['finished' => 'No finished matches have published results yet.',
             'upcoming' => 'No upcoming matches are scheduled right now.', 'live' => 'No matches are in progress right now.'];
@@ -32,7 +32,7 @@
         <summary>
             <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
             Filter matches
-            <span>{{ $hasFilters ? 'Filters applied' : 'Stage, group & order' }}</span>
+            <span>{{ $hasFilters ? 'Filters applied' : 'Stage, group, venue & order' }}</span>
         </summary>
         <form method="GET" action="{{ route('tournament.index') }}" aria-label="Filter matches" class="tc-form tc-form-matches">
             <input type="hidden" name="tab" value="matches">
@@ -52,6 +52,15 @@
                     <option value="">All groups</option>
                     @foreach ($matchData['groups'] as $group)
                         <option value="{{ $group['id'] }}" @selected($filters['group_id'] === $group['id'])>{{ $group['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="match-venue" class="mb-2 block font-semibold">Venue</label>
+                <select id="match-venue" name="venue" class="select w-full">
+                    <option value="">All venues</option>
+                    @foreach (config('tournament.venues') as $venue)
+                        <option value="{{ $venue }}" @selected($filters['venue'] === $venue)>{{ $venue }}</option>
                     @endforeach
                 </select>
             </div>

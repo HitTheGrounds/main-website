@@ -11,52 +11,95 @@ new class extends Component {
 }; ?>
 
 @php
-    $formatNrr = fn ($nrr) => $nrr === null ? '-'
-        : (string) \Brick\Math\BigDecimal::of((string) $nrr)->toScale(3, \Brick\Math\RoundingMode::HALF_UP);
+    $formatNrr = function ($nrr) {
+        if ($nrr === null) {
+            return '-';
+        }
+        $value = \Brick\Math\BigDecimal::of((string) $nrr)->toScale(3, \Brick\Math\RoundingMode::HALF_UP);
+
+        return $value->isPositive() ? '+'.$value : (string) $value;
+    };
+    // "Group A" -> "A"; any other name falls back to its first character.
+    $groupMark = function (string $name) {
+        $last = \Illuminate\Support\Str::afterLast(trim($name), ' ');
+
+        return mb_strtoupper(mb_strlen($last) <= 2 ? $last : mb_substr(trim($name), 0, 1));
+    };
 @endphp
-{{-- 16:9 venue screen: sizes use vh so all groups fit any display. Re-reads standings every 15 seconds. --}}
-<div class="flex h-screen flex-col gap-[1.2vh] px-[1.5vw] py-[1.5vh]" wire:poll.15s>
-    <header class="flex items-center justify-between border-b-2 border-primary pb-[.8vh]">
-        <img src="{{ asset('images/htg-logo-horizontal.webp') }}" alt="Hit the Grounds {{ config('tournament.year') }}, powered by GTN" width="900" height="481" class="h-[6vh] w-auto">
-        <h1 class="text-[3.4vh] font-extrabold uppercase text-primary-ink">Group stage</h1>
+{{-- 14 ft × 7 ft LED canvas (2:1). Re-reads standings every 15 seconds. --}}
+<div class="led-viewport" wire:poll.15s>
+  <main class="led-stage">
+    <header class="led-header">
+        <div class="led-logo">
+            <img src="{{ asset('images/htg-logo-horizontal.webp') }}" alt="Hit the Grounds {{ config('tournament.year') }}, powered by GTN" width="900" height="481">
+        </div>
+        <div class="led-title">
+            <span class="led-live">Live</span>
+            <h1>Group stage <span>standings</span></h1>
+        </div>
     </header>
-    <div class="grid min-h-0 flex-1 auto-rows-fr grid-cols-2 gap-x-[1.5vw] gap-y-[1.2vh]">
+
+    <div class="led-groups">
         @forelse($groups as $group)
-            <section wire:key="led-{{ $group['id'] }}" aria-labelledby="led-group-{{ $group['id'] }}"
-                     class="min-h-0 overflow-hidden rounded-xl border border-base-300 bg-white/60">
-                <table class="w-full table-fixed border-collapse text-[2vh] tabular-nums [&_td]:px-[.5vw] [&_td]:py-[.2vh] [&_td]:text-center [&_th]:px-[.5vw] [&_th]:py-[.2vh] [&_th]:text-center [&_th]:whitespace-nowrap">
-                    <caption id="led-group-{{ $group['id'] }}" class="border-b-[3px] border-primary bg-base-200 px-[1vw] py-[.3vh] text-left text-[2.1vh] font-extrabold uppercase tracking-wide">{{ $group['name'] }}</caption>
-                    <thead class="text-[1.4vh] text-base-content/65"><tr>
-                        <th scope="col" class="w-[6%]">#</th>
-                        <th scope="col" class="w-[58%] !text-left">Team</th>
-                        <th scope="col"><abbr title="Matches played" class="no-underline">P</abbr></th>
-                        <th scope="col"><abbr title="Points" class="no-underline">Pts</abbr></th>
-                        <th scope="col" class="w-[16%]"><abbr title="Net run rate" class="no-underline">NRR</abbr></th>
+            <section wire:key="led-{{ $group['id'] }}" aria-labelledby="led-group-{{ $group['id'] }}" class="led-group">
+                <div class="led-group-head">
+                    <span class="led-group-letter" aria-hidden="true">{{ $groupMark($group['name']) }}</span>
+                    <h2 id="led-group-{{ $group['id'] }}" class="led-group-name">{{ $group['name'] }}</h2>
+                </div>
+                <table class="led-table">
+                    <colgroup>
+                        {{-- NRR gets room for its widest form, e.g. "-12.345". --}}
+                        <col style="width: 7%"><col style="width: 33%">
+                        <col style="width: 6.5%"><col style="width: 6.5%"><col style="width: 6.5%"><col style="width: 6.5%">
+                        <col style="width: 22%"><col style="width: 12%">
+                    </colgroup>
+                    <thead><tr>
+                        <th scope="col">#</th>
+                        <th scope="col" class="led-col-team">Team</th>
+                        <th scope="col"><abbr title="Matches played">P</abbr></th>
+                        <th scope="col"><abbr title="Won">W</abbr></th>
+                        <th scope="col"><abbr title="Lost">L</abbr></th>
+                        <th scope="col"><abbr title="Tied">T</abbr></th>
+                        <th scope="col"><abbr title="Net run rate">NRR</abbr></th>
+                        <th scope="col" class="led-pts-head"><abbr title="Points">Pts</abbr></th>
                     </tr></thead>
                     <tbody>@foreach($group['teams'] as $team)
-                        <tr wire:key="led-{{ $group['id'] }}-{{ $team['id'] }}" class="border-t border-base-300">
-                            <td>{{ $team['rank'] }}</td>
-                            <th scope="row" class="!text-left font-bold">
-                                <span class="flex min-w-0 items-center gap-[.6vw]">
-                                    <x-tournament.team-badge :name="$team['name']" class="!h-[2.7vh] !w-[4vh] !rounded-md !p-[.2vh] !text-[1.1vh]" />
-                                    <span class="truncate">{{ $team['name'] }}</span>
+                        <tr wire:key="led-{{ $group['id'] }}-{{ $team['id'] }}" @class(['led-qualified' => $team['qualified'] ?? false])>
+                            <td class="led-rank">{{ $team['rank'] }}</td>
+                            <th scope="row" class="led-col-team">
+                                <span class="led-team">
+                                    <x-tournament.team-badge :name="$team['name']" />
+                                    <span class="led-team-name">{{ $team['name'] }}</span>
+                                    @if($team['qualified'] ?? false)
+                                        <span class="sr-only">(qualified)</span>
+                                    @endif
                                 </span>
                             </th>
                             <td>{{ $team['played'] }}</td>
-                            <td class="font-extrabold text-primary-ink">{{ $team['points'] }}</td>
-                            <td>{{ $formatNrr($team['nrr']) }}</td>
+                            <td class="led-w">{{ $team['wins'] }}</td>
+                            <td class="led-l">{{ $team['losses'] }}</td>
+                            <td class="led-t">{{ $team['ties'] }}</td>
+                            <td class="led-nrr">{{ $formatNrr($team['nrr']) }}</td>
+                            <td class="led-pts">{{ $team['points'] }}</td>
                         </tr>
                     @endforeach</tbody>
                 </table>
             </section>
         @empty
-            <p class="text-[3vh]">No tournament groups yet.</p>
+            <p class="led-empty">No tournament groups yet.</p>
         @endforelse
-        @if(count($groups) % 2 === 1)
-            {{-- Odd group count: the spare grid cell carries the tournament logo. --}}
-            <div class="flex min-h-0 items-center justify-center px-[2vw] py-[1vh]">
-                <img src="/images/htg-logo-orange.avif" alt="" width="1500" height="710" class="max-h-full max-w-full object-contain">
+
+        {{-- With 5 to 7 groups the centred bottom row leaves the outer columns empty; fill them with
+             quiet brand line art. Absolutely positioned, so they take no grid cells. --}}
+        @if(count($groups) >= 5 && count($groups) <= 7)
+            <div class="led-ornament led-ornament-left" aria-hidden="true">
+                <img src="{{ asset('images/led/ornament-bars.png') }}" alt="" width="241" height="800">
+            </div>
+            <div class="led-ornament led-ornament-right" aria-hidden="true">
+                <img src="{{ asset('images/led/ornament-orbit.png') }}" alt="" width="417" height="800">
             </div>
         @endif
     </div>
+
+  </main>
 </div>

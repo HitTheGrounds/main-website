@@ -4,8 +4,8 @@
         @include('partials.head', ['title' => 'Group stage screen'])
         @livewireStyles
     </head>
-    {{-- Full-screen view for the venue LED screen: no scorer navigation. --}}
-    <body class="min-h-screen bg-base-100 text-base-content">
+    {{-- Group stage subpage for the venue LED screen: no scorer navigation. --}}
+    <body class="led-body min-h-screen">
         <livewire:scorer.group-screen />
         @livewireScripts
     </body>

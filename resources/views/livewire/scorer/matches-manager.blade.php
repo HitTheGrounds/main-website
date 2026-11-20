@@ -25,7 +25,7 @@ new class extends Component {
     public ?string $fixtureRevision = null;
     #[Locked]
     public array $fixtureTeams = [];
-    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => ''];
+    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => '', 'venue' => ''];
     public string $notice = '';
     // Which popup is open: '' (none), 'create' or 'edit'. UI state only; the
     // browser can change it freely, so nothing security-relevant depends on it.
@@ -58,6 +58,16 @@ new class extends Component {
 
     public function with(): array
     {
+        if (! app(\App\Services\Tournament\PlayoffFeature::class)->enabled($this->year())) {
+            if (($this->filterForm['stage'] ?? '') === 'PO') {
+                $this->filterForm['stage'] = '';
+            }
+            if (($this->filters['stage'] ?? '') === 'PO') {
+                $this->filters['stage'] = '';
+                $this->filterForm['stage'] = '';
+                $this->resetPage();
+            }
+        }
         $setup = app(TournamentGroupService::class)->setup($this->year());
         $teams = $setup['groups']->firstWhere('id', $this->selectedGroupId)['teams'] ?? collect();
         $approvedIds = Team::whereIn('id', $teams->pluck('id'))->where('approved', true)->pluck('id');
@@ -81,6 +91,7 @@ new class extends Component {
             'matches' => $matches,
             'editing' => $editing,
             'year' => $this->year(),
+            'stageLabels' => app(\App\Services\Tournament\PlayoffFeature::class)->labels($this->year()),
         ];
     }
 
@@ -193,7 +204,7 @@ new class extends Component {
             if ($key === 'stage') {
                 $this->fixtureStructure['group_id'] = '';
                 $this->fixtureStructure['bracket_position'] = '';
-                $format = ['G' => 'group', 'QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$value] ?? null;
+                $format = ['G' => 'group', 'PO' => 'playoff', 'QF' => 'quarter_final', 'SF' => 'semi_final', 'F' => 'final'][$value] ?? null;
                 if ($format === null) {
                     throw ValidationException::withMessages(['stage' => 'Select a valid tournament round.']);
                 }
@@ -393,8 +404,8 @@ new class extends Component {
                                 <div class="sd-form-grid">
                                     <label class="form-control"><span class="label">Status</span><select wire:model="newSchedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>
                                     <label class="form-control"><span class="label">Match number (optional)</span><input type="number" min="1" wire:model="newSchedule.display_number" class="input w-full" /></label>
-                                    <label class="form-control"><span class="label">Scheduled time (Asia/Colombo, optional)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" class="input w-full" /></label>
-                                    <label class="form-control"><span class="label">Venue (optional)</span><input wire:model="newSchedule.venue" maxlength="255" class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" required class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Venue</span><select wire:model="newSchedule.venue" required class="select w-full"><option value="">Choose a venue</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
                                 </div>
                             </fieldset>
                         </form>
@@ -460,13 +471,13 @@ new class extends Component {
                                 <legend>Teams and match format</legend>
                                 <div class="sd-form-grid">
                                     <label><span class="label">Round</span><select wire:model.live="fixtureStructure.stage" class="select w-full">
-                                        @foreach(['G' => 'Group', 'QF' => 'Quarter-final', 'SF' => 'Semi-final', 'F' => 'Final'] as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
+                                        @foreach($stageLabels as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
                                     </select></label>
                                     @if(($fixtureStructure['stage'] ?? 'G') === 'G')
                                         <label><span class="label">Group</span><select wire:model.live="fixtureStructure.group_id" class="select w-full"><option value="">Choose a group</option>
                                             @foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach
                                         </select></label>
-                                    @else
+                                    @elseif(($fixtureStructure['stage'] ?? '') !== 'PO')
                                         <label><span class="label">Bracket position</span><select wire:model="fixtureStructure.bracket_position" class="select w-full"><option value="">Choose position</option>
                                             @for($position = 1; $position <= (int) config('tournament.knockout_slots.'.($fixtureStructure['stage'] ?? ''), 0); $position++)<option value="{{ $position }}">{{ $position }}</option>@endfor
                                         </select></label>
@@ -489,8 +500,8 @@ new class extends Component {
                                     <option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option>
                                 @endif
                             </select></label>@endif
-                            <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" class="input w-full" /></label>
-                            <label><span class="label">Venue</span><input wire:model="schedule.venue" maxlength="255" class="input w-full" /></label>
+                            <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" required class="input w-full" /></label>
+                            <label><span class="label">Venue</span><select wire:model="schedule.venue" required class="select w-full"><option value="">Choose a venue</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
                             <label><span class="label">Match number</span><input type="number" min="1" wire:model="schedule.display_number" class="input w-full" /></label>
                         </div>
                     </form>
@@ -521,8 +532,9 @@ new class extends Component {
 
         <form wire:submit="applyFilters" class="sd-filters" aria-label="Filter matches">
             <label><span class="label">Group filter</span><select wire:model="filterForm.group_id" class="select w-full"><option value="">All groups</option>@foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach</select></label>
-            <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option><option value="G">Group</option><option value="QF">Quarter-final</option><option value="SF">Semi-final</option><option value="F">Final</option></select></label>
+            <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option>@foreach($stageLabels as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach</select></label>
             <label><span class="label">Status filter</span><select wire:model="filterForm.status" class="select w-full"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="live">In progress</option><option value="finished">Finished</option></select></label>
+            <label><span class="label">Venue filter</span><select wire:model="filterForm.venue" class="select w-full"><option value="">All venues</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
             <div class="sd-filter-actions">
                 <button type="submit" wire:loading.attr="disabled" class="btn btn-secondary">
                     <x-scorer.icon name="filter" /> Apply filters

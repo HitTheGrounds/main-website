@@ -69,7 +69,7 @@ class TournamentDemoSeeder extends Seeder
         $match = DB::table('matches')->insertGetId(['tournament_year' => $year, 'display_number' => $number,
             'stage' => 'G', 'group_id' => $group, 'team1_id' => $one, 'team2_id' => $two, 'balls_per_over' => $balls,
             'status' => $published ? 'finished' : ($groupIndex % 2 === 0 ? 'upcoming' : 'live'),
-            'venue' => 'DEMO ground '.($groupIndex % 2 + 1),
+            'venue' => 'Ground '.(($number - 1) % 4 + 1), 'scheduled_at' => now()->startOfDay()->addMinutes(30 * $number),
             'result_type' => $published ? ($eligible ? ($tie ? 'tie' : 'win') : 'no_result') : null,
             'result_method' => $eligible ? 'normal' : null, 'winner_id' => $fixture < 3 ? $one : null,
             'batting_first_id' => $eligible ? $one : null,

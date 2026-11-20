@@ -32,7 +32,19 @@ if (bracket) {
             canvas.height = Math.round(bounds.height * scale);
             context.scale(scale, scale);
             context.strokeStyle = getComputedStyle(canvas).color;
-            context.lineWidth = 1.5;
+            // Pages can thicken the lines (the LED wall does) with --bracket-line-width.
+            // Arrowheads grow with the line, and a thick line stops just short of the card
+            // so its arrow tip is not hidden under the card edge. The default 1.5px line
+            // draws exactly as before.
+            const customWidth = parseFloat(getComputedStyle(canvas).getPropertyValue('--bracket-line-width'));
+            const lineWidth = customWidth > 0 ? customWidth : 1.5;
+            const arrowScale = lineWidth / 1.5;
+            const tipGap = customWidth > 0 ? lineWidth : 0;
+            context.lineWidth = lineWidth;
+            if (customWidth > 0) {
+                context.lineJoin = 'round';
+                context.lineCap = 'round';
+            }
             context.beginPath();
 
             // The card inside a slot (a champion badge may sit above it).
@@ -66,18 +78,18 @@ if (bracket) {
                     }
                     const lane = (start + end) / 2 - bounds.left;
                     const startX = start - bounds.left;
-                    const endX = end - bounds.left;
-                    const radius = Math.min(10, Math.abs(startX - lane), Math.abs(endX - lane), Math.abs(endY - startY) / 2);
+                    const endX = end - bounds.left + (leftToRight ? -tipGap : tipGap);
+                    const radius = Math.min(10 * arrowScale, Math.abs(startX - lane), Math.abs(endX - lane), Math.abs(endY - startY) / 2);
 
                     context.moveTo(startX, startY);
                     context.arcTo(lane, startY, lane, endY, radius);
                     context.arcTo(lane, endY, endX, endY, radius);
                     context.lineTo(endX, endY);
 
-                    const arrowBackX = endX + (leftToRight ? -7 : 7);
-                    context.moveTo(arrowBackX, endY - 4);
+                    const arrowBackX = endX + (leftToRight ? -7 : 7) * arrowScale;
+                    context.moveTo(arrowBackX, endY - 4 * arrowScale);
                     context.lineTo(endX, endY);
-                    context.lineTo(arrowBackX, endY + 4);
+                    context.lineTo(arrowBackX, endY + 4 * arrowScale);
                 }
             }
 

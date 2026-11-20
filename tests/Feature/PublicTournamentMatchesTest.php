@@ -69,15 +69,15 @@ class PublicTournamentMatchesTest extends TestCase
             $this->match($group, $teams[0]->id, $teams[$index + 1]->id, [
                 'status' => 'finished', 'result_published_at' => now(), 'result_type' => 'no_result',
                 'balls_per_over' => $balls, 'team1_runs' => 0, 'team1_wickets' => 0, 'team1_deliveries' => 13,
-                'scheduled_at' => '2026-11-20 03:00:00', 'team2_runs' => $index === 1 ? 5 : null,
+                'scheduled_at' => '2026-11-20 03:00:00', 'team2_runs' => $index === 1 ? 5 : null, 'venue' => 'Main Ground',
             ]);
         }
-        // Cards no longer print the schedule, venue or match format. An innings with nothing
+        // Cards print the local schedule and venue, not the match format. An innings with nothing
         // recorded gets one line; a partly recorded innings names each missing part.
         $this->get('/tournament')->assertOk()->assertSee('0/0')->assertSeeText('3.1 overs')->assertSeeText('2.1 overs')
             ->assertSee('Score not recorded')->assertDontSee('Runs not recorded')
             ->assertSee('Wickets not recorded')->assertSee('Overs not recorded')
-            ->assertSee('No result.')->assertDontSee('balls per over')->assertDontSee('20 Nov 2026, 8:30 AM');
+            ->assertSee('No result.')->assertDontSee('balls per over')->assertSee('Fri, 20 Nov 2026 · 8:30 AM')->assertSee('Main Ground');
     }
 
     public static function outcomes(): array
@@ -169,10 +169,19 @@ class PublicTournamentMatchesTest extends TestCase
             ->assertDontSee($venue, false)->assertDontSee('PRIVATE-');
     }
 
+    public function test_venue_filter_shows_only_matches_at_that_venue(): void
+    {
+        [$group, $teams] = $this->fixture(3);
+        $atOne = $this->match($group, $teams[0]->id, $teams[1]->id, ['status' => 'upcoming', 'venue' => 'Ground 1']);
+        $atTwo = $this->match($group, $teams[0]->id, $teams[2]->id, ['status' => 'upcoming', 'venue' => 'Ground 2']);
+        $this->get('/tournament?status=upcoming&venue=Ground+1')->assertOk()->assertSee('<option value="Ground 1" selected', false)
+            ->assertSee('match-'.$atOne.'-heading', false)->assertDontSee('match-'.$atTwo.'-heading', false);
+    }
+
     public static function invalidFilters(): array
     {
         return [[['stage' => ['G']]], [['status' => ['live']]], [['sort' => ['schedule']]],
-            [['group_id' => ['1']]], [['page' => 0]], [['sort' => 'id desc; DROP TABLE users']], [['status' => 'draft']]];
+            [['group_id' => ['1']]], [['page' => 0]], [['sort' => 'id desc; DROP TABLE users']], [['status' => 'draft']], [['venue' => 'Ground 9']]];
     }
 
     #[DataProvider('invalidFilters')]

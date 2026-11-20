@@ -51,19 +51,21 @@ class PublicTournamentService
     public function matches(int $year, array $filters = []): array
     {
         $this->validateYear($year);
-        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'sort', 'page'])) {
+        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'venue', 'sort', 'page'])) {
             throw ValidationException::withMessages(['tournament' => 'Select valid match filters.']);
         }
         $filters = array_map(fn ($value) => $value === '' ? null : $value, $filters);
         $filters = Validator::make($filters, [
-            'stage' => ['nullable', 'string', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['nullable', 'string', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
+            'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
             'sort' => ['nullable', 'string', Rule::in(['recent', 'schedule', 'newest'])],
             'page' => ['nullable', 'integer', 'between:1,10000'],
         ])->validate();
         $filters = ['stage' => $filters['stage'] ?? null, 'status' => $filters['status'] ?? null,
             'group_id' => isset($filters['group_id']) ? (int) $filters['group_id'] : null,
+            'venue' => $filters['venue'] ?? null,
             // Preserve old schedule-sort links while applying the current recency rule.
             'sort' => ($filters['sort'] ?? 'recent') === 'schedule' ? 'recent' : ($filters['sort'] ?? 'recent'),
             'page' => (int) ($filters['page'] ?? 1)];
@@ -71,7 +73,7 @@ class PublicTournamentService
         return $this->snapshots->run(function () use ($year, $filters) {
             $groups = $this->groups($year);
             $query = $this->visibleMatches($year);
-            foreach (['stage', 'status', 'group_id'] as $field) {
+            foreach (['stage', 'status', 'group_id', 'venue'] as $field) {
                 if ($filters[$field] !== null) {
                     $query->where($field, $filters[$field]);
                 }
@@ -231,7 +233,7 @@ class PublicTournamentService
 
             // Tournament-wide clocks, not the request time or mutable summary updated_at.
             // Match-result publication can also change player-award eligibility.
-            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F']);
+            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year));
 
             return ['year' => $year, 'category' => $category, 'gender' => $gender, 'entries' => $entries,
                 'publication_times' => [
@@ -296,6 +298,56 @@ class PublicTournamentService
         });
     }
 
+    public function grounds(int $year): array
+    {
+        $this->validateYear($year);
+
+        return $this->snapshots->run(function () use ($year) {
+            $venues = config('tournament.venues') ?: ['Ground 1', 'Ground 2', 'Ground 3', 'Ground 4'];
+            $groups = $this->groups($year);
+            $matches = $this->bounded(
+                $this->visibleMatches($year)
+                    ->whereNotNull('venue')
+                    ->whereIn('venue', $venues)
+                    ->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')
+                    ->orderBy('scheduled_at')
+                    ->orderBy('id')
+                    ->select(self::MATCH_FIELDS),
+                self::MAX_FIXTURES
+            );
+            $teams = $this->teams($matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->all());
+
+            $grounds = [];
+            foreach ($venues as $venue) {
+                $venueMatches = $matches->filter(fn ($m) => strcasecmp(trim((string) $m->venue), trim((string) $venue)) === 0);
+                $live = $venueMatches->filter(fn ($m) => $m->status === 'live')->values();
+                $upcoming = $venueMatches->filter(fn ($m) => $m->status === 'upcoming')->values();
+                $finished = $venueMatches->filter(fn ($m) => $m->status === 'finished')->values();
+
+                $presentedLive = $live->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedUpcoming = $upcoming->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedFinished = $finished->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+
+                $grounds[] = [
+                    'venue' => $venue,
+                    'live_match' => $presentedLive[0] ?? null,
+                    'live_matches' => $presentedLive,
+                    'upcoming_matches' => $presentedUpcoming,
+                    'finished_matches' => $presentedFinished,
+                    'latest_finished' => $presentedFinished !== [] ? end($presentedFinished) : null,
+                    'total_matches' => count($venueMatches),
+                ];
+            }
+
+            return [
+                'year' => $year,
+                'venues' => $venues,
+                'grounds' => $grounds,
+                'latest_result_published_at' => $this->publicationTime($matches->where('status', 'finished')->max('result_published_at')),
+            ];
+        });
+    }
+
     private function presentMatch(TournamentMatch $match, $teams, $groups): array
     {
         $a = $teams->get($match->team1_id)?->team_name ?? 'Team unavailable';
@@ -321,7 +373,7 @@ class PublicTournamentService
             'status' => $match->status, 'balls_per_over' => $match->balls_per_over,
             'overs_per_innings' => $match->overs_per_innings, 'max_wickets' => $match->max_wickets,
             'scheduled_at' => $match->scheduled_at?->toIso8601String(), 'venue' => $match->venue,
-            'display_number' => $match->display_number, 'result' => $result];
+            'display_number' => $match->display_number, 'batting_first_id' => $match->batting_first_id, 'result' => $result];
     }
 
     private function publicationTime(string|\DateTimeInterface|null $value): ?string
@@ -331,7 +383,7 @@ class PublicTournamentService
 
     private function visibleMatches(int $year): Builder
     {
-        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F'])
+        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year))
             ->where(fn ($query) => $query->whereIn('status', ['upcoming', 'live'])
                 ->orWhere(fn ($finished) => $finished->where('status', 'finished')->whereNotNull('result_published_at')));
     }

@@ -41,7 +41,7 @@ class PublicTournamentController extends Controller
         $filterErrors = [];
         if ($tab === 'matches') {
             // The Matches tab is split into status tabs; with no status chosen it opens on Finished.
-            $matchFilters = array_intersect_key($request->query(), array_flip(['stage', 'status', 'group_id', 'sort', 'page']));
+            $matchFilters = array_intersect_key($request->query(), array_flip(['stage', 'status', 'group_id', 'venue', 'sort', 'page']));
             if (($matchFilters['status'] ?? '') === '') {
                 $matchFilters['status'] = 'finished';
             }

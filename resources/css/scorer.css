@@ -114,6 +114,36 @@
 .led-empty { grid-column: 1 / -1; align-self: center; text-align: center; font-size: 4cqh; font-weight: 800; color: var(--led-muted); }
 @media (prefers-reduced-motion: reduce) { .led-live::before { animation: none; } }
 
+/* Reuse the public bracket, keeping its mirrored desktop layout on the LED wall. */
+.tc.led-bracket { max-width: none; padding: 1.5vh 1.5vw; }
+.led-bracket .tc-playoff-scroll { flex: 1; min-height: 0; overflow: visible; }
+.led-bracket .tc-playoffs {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  grid-template-columns: repeat(5, minmax(0, 14cqw));
+  grid-template-rows: auto repeat(2, auto);
+  gap: 3cqh 2cqw;
+  padding: 0;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+}
+.led-bracket .tc-playoff-round,
+.led-bracket .tc-playoff-matches { display: contents; }
+.led-bracket .tc-playoff-mirror { display: flex; }
+.led-bracket .tc-playoff-mirror[data-stage="SF"] { grid-column: 4; }
+.led-bracket .tc-playoff-mirror[data-stage="QF"] { grid-column: 5; }
+.led-bracket .tc-playoff-round .tc-playoff-slot { grid-column: var(--column); grid-row: var(--row); padding: 0; }
+.led-bracket .tc-playoff-slot .tc-match { max-width: none; }
+.led-bracket .tc-round-head :is(h3, span) { font-size: 2.4cqh; }
+.led-bracket .tc-bracket-team-details .tc-team-name,
+.led-bracket .tc-playoff-slot .tc-score { font-size: 2cqh; }
+.led-bracket .tc-team-logo { width: 10cqh; height: 6cqh; padding: .8cqh; }
+.led-bracket .tc-empty-slot { padding: 2cqh 1cqw; }
+.led-bracket .tc-empty-slot h4 { font-size: 2.6cqh; }
+.led-bracket .tc-empty-slot p { font-size: 2cqh; }
+
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);
   --scorer-paper: color-mix(in srgb, var(--color-base-100) 32%, white);

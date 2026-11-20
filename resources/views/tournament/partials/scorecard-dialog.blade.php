@@ -1,6 +1,6 @@
 <dialog id="match-scorecard" aria-labelledby="scorecard-title" class="tc-scorecard">
     <header><h2 id="scorecard-title">Match scorecard</h2>
-        <form method="dialog"><button class="btn btn-sm" autofocus>Close</button></form>
+        <button type="button" class="btn btn-sm" data-scorecard-close autofocus>Close</button>
     </header>
     <div data-scorecard-body></div>
 </dialog>
@@ -26,6 +26,7 @@
                 if (!controller.signal.aborted) body.innerHTML = '<p role="alert">The scorecard could not be loaded. Close and reopen it to try again.</p>';
             }
         });
+        dialog.querySelector('[data-scorecard-close]').addEventListener('click', () => dialog.close());
         dialog.addEventListener('close', () => request?.abort());
         dialog.addEventListener('change', event => {
             if (event.target.name !== 'innings') return;

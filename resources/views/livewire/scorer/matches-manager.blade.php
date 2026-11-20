@@ -393,8 +393,8 @@ new class extends Component {
                                 <div class="sd-form-grid">
                                     <label class="form-control"><span class="label">Status</span><select wire:model="newSchedule.status" class="select w-full"><option value="upcoming">Upcoming</option><option value="live">In progress</option></select></label>
                                     <label class="form-control"><span class="label">Match number (optional)</span><input type="number" min="1" wire:model="newSchedule.display_number" class="input w-full" /></label>
-                                    <label class="form-control"><span class="label">Scheduled time (Asia/Colombo, optional)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" class="input w-full" /></label>
-                                    <label class="form-control"><span class="label">Venue (optional)</span><input wire:model="newSchedule.venue" maxlength="255" class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="newSchedule.scheduled_at" required class="input w-full" /></label>
+                                    <label class="form-control"><span class="label">Venue</span><select wire:model="newSchedule.venue" required class="select w-full"><option value="">Choose a venue</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
                                 </div>
                             </fieldset>
                         </form>
@@ -489,8 +489,8 @@ new class extends Component {
                                     <option value="{{ $editing->team1_id }}">{{ $editing->team1->team_name }}</option><option value="{{ $editing->team2_id }}">{{ $editing->team2->team_name }}</option>
                                 @endif
                             </select></label>@endif
-                            <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" class="input w-full" /></label>
-                            <label><span class="label">Venue</span><input wire:model="schedule.venue" maxlength="255" class="input w-full" /></label>
+                            <label><span class="label">Scheduled time (Asia/Colombo)</span><input type="datetime-local" wire:model="schedule.scheduled_at" required class="input w-full" /></label>
+                            <label><span class="label">Venue</span><select wire:model="schedule.venue" required class="select w-full"><option value="">Choose a venue</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
                             <label><span class="label">Match number</span><input type="number" min="1" wire:model="schedule.display_number" class="input w-full" /></label>
                         </div>
                     </form>

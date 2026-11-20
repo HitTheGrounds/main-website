@@ -174,6 +174,41 @@
 .led-bracket .tc-empty-slot h4 { font-family: inherit; font-size: 2.3cqh; font-weight: 800; color: var(--led-text); }
 .led-bracket .tc-empty-slot p { margin-top: .8cqh; font-size: 1.9cqh; color: var(--led-muted); }
 
+.tc.led-leaderboard { max-width: none; padding: 1.5vh 1.5vw; }
+.led-cap-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2cqw; flex: 1; min-height: 0; padding-block: 2cqh; }
+.led-cap-panel { min-width: 0; border: 1px solid var(--tc-line); border-top: .6cqh solid var(--cap-color); border-radius: 1.5cqh; background: rgb(255 255 255 / .6); overflow: hidden; }
+.led-cap-runs { --cap-color: #b8480a; --cap-tint: #fbdcc7; }
+.led-cap-wickets { --cap-color: #7030a0; --cap-tint: #eee0f8; }
+.led-cap-heading { display: flex; align-items: center; gap: 1cqw; padding: 2cqh 1.5cqw; background: var(--cap-tint); color: var(--cap-color); }
+.led-cap-heading > img { width: 8cqh; height: 8cqh; object-fit: contain; }
+.led-cap-heading h2 { font-size: 3.8cqh; font-weight: 800; line-height: 1.2; }
+.led-cap-heading p { font-size: 2cqh; margin-top: .5cqh; }
+.led-leaderboard .tc-stats-leaderboard { table-layout: fixed; font-size: 2.7cqh; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td) { padding: 1.5cqh .6cqw; height: 10cqh; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):first-child { width: 8%; padding-left: 1cqw; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):nth-child(2) { width: 15%; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):last-child { width: 22%; padding-right: 1cqw; }
+.led-leaderboard .tc-stats-leaderboard tbody th { width: auto; line-height: 1.2; }
+.led-leaderboard .tc-stats-team { font-size: 1.9cqh; margin-top: .6cqh; }
+.led-leaderboard .tc-badge { width: 6cqw; max-width: 100%; height: 5cqh; padding: .5cqh; font-size: 1.7cqh; }
+.led-leaderboard .tc-stats-score { gap: .5cqw; font-size: 3.5cqh; }
+.led-leaderboard .tc-stats-score img { width: 3.5cqh; height: 3.5cqh; }
+.led-cap-empty { padding: 5cqh 2cqw; font-size: 2.7cqh; text-align: center; }
+.led-cap-note { padding: 1cqh 1cqw; font-size: 1.8cqh; }
+.led-stats-columns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2cqw; }
+.led-stat-sixes { --cap-color: #b8480a; --cap-tint: #fbdcc7; }
+.led-stat-fours { --cap-color: #176442; --cap-tint: #deeee4; }
+.led-stat-dot_balls { --cap-color: #305d97; --cap-tint: #e1eaf8; }
+.led-stats-leaderboard .led-cap-heading { min-height: 13cqh; padding-inline: 1cqw; }
+.led-stats-leaderboard .led-cap-heading h2 { font-size: 3cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard { font-size: 2.4cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td) { padding-inline: .4cqw; height: 11cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):first-child { width: 9%; padding-left: .6cqw; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):nth-child(2) { width: 18%; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):last-child { width: 16%; padding-right: .6cqw; }
+.led-stats-leaderboard .tc-stats-team { font-size: 1.7cqh; }
+.led-stats-leaderboard .tc-stats-score { font-size: 3cqh; }
+
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);
   --scorer-paper: color-mix(in srgb, var(--color-base-100) 32%, white);

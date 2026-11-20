@@ -139,6 +139,7 @@ new class extends Component {
     <header class="scorer-heading">
         <h1 class="text-2xl font-bold sm:text-3xl">Qualification &amp; bracket</h1>
         <p>Tournament {{ $selection['year'] }}. Select advancing teams and choose each knockout matchup manually.</p>
+        <a href="{{ route('scorer.screen.bracket') }}" target="_blank" class="link">Bracket LED screen <span class="sr-only">(opens in a new tab)</span></a>
     </header>
     <div class="scorer-feedback" aria-live="polite">
         @if($notice)<p role="status" class="alert alert-success">{{ $notice }}</p>@endif

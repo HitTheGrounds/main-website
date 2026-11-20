@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PublicTournamentController;
+use App\Http\Controllers\ScorerBracketScreenController;
 use App\Http\Middleware\EnsureTournamentEnabled;
 use App\Services\Tournament\TournamentWriteService;
 use Illuminate\Support\Facades\Cache;
@@ -27,6 +28,7 @@ Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'scorer'])
         Route::view('/groups', 'scorer.groups.index')->name('groups.index');
         Route::view('/standings', 'scorer.standings')->name('standings');
         Route::view('/screen/group_stage', 'scorer.screen.group_stage')->name('screen.group_stage');
+        Route::get('/screen/bracket', ScorerBracketScreenController::class)->name('screen.bracket');
         Route::view('/knockouts', 'scorer.knockouts')->name('knockouts');
         Route::view('/matches/{matchId}/result', 'scorer.result')->whereNumber('matchId')->name('matches.result');
         Route::view('/matches/{matchId}/players', 'scorer.players')->whereNumber('matchId')->name('matches.players');

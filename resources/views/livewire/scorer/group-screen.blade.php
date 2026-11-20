@@ -48,10 +48,11 @@ new class extends Component {
                 </div>
                 <table class="led-table">
                     <colgroup>
-                        {{-- NRR gets room for its widest form, e.g. "-12.345". --}}
-                        <col style="width: 7%"><col style="width: 33%">
-                        <col style="width: 6.5%"><col style="width: 6.5%"><col style="width: 6.5%"><col style="width: 6.5%">
-                        <col style="width: 22%"><col style="width: 12%">
+                        {{-- Give final team names room for whole words beside their badges,
+                             while keeping space for NRR values such as "-12.345". --}}
+                        <col style="width: 6%"><col style="width: 42%">
+                        <col style="width: 6%"><col style="width: 6%"><col style="width: 6%"><col style="width: 6%">
+                        <col style="width: 18%"><col style="width: 10%">
                     </colgroup>
                     <thead><tr>
                         <th scope="col">#</th>

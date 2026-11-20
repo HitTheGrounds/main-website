@@ -38,24 +38,6 @@
                             $isLive = $liveMatch !== null;
                             $isFeaturedNext = ! $isLive && $featuredMatch !== null;
                             $scheduleList = $isLive ? $upcoming : array_slice($upcoming, 1);
-                            // MOCK upcoming fixtures for layout previews: local environment only, and only for a ground
-                            // with no real upcoming fixtures. Real data always wins; production never sees these.
-                            if ($scheduleList === [] && app()->isLocal()) {
-                                $mockTeams = [1 => ['D1', 'D2', 'D3', 'D4', 'F1', 'F2'], 2 => ['C1', 'C2', 'E1', 'E2', 'G1', 'G2'],
-                                    3 => ['B1', 'B2', 'D3', 'D4', 'F3', 'F4'], 4 => ['A1', 'A2', 'C3', 'C4', 'E3', 'E4']][(($groundNum - 1) % 4) + 1];
-                                $mockGroups = [1 => ['Demo D', 'Demo D', 'Demo F'], 2 => ['Demo C', 'Demo E', 'Demo G'], 3 => ['Demo B', 'Demo D', 'Demo F'], 4 => ['Demo A', 'Demo C', 'Demo E']][(($groundNum - 1) % 4) + 1];
-                                foreach ([0, 1, 2] as $k) {
-                                    $scheduleList[] = ['display_number' => 20 + $groundNum * 3 + $k, 'stage' => 'G', 'group' => ['name' => $mockGroups[$k]], 'scheduled_at' => null,
-                                        'team1' => ['name' => 'DEMO 2026 '.$mockTeams[$k * 2]], 'team2' => ['name' => 'DEMO 2026 '.$mockTeams[$k * 2 + 1]]];
-                                }
-                            }
-                            // MOCK next match for a ground whose matches are all finished (same local-only rule),
-                            // so the area under the ground shows who plays next instead of the last result.
-                            if ($featuredMatch === null && app()->isLocal()) {
-                                $featuredMatch = ['team1' => ['name' => 'DEMO 2026 H'.($groundNum * 2 - 1)], 'team2' => ['name' => 'DEMO 2026 H'.($groundNum * 2)],
-                                    'scheduled_at' => \Carbon\CarbonImmutable::now($tz)->setTime(15, 0)->addMinutes(15 * $groundNum)->toIso8601String()];
-                                $isFeaturedNext = true;
-                            }
                             $latestFinished = $ground['latest_finished'] ?? null;
                             $hasMatches = $featuredMatch !== null || ! empty($scheduleList) || $latestFinished !== null;
                         @endphp

@@ -37,12 +37,23 @@ class TournamentCompletedDemoSeeder extends Seeder
             $number = 0;
             $players = $qualifiers = [];
 
-            foreach (range(0, 6) as $groupIndex) {
+            // Final registered names, in the same group order as the venue screen.
+            $groupTeams = [
+                ['CSE 22', '99x', 'Team Aayu', 'BoardOne - B team'],
+                ['Team Enlear', 'BoardOne - A team', 'TR Challengers', 'CSE23'],
+                ['SC Strikers', 'CSE 21', 'Creative Software', 'CSE 24'],
+                ['Choreo Labs', 'CSE 25', 'TR Strikers', 'GTN Dominators'],
+                ['Team SenzMate', 'DFN Team B', 'PickMe B', 'GTN Sixers'],
+                ['Synopsys', 'SC Warriors', 'CSE 18', 'DFN Team A'],
+                ['Xitricon Titans', 'Yaala Labs', 'Axonect Strikers', 'PickMe A'],
+            ];
+
+            foreach ($groupTeams as $groupIndex => $names) {
                 $letter = chr(65 + $groupIndex);
-                $group = DB::table('tournament_groups')->insertGetId(['tournament_year' => $year, 'name' => 'DEMO '.$letter]);
+                $group = DB::table('tournament_groups')->insertGetId(['tournament_year' => $year, 'name' => 'Group '.$letter]);
                 $teams = [];
-                foreach (range(1, 4) as $position) {
-                    $name = 'DEMO '.$year.' '.$letter.$position;
+                foreach ($names as $teamIndex => $name) {
+                    $position = $teamIndex + 1;
                     $team = DB::table('teams')->insertGetId([
                         'user_id' => $owner, 'company_id' => $company, 'team_name' => $name,
                         'captain_email' => strtolower($letter).$position.'@example.invalid',
@@ -89,7 +100,7 @@ class TournamentCompletedDemoSeeder extends Seeder
             $rebuild->rebuild($year);
         });
 
-        $this->command?->info('Created completed DEMO '.$year.': 7 groups, 28 teams, 336 players, 42 group matches, 4 quarterfinals, 2 semifinals and 1 final, with published results and player statistics. Champion: DEMO '.$year.' A1.');
+        $this->command?->info('Created completed DEMO '.$year.': 7 groups, 28 teams, 336 players, 42 group matches, 4 quarterfinals, 2 semifinals and 1 final, with published results and player statistics. Champion: CSE 22.');
     }
 
     private function finishedMatch(int $year, int $number, string $stage, int $one, int $two, array $players, int $balls, ?int $group = null, ?int $slot = null): void

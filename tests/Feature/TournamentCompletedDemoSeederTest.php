@@ -59,7 +59,7 @@ class TournamentCompletedDemoSeederTest extends TestCase
             ]), $match->id);
         }
 
-        $champion = Team::where('team_name', 'DEMO 2026 A1')->firstOrFail();
+        $champion = Team::where('team_name', 'CSE 22')->firstOrFail();
         $this->assertSame($champion->id, $matches->firstWhere('stage', 'F')->winner_id);
         $this->assertDatabaseHas('player_tournament_stats', [
             'team_member_id' => DB::table('team_members')->where('team_id', $champion->id)->orderBy('id')->value('id'),
@@ -69,10 +69,10 @@ class TournamentCompletedDemoSeederTest extends TestCase
         config(['tournament.enabled' => true]);
         Route::middleware('web')->group(base_path('routes/tournament.php'));
         Route::getRoutes()->refreshNameLookups();
-        $this->get('/tournament?tab=bracket')->assertOk()->assertSee('Champion: DEMO 2026 A1')
+        $this->get('/tournament?tab=bracket')->assertOk()->assertSee('Champion: CSE 22')
             ->assertDontSee('To be confirmed');
-        $this->get('/tournament?tab=table')->assertOk()->assertSee('DEMO A');
-        $this->get('/tournament?tab=stats')->assertOk()->assertSee('DEMO 2026 A1 Player 1');
+        $this->get('/tournament?tab=table')->assertOk()->assertSee('Group A');
+        $this->get('/tournament?tab=stats')->assertOk()->assertSee('CSE 22 Player 1');
 
         $snapshot = $matches->toJson();
         try {

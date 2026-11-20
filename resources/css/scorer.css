@@ -1,3 +1,714 @@
+/* Venue screen: preserve the physical LED wall's 14:7 ratio at any resolution. */
+.led-viewport {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+.led-stage {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  width: min(100vw, 200dvh);
+  height: min(100dvh, 50vw);
+  padding: 1.5vh 1.5vw;
+  gap: 1.2vh;
+}
+.led-groups {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1.6cqh 1.6cqh;
+}
+/* Four cards per row, all the same width; a shorter second row is centred. */
+.led-group { grid-column: span 2; }
+/* Counted by element type so the decorative <div> ornaments beside the <section> cards are ignored. */
+.led-group:nth-of-type(5):nth-last-of-type(3) { grid-column: 2 / span 2; }
+.led-group:nth-of-type(5):nth-last-of-type(2) { grid-column: 3 / span 2; }
+.led-group:nth-of-type(5):last-of-type { grid-column: 4 / span 2; }
+
+/* Light palette on the brand cream. Every text colour clears 5.4:1 on its background
+   (measured on the shaded rows too) so it stays legible from the back of the venue. */
+.led-body {
+  --led-bg: var(--color-base-100);
+  --led-card: #FFFFFF;
+  --led-card-head: #03162F; /* brand navy: header strips and group letters */
+  --led-row-alt: rgb(31 27 22 / .035);
+  --led-line: rgb(31 27 22 / .14);
+  --led-text: var(--color-secondary);
+  --led-muted: rgb(31 27 22 / .74);
+  --led-orange: var(--color-primary);
+  --led-orange-ink: #9A3A06;
+  --led-win: #17663A;
+  --led-loss: #A82A18;
+  --led-tie: #7A4F00;
+  margin: 0;
+  background: var(--led-bg);
+  color: var(--led-text);
+  -webkit-font-smoothing: antialiased;
+}
+.led-viewport { background: radial-gradient(120% 90% at 50% 0%, #FBF9F4 0%, var(--led-bg) 60%); }
+
+.led-header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 2cqh; height: 8cqh; }
+.led-logo { display: flex; align-items: center; height: 100%; padding: .4cqh 0; }
+.led-logo img { height: 100%; width: auto; }
+.led-title { display: flex; align-items: center; gap: 1.6cqh; }
+.led-title h1 { margin: 0; font-size: 5cqh; font-weight: 900; line-height: 1; letter-spacing: .02em; text-transform: uppercase; }
+.led-title h1 span { color: var(--led-orange-ink); }
+.led-live { display: inline-flex; align-items: center; gap: .8cqh; padding: .7cqh 1.4cqh; border-radius: 99cqh; background: rgb(255 106 19 / .14); color: var(--led-orange-ink); font-size: 1.9cqh; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.led-live::before { content: ""; width: 1.1cqh; height: 1.1cqh; border-radius: 50%; background: currentColor; animation: led-pulse 2s ease-in-out infinite; }
+@keyframes led-pulse { 50% { opacity: .25; } }
+
+.led-group { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border-radius: 1.6cqh; background: var(--led-card); box-shadow: inset 0 0 0 1px var(--led-line), 0 .4cqh 1.6cqh rgb(31 27 22 / .06); }
+.led-group-head { display: flex; flex: none; align-items: center; gap: 1.2cqh; padding: 1.1cqh 1.8cqh; background: var(--led-card-head); border-bottom: .45cqh solid var(--led-orange); }
+.led-group-letter { display: grid; place-items: center; flex: none; min-width: 4.6cqh; height: 4.6cqh; padding: 0 .6cqh; border-radius: 1cqh; background: var(--led-orange); color: var(--led-card-head); font-size: 3.1cqh; font-weight: 900; line-height: 1; }
+.led-group-name { min-width: 0; color: #fff; font-size: 2.9cqh; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; overflow-wrap: anywhere; }
+
+/* Inset from the card edges so rows, shading and the points column never touch the border. */
+.led-table { flex: 1 1 0; width: calc(100% - 2.4cqh); min-height: 0; margin: .6cqh 1.2cqh 1.2cqh; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
+.led-table th, .led-table td { padding: 0 .4cqh; text-align: center; white-space: nowrap; }
+.led-table :is(th, td):first-child { padding-left: .8cqh; }
+.led-table :is(th, td):last-child { padding-right: .8cqh; }
+.led-table thead tr { border-bottom: 1px solid var(--led-line); }
+.led-table tbody tr:first-child { border-top: 0; }
+.led-table thead th { height: 3.6cqh; color: var(--led-muted); font-size: 1.75cqh; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.led-table thead abbr { text-decoration: none; }
+.led-table tbody tr { border-top: 1px solid var(--led-line); }
+.led-table tbody tr:nth-child(even) { background: var(--led-row-alt); }
+.led-table tbody td { font-size: 2.7cqh; font-weight: 700; }
+.led-table .led-col-team { text-align: left; }
+.led-rank { color: var(--led-muted); font-weight: 800; }
+.led-team { display: flex; align-items: center; gap: 1cqh; min-width: 0; font-size: 2.6cqh; font-weight: 800; }
+.led-team-name { min-width: 0; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
+.led-team .tc-badge { width: 4.4cqh; height: 3.2cqh; padding: .25cqh; border-radius: .7cqh; box-shadow: inset 0 0 0 1px var(--led-line); font-size: 1.15cqh; }
+.led-team .tc-badge-cse { gap: .2cqh; font-size: 1.05cqh; }
+.led-team .tc-badge-initials { background: var(--color-base-200); }
+.led-w { color: var(--led-win); }
+.led-l { color: var(--led-loss); }
+.led-t { color: var(--led-tie); }
+.led-nrr { color: var(--led-muted); font-size: 2.3cqh !important; }
+.led-pts { position: relative; color: var(--led-orange-ink); font-size: 3cqh !important; font-weight: 900 !important; }
+.led-table thead .led-pts-head { color: var(--led-orange-ink); }
+.led-table tbody .led-pts { background: rgb(255 106 19 / .12); }
+/* Cards are a quarter of the wall wide, so type is sized to fit that width. */
+.led-group .led-table tbody td { font-size: 2.4cqh; }
+.led-group .led-team { gap: .7cqh; font-size: 2.1cqh; }
+.led-group .led-team .tc-badge { width: 3.6cqh; height: 2.7cqh; }
+.led-group .led-nrr { font-size: 2cqh !important; }
+.led-group .led-pts { font-size: 2.7cqh !important; }
+.led-table tbody tr:first-child .led-pts { border-radius: .8cqh .8cqh 0 0; }
+.led-table tbody tr:last-child .led-pts { border-radius: 0 0 .8cqh .8cqh; }
+.led-qualified td:first-child { box-shadow: inset .5cqh 0 0 var(--led-orange-ink); }
+.led-qualified .led-rank { color: var(--led-orange-ink); }
+
+/* Decorative line art in the bottom row's empty outer columns: muted so it never competes with the tables. */
+.led-groups { position: relative; }
+.led-ornament { position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; width: calc(12.5% - 1.6cqh); height: calc(50% - .8cqh); padding: 1.5cqh 0; pointer-events: none; opacity: .5; }
+.led-ornament img { width: auto; height: auto; max-width: 100%; max-height: 100%; }
+.led-ornament-left { left: 0; }
+.led-ornament-right { right: 0; }
+.led-ornament-right img { transform: scaleX(-1); }
+.led-empty { grid-column: 1 / -1; align-self: center; text-align: center; font-size: 4cqh; font-weight: 800; color: var(--led-muted); }
+@media (prefers-reduced-motion: reduce) { .led-live::before { animation: none; } }
+
+/* Knockout screen: reuses the public bracket markup, restyled here only, in the group stage screen's palette. */
+.tc.led-bracket { max-width: none; margin: 0; padding: 1.5vh 1.5vw; }
+.led-bracket .tc-playoff-scroll { flex: 1; min-height: 0; overflow: visible; }
+.led-bracket .tc-playoffs {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 2.4cqh 7cqh; /* room for the connector lines and arrows between rounds */
+  padding: 1cqh 0 0;
+  align-content: stretch;
+  align-items: center;
+}
+.led-bracket .tc-playoff-round,
+.led-bracket .tc-playoff-matches { display: contents; }
+.led-bracket .tc-playoff-mirror { display: flex; }
+.led-bracket .tc-playoff-mirror[data-stage="SF"] { grid-column: 4; }
+.led-bracket .tc-playoff-mirror[data-stage="QF"] { grid-column: 5; }
+.led-bracket .tc-playoff-round .tc-playoff-slot { grid-column: var(--column); grid-row: var(--row); padding: 0; }
+
+/* Round labels: the public bracket's orange bar and underline, sized for the wall. */
+.led-bracket .tc-playoffs .tc-round-head { justify-content: flex-start; align-self: end; margin: 0; padding: 0 0 1cqh; border-bottom: .3cqh solid var(--led-line); }
+.led-bracket .tc-round-head :is(h3, span) { margin: 0; padding: 0 0 0 1.2cqh; border-left: .55cqh solid var(--led-orange); border-radius: 0; background: none; color: var(--led-text); font-size: 2.8cqh; font-weight: 800; line-height: 1.1; }
+
+/* Orange connector lines as on the public bracket, thickened for distance. */
+.led-bracket .tc-playoff-lines { color: var(--led-orange-ink); --bracket-line-width: 2.5; }
+
+/* Match cards: the public layout (logo tile above name and score), enlarged. */
+.led-bracket .tc-playoff-slot .tc-match { max-width: none; margin: 0; border: 1px solid var(--led-line); border-radius: 1.6cqh; background: var(--led-card); box-shadow: 0 .6cqh 2cqh rgb(3 22 47 / .08); }
+/* Rows run edge to edge with their own padding, so winner and loser rows get the same width. */
+.led-bracket .tc-scoreboard { padding-inline: 0; }
+.led-bracket .tc-playoff-slot .tc-team { gap: 1.2cqh; margin-inline: 0; padding: 1.8cqh 1.8cqh; }
+.led-bracket .tc-team + .tc-team { border-top-color: var(--led-line); }
+.led-bracket .tc-team-logo { width: 12cqh; height: 7cqh; padding: .9cqh; border-color: var(--led-line); border-radius: 1cqh; font-size: 2cqh; }
+.led-bracket .tc-team-logo-cse { font-size: 1.9cqh; }
+.led-bracket .tc-bracket-team-details { align-items: baseline; gap: 1cqh; }
+.led-bracket .tc-bracket-team-details .tc-team-name { font-size: 2.5cqh; font-weight: 800; line-height: 1.15; letter-spacing: 0; color: var(--led-text); }
+.led-bracket .tc-playoff-slot .tc-score { font-size: 2.7cqh; font-weight: 700; color: var(--led-text); }
+.led-bracket .tc-unknown { font-size: 1.5cqh; }
+
+/* Winner: peach row, bold, score in deep orange. Loser: readable grey instead of the public 45% fade. */
+.led-bracket .tc-playoffs .tc-team-winner { background: color-mix(in srgb, var(--color-accent) 85%, white); }
+.led-bracket .tc-playoffs .tc-team-winner .tc-score { color: var(--led-orange-ink); font-weight: 900; }
+.led-bracket .tc-playoffs .tc-team-eliminated { opacity: 1; }
+.led-bracket .tc-playoffs .tc-team-eliminated :is(.tc-team-name, .tc-score) { color: var(--led-muted); font-weight: 700; }
+.led-bracket .tc-playoffs .tc-team-eliminated .tc-team-logo { opacity: .6; }
+
+/* Final: gold champion row from the public bracket, with a larger badge above. */
+.led-bracket .tc-playoffs .tc-team-champion { background: color-mix(in srgb, #ffc440 45%, white); box-shadow: inset 0 0 0 .35cqh #e8a317; }
+.led-bracket .tc-champion-badge { bottom: calc(100% + 1.6cqh); max-width: none; gap: .9cqh; padding: 1cqh 2.4cqh; font-size: 2.2cqh; box-shadow: 0 .4cqh 1.2cqh rgb(3 22 47 / .12); }
+.led-bracket .tc-champion-badge svg { width: 2.6cqh; height: 2.6cqh; }
+.led-bracket .tc-champion-cup-logo { top: -1.2cqh; left: -1.2cqh; width: 3.4cqh; height: 3.4cqh; padding: .6cqh; }
+
+/* Slots without a fixture yet. */
+.led-bracket .tc-empty-slot { padding: 2.4cqh 1.6cqh; border: .3cqh dashed var(--led-line); border-radius: 1.4cqh; background: rgb(255 255 255 / .55); }
+.led-bracket .tc-empty-slot h4 { font-family: inherit; font-size: 2.3cqh; font-weight: 800; color: var(--led-text); }
+.led-bracket .tc-empty-slot p { margin-top: .8cqh; font-size: 1.9cqh; color: var(--led-muted); }
+
+.tc.led-leaderboard { max-width: none; padding: 1.5vh 1.5vw; }
+.led-cap-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2cqw; flex: 1; min-height: 0; padding-block: 2cqh; }
+.led-cap-panel { min-width: 0; border: 1px solid var(--tc-line); border-top: .6cqh solid var(--cap-color); border-radius: 1.5cqh; background: rgb(255 255 255 / .6); overflow: hidden; }
+.led-cap-runs { --cap-color: #b8480a; --cap-tint: #fbdcc7; }
+.led-cap-wickets { --cap-color: #7030a0; --cap-tint: #eee0f8; }
+.led-cap-heading { display: flex; align-items: center; gap: 1cqw; padding: 2cqh 1.5cqw; background: var(--cap-tint); color: var(--cap-color); }
+.led-cap-heading > img { width: 8cqh; height: 8cqh; object-fit: contain; }
+.led-cap-heading h2 { font-size: 3.8cqh; font-weight: 800; line-height: 1.2; }
+.led-cap-heading p { font-size: 2cqh; margin-top: .5cqh; }
+.led-leaderboard .tc-stats-leaderboard { table-layout: fixed; font-size: 2.7cqh; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td) { padding: 1.5cqh .6cqw; height: 10cqh; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):first-child { width: 8%; padding-left: 1cqw; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):nth-child(2) { width: 15%; }
+.led-leaderboard .tc-stats-leaderboard :is(th, td):last-child { width: 22%; padding-right: 1cqw; }
+.led-leaderboard .tc-stats-leaderboard tbody th { width: auto; line-height: 1.2; }
+.led-leaderboard .tc-stats-team { font-size: 1.9cqh; margin-top: .6cqh; }
+.led-leaderboard .tc-badge { width: 6cqw; max-width: 100%; height: 5cqh; padding: .5cqh; font-size: 1.7cqh; }
+.led-leaderboard .tc-stats-score { gap: .5cqw; font-size: 3.5cqh; }
+.led-leaderboard .tc-stats-score img { width: 3.5cqh; height: 3.5cqh; }
+/* Cap screen table: even padding, edges lined up with the panel heading, rows filling the panel. */
+.led-cap-panel:has(.led-cap-table) { display: flex; flex-direction: column; }
+.led-cap-panel .led-cap-table { flex: 1 1 0; height: 100%; min-height: 0; }
+.led-leaderboard .led-cap-table :is(th, td) { width: auto; height: auto; padding: 1.2cqh 1.4cqh; }
+.led-leaderboard .led-cap-table :is(th, td):first-child { width: auto; padding-left: 1.5cqw; }
+.led-leaderboard .led-cap-table :is(th, td):last-child { width: auto; padding-right: 1.5cqw; }
+.led-leaderboard .led-cap-table tbody tr:last-child :is(th, td) { border-bottom: 0; }
+.led-leaderboard .led-cap-table .tc-badge { width: 100%; max-width: 12cqh; }
+/* Column titles row: small muted labels over the stat columns only. */
+.led-leaderboard .led-cap-table thead.led-cap-head th { height: 1px; padding-block: 1.2cqh; border-bottom: .25cqh solid var(--tc-line); background: rgb(255 255 255 / .5); color: rgb(31 27 22 / .74); font-size: 1.8cqh; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; text-align: end; }
+/* Strike rate: title and values centred on the same axis (the title is wider than the numbers). */
+.led-leaderboard .led-cap-table .led-cap-sr { text-align: center; color: rgb(31 27 22 / .74); font-size: 3cqh; font-weight: 700; }
+.led-leaderboard .led-cap-table thead.led-cap-head th.led-cap-sr-head { text-align: center; }
+/* Stats screen: three narrower panels, so tighter cell padding matching its 1cqw heading inset. */
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td) { height: auto; padding: 1.2cqh .9cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td):first-child { padding-left: 1cqw; }
+.led-stats-leaderboard .tc-stats-leaderboard.led-cap-table :is(th, td):last-child { padding-right: 1cqw; }
+.led-cap-empty { padding: 5cqh 2cqw; font-size: 2.7cqh; text-align: center; }
+.led-cap-note { padding: 1cqh 1cqw; font-size: 1.8cqh; }
+.led-stats-columns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.2cqw; }
+.led-stat-sixes { --cap-color: #b8480a; --cap-tint: #fbdcc7; }
+.led-stat-fours { --cap-color: #176442; --cap-tint: #deeee4; }
+.led-stat-dot_balls { --cap-color: #305d97; --cap-tint: #e1eaf8; }
+.led-stats-leaderboard .led-cap-heading { min-height: 13cqh; padding-inline: 1cqw; }
+.led-stats-leaderboard .led-cap-heading h2 { font-size: 3cqh; }
+/* Category illustration: a fixed box so the wide (fours) and compact (dot ball) art line up. */
+.led-stats-leaderboard .led-cap-heading > .led-stat-icon { flex: none; width: 14cqh; height: 8.5cqh; object-fit: contain; object-position: center; }
+.led-stats-leaderboard .tc-stats-leaderboard { font-size: 2.4cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td) { padding-inline: .4cqw; height: 11cqh; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):first-child { width: 9%; padding-left: .6cqw; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):nth-child(2) { width: 18%; }
+.led-stats-leaderboard .tc-stats-leaderboard :is(th, td):last-child { width: 16%; padding-right: .6cqw; }
+.led-stats-leaderboard .tc-stats-team { font-size: 1.7cqh; }
+.led-stats-leaderboard .tc-stats-score { font-size: 3cqh; }
+
+/* Grounds LED screen (2:1 aspect ratio, four grounds from four sides) */
+.led-grounds-stage {
+  gap: 1cqh;
+}
+/* Lift the shared page cap (91rem) so the stage keeps its 2:1 shape on wide screens such as 1920×1080. */
+.tc.led-grounds-stage { max-width: none; margin: 0; padding: 1.5vh 1.5vw; }
+.led-header-clock {
+  display: flex;
+  align-items: center;
+  gap: .8cqh;
+  padding: .5cqh 1.4cqh;
+  border-radius: 99cqh;
+  background: var(--led-card);
+  box-shadow: inset 0 0 0 1px var(--led-line);
+  font-size: 2.2cqh;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--led-card-head);
+}
+.led-clock-dot {
+  width: .9cqh;
+  height: .9cqh;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: led-pulse 2s ease-in-out infinite;
+}
+.led-grounds-grid {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 1.4cqh 1.4cqw;
+}
+.led-ground-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1.5cqh;
+  background: var(--led-card);
+  box-shadow: inset 0 0 0 1px var(--led-line), 0 .4cqh 1.6cqh rgb(31 27 22 / .06);
+  position: relative;
+}
+.led-ground-head {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: .8cqh 1.4cqw;
+  background: var(--led-card-head);
+  border-bottom: .35cqh solid #16a34a;
+  gap: 1cqw;
+}
+.led-ground-head-title {
+  display: flex;
+  align-items: center;
+  gap: 1cqh;
+  min-width: 0;
+}
+.led-ground-tag {
+  display: grid;
+  place-items: center;
+  min-width: 4cqh;
+  height: 4cqh;
+  padding: 0 .4cqh;
+  border-radius: .8cqh;
+  background: var(--led-orange);
+  color: var(--led-card-head);
+  font-size: 2.3cqh;
+  font-weight: 900;
+  line-height: 1;
+}
+.led-ground-name {
+  color: #ffffff;
+  font-size: 2.4cqh;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin: 0;
+  white-space: nowrap;
+}
+.led-ground-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .6cqh;
+  padding: .4cqh 1cqh;
+  border-radius: 99cqh;
+  font-size: 1.5cqh;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.led-ground-pill.is-live {
+  background: rgb(22 163 74 / .2);
+  color: #4ade80;
+  border: 1px solid rgb(74 222 128 / .4);
+}
+.led-ground-pill.is-upcoming {
+  background: rgb(255 106 19 / .2);
+  color: #ff9d66;
+  border: 1px solid rgb(255 157 102 / .4);
+}
+.led-ground-pill.is-concluded {
+  background: rgb(255 255 255 / .12);
+  color: rgb(255 255 255 / .75);
+}
+.led-ground-pill.is-idle {
+  background: rgb(255 255 255 / .08);
+  color: rgb(255 255 255 / .6);
+}
+.led-pill-pulse {
+  width: 1cqh;
+  height: 1cqh;
+  border-radius: 50%;
+  background: currentColor;
+  animation: led-pulse 2s ease-in-out infinite;
+}
+.led-pill-pulse-sm {
+  width: .8cqh;
+  height: .8cqh;
+  border-radius: 50%;
+  background: currentColor;
+  animation: led-pulse 2s ease-in-out infinite;
+}
+.led-ground-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 1cqh 1.2cqw;
+  gap: 1.2cqw;
+}
+.led-ground-arena {
+  flex: 1.3 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgb(31 27 22 / .025);
+  border: 1px solid var(--led-line);
+  border-radius: 1.2cqh;
+  padding: 1.1cqh 1.2cqw;
+  position: relative;
+  overflow: hidden;
+}
+.led-arena-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1cqw;
+  flex: none;
+}
+.led-arena-badge-group {
+  display: flex;
+  align-items: center;
+  gap: .8cqh;
+  min-width: 0;
+}
+.led-arena-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5cqh;
+  padding: .3cqh .8cqh;
+  border-radius: .6cqh;
+  font-size: 1.35cqh;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.led-arena-badge.is-live {
+  background: rgb(22 163 74 / .15);
+  color: #15803d;
+  border: 1px solid rgb(22 163 74 / .3);
+}
+.led-arena-badge.is-next {
+  background: rgb(255 106 19 / .15);
+  color: var(--led-orange-ink);
+  border: 1px solid rgb(255 106 19 / .3);
+}
+.led-arena-stage {
+  font-size: 1.5cqh;
+  font-weight: 800;
+  color: var(--led-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.led-arena-time {
+  display: inline-flex;
+  align-items: center;
+  gap: .4cqh;
+  font-size: 1.5cqh;
+  font-weight: 800;
+  color: var(--led-orange-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.led-arena-teams {
+  display: flex;
+  flex-direction: column;
+  gap: .7cqh;
+  margin-block: auto;
+  position: relative;
+  z-index: 1;
+}
+.led-arena-team {
+  display: flex;
+  align-items: center;
+  gap: .8cqw;
+  min-width: 0;
+}
+.led-team-badge {
+  width: 5cqh !important;
+  height: 3.5cqh !important;
+  flex: none;
+  border-radius: .6cqh;
+}
+.led-arena-team-info {
+  display: flex;
+  align-items: center;
+  gap: .8cqh;
+  min-width: 0;
+}
+.led-arena-team-name {
+  font-size: 2.2cqh;
+  font-weight: 800;
+  color: var(--led-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.led-arena-bat-pill {
+  flex: none;
+  padding: .2cqh .6cqh;
+  border-radius: .4cqh;
+  background: rgb(3 22 47 / .08);
+  color: var(--led-card-head);
+  font-size: 1.2cqh;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.led-arena-vs {
+  display: flex;
+  align-items: center;
+  gap: .8cqw;
+  color: var(--led-muted);
+  font-size: 1.2cqh;
+  font-weight: 900;
+  letter-spacing: .12em;
+  padding-left: 2.4cqh;
+}
+.led-arena-vs::before,
+.led-arena-vs::after {
+  content: "";
+  height: 1px;
+  background: var(--led-line);
+  flex: 1;
+}
+.led-arena-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1cqw;
+  padding-top: .6cqh;
+  border-top: 1px solid var(--led-line);
+  flex: none;
+  position: relative;
+  z-index: 1;
+}
+.led-arena-rules {
+  display: flex;
+  align-items: center;
+  gap: .6cqh;
+  font-size: 1.35cqh;
+  font-weight: 700;
+  color: var(--led-muted);
+  white-space: nowrap;
+}
+.led-arena-live-note {
+  font-size: 1.25cqh;
+  font-weight: 700;
+  color: var(--led-orange-ink);
+  white-space: nowrap;
+}
+.led-arena-concluded {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  gap: 1cqh;
+  position: relative;
+  z-index: 1;
+}
+.led-concluded-badge {
+  display: inline-block;
+  padding: .3cqh .8cqh;
+  border-radius: .5cqh;
+  background: rgb(22 163 74 / .12);
+  color: #15803d;
+  font-size: 1.3cqh;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.led-concluded-label {
+  font-size: 1.3cqh;
+  font-weight: 700;
+  color: var(--led-muted);
+  text-transform: uppercase;
+}
+.led-concluded-desc {
+  font-size: 2cqh;
+  font-weight: 800;
+  color: var(--led-text);
+  margin-top: .3cqh;
+}
+.led-arena-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  gap: .6cqh;
+  color: var(--led-muted);
+  position: relative;
+  z-index: 1;
+}
+.led-empty-title {
+  font-size: 1.8cqh;
+  font-weight: 800;
+  color: var(--led-card-head);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.led-empty-sub {
+  font-size: 1.4cqh;
+  font-weight: 600;
+}
+/* Arena: the 3D ground (Blender render) fills the top; the current match sits underneath it. */
+.led-ground-arena { justify-content: flex-start; gap: .8cqh; }
+.led-ground-art { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.led-ground-art :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 1cqh 1.2cqh rgb(3 22 47 / .16)); }
+.led-ground-match { flex: none; display: flex; flex-direction: column; gap: .7cqh; padding-top: .7cqh; border-top: 1px solid var(--led-line); }
+.led-ground-match :is(.led-arena-concluded, .led-arena-empty) { flex: none; gap: .4cqh; }
+.led-ground-match .led-arena-foot { padding-top: .5cqh; }
+
+/* Teams on one row: team 1 left, VS centred, team 2 right (mirrored). */
+/* Equal halves for both teams (grid, not flex) so neither name gets less room than the other. */
+.led-arena-teams.is-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .8cqh; margin: 0; padding-block: .4cqh; }
+.led-arena-teams.is-row .led-arena-team { min-width: 0; gap: .6cqh; }
+.led-arena-teams.is-row .led-team-badge { width: 4.2cqh !important; height: 3cqh !important; }
+/* One line per name; a very long name ends in "…" rather than breaking the row. */
+.led-arena-teams.is-row .led-arena-team-name { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.15; font-size: 2.05cqh; }
+.led-arena-teams.is-row .led-arena-team-right { flex-direction: row-reverse; text-align: right; }
+.led-arena-teams.is-row .led-arena-team-right .led-arena-team-info { flex-direction: row-reverse; }
+.led-arena-teams.is-row .led-arena-vs { flex: none; padding: .3cqh .8cqh; border-radius: .6cqh; background: rgb(3 22 47 / .07); color: var(--led-card-head); }
+.led-arena-teams.is-row .led-arena-vs::before,
+.led-arena-teams.is-row .led-arena-vs::after { content: none; }
+.led-ground-schedule {
+  flex: .95 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--led-line);
+  border-radius: 1.2cqh;
+  padding: 1.1cqh 1.1cqw;
+  overflow: hidden;
+}
+.led-sched-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: .6cqh;
+  border-bottom: 1px solid var(--led-line);
+  flex: none;
+}
+.led-sched-title {
+  margin: 0;
+  font-size: 1.6cqh;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--led-card-head);
+}
+.led-sched-count {
+  font-size: 1.25cqh;
+  font-weight: 700;
+  color: var(--led-muted);
+  text-transform: uppercase;
+}
+.led-sched-list {
+  display: flex;
+  flex-direction: column;
+  gap: .6cqh;
+  flex: 1;
+  overflow: hidden;
+  margin-top: .6cqh;
+}
+.led-sched-item {
+  display: flex;
+  align-items: center;
+  gap: .8cqw;
+  padding: .55cqh .8cqw;
+  border-radius: .8cqh;
+  background: var(--led-row-alt);
+  border: 1px solid rgb(31 27 22 / .05);
+  min-width: 0;
+}
+.led-sched-item-time {
+  font-size: 1.5cqh;
+  font-weight: 800;
+  color: var(--led-orange-ink);
+  background: rgb(255 106 19 / .1);
+  padding: .25cqh .6cqh;
+  border-radius: .4cqh;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.led-sched-item-main {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .2cqh;
+}
+.led-sched-item-meta {
+  display: flex;
+  align-items: center;
+  gap: .4cqw;
+  font-size: 1.2cqh;
+  font-weight: 700;
+  color: var(--led-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.led-sched-item-matchup {
+  display: flex;
+  align-items: center;
+  gap: .4cqw;
+  font-size: 1.55cqh;
+  font-weight: 700;
+  color: var(--led-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.led-sched-vs {
+  font-size: 1.2cqh;
+  font-weight: 600;
+  color: var(--led-muted);
+  flex: none;
+}
+/* Matchup without the time: both names get equal halves, "vs" in the middle. */
+.led-sched-item .led-sched-item-matchup { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .8cqh; font-size: 1.7cqh; }
+.led-sched-team { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.led-sched-team:last-child { text-align: right; }
+.led-sched-item { padding: .7cqh 1cqw; }
+.led-sched-empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  flex: 1;
+  color: var(--led-muted);
+  font-size: 1.4cqh;
+  font-weight: 600;
+  padding: 1cqh;
+}
+
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);
   --scorer-paper: color-mix(in srgb, var(--color-base-100) 32%, white);

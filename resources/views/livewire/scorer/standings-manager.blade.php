@@ -68,14 +68,14 @@ new class extends Component {
     $adjustGroup = $groupId !== null ? collect($groups)->firstWhere('id', $groupId) : null;
     $adjustTeam = $adjustGroup ? collect($adjustGroup['teams'])->firstWhere('id', $teamId) : null;
 @endphp
-<div class="scorer-screen sst-screen space-y-5">
+<div class="scorer-screen sst-screen space-y-5" x-data="{ screenPickerOpen: false }">
     <header class="scorer-heading sd-heading">
         <div class="sd-heading-copy">
             <h1 class="text-2xl font-bold sm:text-3xl">Group standings</h1>
             <p class="text-sm">Published results, ranked by points then net run rate. Equal records remain tied.</p>
         </div>
         <div class="sg-heading-actions">
-            <a href="{{ route('scorer.screen') }}" target="_blank" class="btn btn-ghost sd-btn-quiet">LED screen <span aria-hidden="true">↗</span><span class="sr-only">(opens in a new tab)</span></a>
+            <button type="button" x-on:click="screenPickerOpen = true" class="btn btn-ghost sd-btn-quiet" aria-haspopup="dialog" aria-controls="led-screen-dialog"><x-scorer.icon name="eye" /> LED screen</button>
             <a href="{{ route('scorer.knockouts') }}" class="btn btn-ghost sd-btn-quiet"><x-scorer.icon name="trophy" /> Choose advancing teams</a>
             <button type="button" wire:click="$refresh" wire:loading.attr="disabled" class="btn btn-outline"><x-scorer.icon name="refresh" /> Refresh standings</button>
         </div>
@@ -170,6 +170,42 @@ new class extends Component {
         </section>
     @empty<p class="sd-empty">No tournament groups yet. Add groups in <a href="{{ route('scorer.groups.index') }}" class="link">Group setup</a>.</p>@endforelse
     </div>
+
+    <dialog id="led-screen-dialog" class="sd-dialog" aria-labelledby="led-screen-heading" aria-describedby="led-screen-description" wire:ignore.self
+            x-effect="screenPickerOpen ? ($el.open || $el.showModal()) : ($el.open && $el.close())"
+            x-on:cancel.prevent="screenPickerOpen = false" x-on:click.self="screenPickerOpen = false">
+        <div class="sd-dialog-panel">
+            <header class="sd-dialog-head">
+                <div>
+                    <h2 id="led-screen-heading">Choose an LED screen</h2>
+                    <p id="led-screen-description">Select a display to open in a new tab.</p>
+                </div>
+                <button type="button" x-on:click="screenPickerOpen = false" class="sd-icon-btn" aria-label="Close screen selector"><x-scorer.icon name="x" /></button>
+            </header>
+            <div class="sd-dialog-body">
+                @foreach ([
+                    'group_stage' => ['Group stage', 'Group standings, points and net run rate.', 'scoreboard'],
+                    'grounds' => ['Grounds schedule', 'Live and upcoming matches across all four grounds.', 'pin'],
+                    'bracket' => ['Knockout bracket', 'Quarter-finals, semi-finals and the final.', 'trophy'],
+                    'cap_leaderboard' => ['Cap leaderboards', 'Top five run scorers and wicket takers.', 'users'],
+                    'stats_leaderboard' => ['Stats leaderboards', 'Top five players for sixes, fours and dot balls.', 'ball'],
+                ] as $screen => [$label, $description, $icon])
+                    <a href="{{ route('scorer.screen.'.$screen) }}" target="_blank" rel="noopener" x-on:click="screenPickerOpen = false"
+                       class="flex items-center gap-3 rounded-lg border border-base-300 p-4 hover:bg-base-200">
+                        <x-scorer.icon :name="$icon" />
+                        <span class="min-w-0">
+                            <strong class="block">{{ $label }}</strong>
+                            <span class="block text-sm">{{ $description }}</span>
+                        </span>
+                        <span class="sr-only">(opens in a new tab)</span>
+                    </a>
+                @endforeach
+            </div>
+            <footer class="sd-dialog-foot">
+                <button type="button" x-on:click="screenPickerOpen = false" class="btn btn-ghost">Cancel</button>
+            </footer>
+        </div>
+    </dialog>
 
     {{-- Adjust points popup: open while a team is chosen ($groupId). --}}
     <dialog id="adjust-points-dialog" class="sd-dialog sg-dialog-sm" aria-labelledby="adjust-heading" wire:ignore.self

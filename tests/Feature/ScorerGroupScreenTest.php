@@ -26,12 +26,12 @@ class ScorerGroupScreenTest extends TestCase
         }
 
         $company = User::factory()->create(['is_admin' => false]);
-        $this->signedIn($company)->get('/scorer/screen')->assertForbidden();
+        $this->signedIn($company)->get('/scorer/screen/group_stage')->assertForbidden();
 
         $scorer = User::factory()->create(['is_admin' => false, 'company_id' => null]);
         $scorer->is_scorer = true;
         $scorer->save();
-        $this->signedIn($scorer)->get('/scorer/screen')->assertOk()
+        $this->signedIn($scorer)->get('/scorer/screen/group_stage')->assertOk()
             ->assertSee('wire:poll.15s', false)
             ->assertSeeInOrder(['Group A', 'Aayu Technologies', '3', '4', '1.235', 'Group B', 'BoardOne A']);
     }

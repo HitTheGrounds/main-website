@@ -254,6 +254,56 @@ class PublicTournamentService
         });
     }
 
+    public function grounds(int $year): array
+    {
+        $this->validateYear($year);
+
+        return $this->snapshots->run(function () use ($year) {
+            $venues = config('tournament.venues') ?: ['Ground 1', 'Ground 2', 'Ground 3', 'Ground 4'];
+            $groups = $this->groups($year);
+            $matches = $this->bounded(
+                $this->visibleMatches($year)
+                    ->whereNotNull('venue')
+                    ->whereIn('venue', $venues)
+                    ->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')
+                    ->orderBy('scheduled_at')
+                    ->orderBy('id')
+                    ->select(self::MATCH_FIELDS),
+                self::MAX_FIXTURES
+            );
+            $teams = $this->teams($matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->all());
+
+            $grounds = [];
+            foreach ($venues as $venue) {
+                $venueMatches = $matches->filter(fn ($m) => strcasecmp(trim((string) $m->venue), trim((string) $venue)) === 0);
+                $live = $venueMatches->filter(fn ($m) => $m->status === 'live')->values();
+                $upcoming = $venueMatches->filter(fn ($m) => $m->status === 'upcoming')->values();
+                $finished = $venueMatches->filter(fn ($m) => $m->status === 'finished')->values();
+
+                $presentedLive = $live->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedUpcoming = $upcoming->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedFinished = $finished->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+
+                $grounds[] = [
+                    'venue' => $venue,
+                    'live_match' => $presentedLive[0] ?? null,
+                    'live_matches' => $presentedLive,
+                    'upcoming_matches' => $presentedUpcoming,
+                    'finished_matches' => $presentedFinished,
+                    'latest_finished' => $presentedFinished !== [] ? end($presentedFinished) : null,
+                    'total_matches' => count($venueMatches),
+                ];
+            }
+
+            return [
+                'year' => $year,
+                'venues' => $venues,
+                'grounds' => $grounds,
+                'latest_result_published_at' => $this->publicationTime($matches->where('status', 'finished')->max('result_published_at')),
+            ];
+        });
+    }
+
     private function presentMatch(TournamentMatch $match, $teams, $groups): array
     {
         $a = $teams->get($match->team1_id)?->team_name ?? 'Team unavailable';
@@ -279,7 +329,7 @@ class PublicTournamentService
             'status' => $match->status, 'balls_per_over' => $match->balls_per_over,
             'overs_per_innings' => $match->overs_per_innings, 'max_wickets' => $match->max_wickets,
             'scheduled_at' => $match->scheduled_at?->toIso8601String(), 'venue' => $match->venue,
-            'display_number' => $match->display_number, 'result' => $result];
+            'display_number' => $match->display_number, 'batting_first_id' => $match->batting_first_id, 'result' => $result];
     }
 
     private function publicationTime(string|\DateTimeInterface|null $value): ?string

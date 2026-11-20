@@ -1,4 +1,4 @@
-<p class="mb-3 text-sm">{{ $match['result']['description'] }}</p>
+<p class="tc-scorecard-result">{{ $match['result']['description'] }}</p>
 <fieldset class="tc-innings">
     <legend class="sr-only">Batting team</legend>
     @foreach ($sides as $side)
@@ -31,8 +31,8 @@
             @endforelse
             </tbody>
         </table></div>
-        <p class="tc-innings-total">Total <strong>{{ $total['runs'] ?? '—' }}@if ($total['wickets'] !== null)/{{ $total['wickets'] }}@endif</strong>
-            @if ($total['overs'] !== null) ({{ $total['overs'] }}.{{ $total['balls'] }} overs) @endif</p>
+        <p class="tc-innings-total"><span>Total</span> <strong>{{ $total['runs'] ?? '—' }}@if ($total['wickets'] !== null)/{{ $total['wickets'] }}@endif</strong>
+            @if ($total['overs'] !== null) <small>({{ $total['overs'] }}.{{ $total['balls'] }} overs)</small> @endif</p>
         <h3>Bowling <small>{{ $match[$other]['name'] }}</small></h3>
         <div class="tc-score-table"><table aria-label="{{ $match[$other]['name'] }} bowling">
             <thead><tr><th>Bowler</th><th>O</th><th>Dots</th><th>R</th><th>W</th><th>Econ</th></tr></thead>

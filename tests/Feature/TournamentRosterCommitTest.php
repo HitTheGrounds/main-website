@@ -70,7 +70,12 @@ class TournamentRosterCommitTest extends TestCase
 
     public function test_management_works_before_feature_migrations_are_applied(): void
     {
-        $paths = array_merge(glob(database_path('migrations/2026_11_01_*.php')), glob(database_path('migrations/2026_11_14_*.php')));
+        // Undo every migration since tournament features were introduced, newest
+        // first, so later column/constraint changes are undone before their tables.
+        $paths = array_filter(
+            glob(database_path('migrations/*.php')),
+            fn ($path) => strcmp(basename($path), '2026_11_01_000001_add_is_scorer_to_users_table.php') >= 0,
+        );
         rsort($paths);
         foreach ($paths as $path) {
             (require $path)->down();

@@ -145,7 +145,7 @@
               <ul class="mt-3 space-y-4">
                 <li class="flex items-center gap-4">
                   <img src="/images/rulebook_illustrations/orange/no_ball_height.avif" alt="Height No-Ball" class="size-16 shrink-0 ">
-                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Over-height no-balls</span> judged at chest height. Only one bouncer per over is permitted; any subsequent bouncers will be called no-balls.</span>
+                  <span class="text-base-content/80"><span class="font-semibold text-base-content">Full-toss over-height no-balls</span> called if a delivery passes the batter above chest height without bouncing.</span>
                 </li>
                 <li class="flex items-center gap-4">
                   <img src="/images/rulebook_illustrations/orange/no_ball_foot.avif" alt="Foot No-Ball" class="size-16 shrink-0 ">
@@ -153,6 +153,19 @@
                 </li>
                 <li class="flex gap-3 text-base-content/80 italic"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>No free hits will be awarded for no-balls</span></li>
               </ul>
+            </div>
+            <div class="py-5">
+              <h3 class="font-semibold text-lg text-base-content">Bouncer Rules</h3>
+              <ul class="mt-3 space-y-2 text-base-content/80 leading-relaxed">
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>If a ball bounces above head height, it will be considered a <span class="font-bold text-primary-ink">bouncer</span>.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span>Only <span class="font-bold text-primary-ink">one bouncer per over</span> is allowed, whether it is hit by the batter or not.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span><span class="font-bold text-primary-ink">First bouncer of the over:</span> If hit by the batter, the runs scored from it are counted. If left or not hit by the batter, it will be called a <span class="font-bold text-primary-ink">wide</span>.</span></li>
+                <li class="flex gap-3"><span class="mt-2.5 size-1.5 shrink-0 bg-primary"></span><span><span class="font-bold text-primary-ink">Subsequent bouncers:</span> Any second or subsequent bouncer above head height in the same over will be called a <span class="font-bold text-primary-ink">no-ball</span>.</span></li>
+              </ul>
+            </div>
+            <div class="py-5">
+              <h3 class="font-semibold text-lg text-base-content">Multi-Bounce Deliveries (Dead Ball)</h3>
+              <p class="mt-2 text-base-content/80 leading-relaxed">If a ball bounces <span class="font-bold text-primary-ink">more than once (two or more bounces)</span> before reaching the popping crease or batter, it will be called a <span class="font-bold text-primary-ink">dead ball</span> immediately. The delivery does not count and must be re-bowled.</p>
             </div>
           </div>
         </section>

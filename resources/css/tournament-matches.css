@@ -118,6 +118,12 @@
 .tc-stats-leaderboard thead th { overflow-wrap: normal; word-break: normal; }
 .tc-stats-leaderboard tbody th { overflow-wrap: anywhere; }
 .tc-stats-leaderboard td.tc-stats-rate { font-size: 1rem; }
+@media (min-width: 1024px) {
+  /* Rank and logo use 8rem together; centre the rate in the table. */
+  .tc-stats-leaderboard:has(.tc-stats-rate) thead th:nth-child(3) { width: calc(40% - 8rem); }
+  .tc-stats-leaderboard .tc-stats-rate { width: 20%; text-align: center; }
+  .tc-stats-leaderboard:has(.tc-stats-rate) .tc-stats-total { width: 40%; }
+}
 @media (max-width: 479px) {
   .tc-stats-leaderboard :is(th, td) { padding: .75rem .3rem; }
   .tc-stats-leaderboard :is(th, td):first-child { width: 2.75rem; padding-inline-start: .625rem; }

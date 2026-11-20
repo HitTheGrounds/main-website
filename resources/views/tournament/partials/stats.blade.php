@@ -32,8 +32,8 @@
                     <caption class="sr-only">{{ $categories[$category] }}, All players</caption>
                     <thead>
                         <tr>
-                            <th scope="col">Rank</th>
-                            <th scope="col" class="tc-stats-logo">Team</th>
+                            <th scope="col"><span class="sr-only">Rank</span></th>
+                            <th scope="col" class="tc-stats-logo"><span class="sr-only">Team</span></th>
                             <th scope="col">Player</th>
                             @if ($rateLabel)
                                 <th scope="col" class="tc-stats-rate">{{ $rateLabel }}</th>

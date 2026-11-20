@@ -185,6 +185,7 @@ new class extends Component {
             <div class="sd-dialog-body">
                 @foreach ([
                     'group_stage' => ['Group stage', 'Group standings, points and net run rate.', 'scoreboard'],
+                    'grounds' => ['Grounds schedule', 'Live and upcoming matches across all four grounds.', 'pin'],
                     'bracket' => ['Knockout bracket', 'Quarter-finals, semi-finals and the final.', 'trophy'],
                     'cap_leaderboard' => ['Cap leaderboards', 'Top five run scorers and wicket takers.', 'users'],
                     'stats_leaderboard' => ['Stats leaderboards', 'Top five players for sixes, fours and dot balls.', 'ball'],

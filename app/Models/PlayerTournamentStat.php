@@ -9,6 +9,8 @@ class PlayerTournamentStat extends Model
 {
     public const CREATED_AT = null;
 
+    public const BOWLING_OVER_UNITS = 12;
+
     // Derived only from eligible published rows by the totals service.
     protected $guarded = ['*'];
 
@@ -28,6 +30,9 @@ class PlayerTournamentStat extends Model
             'sixes_recorded_count' => 'integer',
             'bowling_balls' => 'integer',
             'bowling_balls_recorded_count' => 'integer',
+            'bowling_overs_units' => 'integer',
+            'strike_rate_complete' => 'boolean',
+            'economy_complete' => 'boolean',
             'runs_conceded' => 'integer',
             'runs_conceded_recorded_count' => 'integer',
             'wickets_taken' => 'integer',

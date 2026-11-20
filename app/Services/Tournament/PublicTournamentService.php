@@ -3,10 +3,13 @@
 namespace App\Services\Tournament;
 
 use App\Models\GroupTeam;
+use App\Models\PlayerTournamentStat;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use App\Support\TeamLogo;
+use Brick\Math\BigRational;
+use Brick\Math\RoundingMode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -187,15 +190,43 @@ class PublicTournamentService
                 $rows = (clone $eligible)->leftJoin('teams as t', 't.id', '=', 'pts.team_id')
                     ->where('pts.'.$metric, '>=', $top->last())->orderByDesc('pts.'.$metric)->orderBy('pts.team_member_id')
                     ->limit(self::MAX_RANKING_ROWS + 1)->get(['pts.team_member_id', 'pts.team_id', 'pts.player_name',
-                        't.team_name', 'pts.'.$metric.' as figure', 'pts.'.$count.' as recorded_count']);
+                        't.team_name', 'pts.'.$metric.' as figure', 'pts.'.$count.' as recorded_count',
+                        'pts.balls_faced', 'pts.runs_conceded', 'pts.bowling_overs_units',
+                        'pts.strike_rate_complete', 'pts.economy_complete']);
                 abort_if($rows->count() > self::MAX_RANKING_ROWS, 503, 'Tournament data is temporarily unavailable.');
-                foreach ($rows as $index => $row) {
-                    $figure = (int) $row->figure;
-                    $entries[] = ['rank' => $index > 0 && $entries[$index - 1]['value'] === $figure ? $entries[$index - 1]['rank'] : $index + 1,
-                        'player_id' => (int) $row->team_member_id, 'player_name' => $row->player_name,
-                        'team_id' => (int) $row->team_id, 'team_name' => $row->team_name ?? 'Team unavailable',
-                        'value' => $figure, 'recorded_count' => (int) $row->recorded_count];
+                $rates = [];
+                foreach ($rows as $row) {
+                    $rates[$row->team_member_id] = $this->rankingRate($row, $category);
                 }
+                foreach ($rows->groupBy('figure') as $group) {
+                    // Missing inputs cannot decide an award. Keep the whole
+                    // tied-total group joint until all its rates are known.
+                    $canBreakTie = $group->every(fn ($row) => $rates[$row->team_member_id] !== null);
+                    if ($canBreakTie) {
+                        $group = $group->sort(function ($a, $b) use ($rates, $category) {
+                            $comparison = $rates[$a->team_member_id]->compareTo($rates[$b->team_member_id]);
+
+                            return ($category === 'runs' ? -$comparison : $comparison)
+                                ?: $a->team_member_id <=> $b->team_member_id;
+                        });
+                    }
+                    $previousRate = null;
+                    $groupStart = count($entries);
+                    foreach ($group as $row) {
+                        $rate = $rates[$row->team_member_id];
+                        $index = count($entries);
+                        $sameRank = $index > $groupStart && (! $canBreakTie || $rate->isEqualTo($previousRate));
+                        $entries[] = ['rank' => $sameRank ? $entries[$index - 1]['rank'] : $index + 1,
+                            'player_id' => (int) $row->team_member_id, 'player_name' => $row->player_name,
+                            'team_id' => (int) $row->team_id, 'team_name' => $row->team_name ?? 'Team unavailable',
+                            'value' => (int) $row->figure, 'recorded_count' => (int) $row->recorded_count,
+                            'rate' => $rate === null ? null : (string) $rate->toScale(2, RoundingMode::HALF_UP)];
+                        $previousRate = $rate;
+                    }
+                }
+                // Apply the cutoff after the rate tie-break, retaining true
+                // joint fifth places rather than every equal raw total.
+                $entries = array_values(array_filter($entries, fn ($entry) => $entry['rank'] <= 5));
             }
 
             // Tournament-wide clocks, not the request time or mutable summary updated_at.
@@ -210,6 +241,19 @@ class PublicTournamentService
                 'leader_ids' => array_column(array_filter($entries, fn ($entry) => $entry['rank'] === 1 && $entry['value'] > 0), 'player_id'),
                 'coverage' => ['players_with_published_entries' => (clone $population)->count(), 'players_with_recorded_metric' => $recordedPlayers]];
         });
+    }
+
+    private function rankingRate(object $row, string $category): ?BigRational
+    {
+        if ($category === 'runs' && $row->strike_rate_complete && $row->balls_faced > 0) {
+            return BigRational::of((string) $row->figure)->multipliedBy(100)->dividedBy((string) $row->balls_faced);
+        }
+        if ($category === 'wickets' && $row->economy_complete && $row->runs_conceded !== null && $row->bowling_overs_units > 0) {
+            return BigRational::of((string) $row->runs_conceded)->multipliedBy(PlayerTournamentStat::BOWLING_OVER_UNITS)
+                ->dividedBy((string) $row->bowling_overs_units);
+        }
+
+        return null;
     }
 
     public function bracket(int $year): array

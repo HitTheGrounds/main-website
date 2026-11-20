@@ -103,14 +103,31 @@
 .tc-stats-categories a { flex: none; white-space: nowrap; }
 .tc-panel.tc-stats-panel { padding: 0; }
 .tc-stats-panel > [role="region"] { border-radius: inherit; }
-.tc-stats-leaderboard { width: 100%; border-collapse: collapse; text-align: start; }
+.tc-stats-leaderboard { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: start; }
 .tc-stats-leaderboard :is(th, td) { padding: .875rem .375rem; border-bottom: 1px solid var(--tc-line); text-align: start; vertical-align: middle; }
 .tc-stats-leaderboard :is(th, td):first-child { padding-inline-start: 1.125rem; }
 .tc-stats-leaderboard :is(th, td):last-child { padding-inline-end: 1.125rem; text-align: end; }
-.tc-stats-score { display: inline-flex; align-items: center; gap: .75rem; white-space: nowrap; }
+.tc-stats-leaderboard :is(th, td):first-child { width: 3.5rem; }
+.tc-stats-leaderboard .tc-stats-logo { width: 4.5rem; }
+.tc-stats-leaderboard .tc-stats-total { width: 6rem; text-align: end; overflow-wrap: anywhere; }
+.tc-stats-leaderboard .tc-stats-rate { width: 7rem; text-align: end; overflow-wrap: anywhere; }
+.tc-stats-score { display: inline-flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: .5rem; max-width: 100%; }
+.tc-stats-score > span { min-width: 0; overflow-wrap: anywhere; }
 .tc-stats-score img { flex: none; width: 2rem; height: 2rem; object-fit: contain; }
-.tc-stats-leaderboard thead { font-size: .8125rem; }
-.tc-stats-leaderboard tbody th { width: 100%; overflow-wrap: anywhere; }
+.tc-stats-leaderboard thead { font-size: .875rem; background: var(--color-base-200); }
+.tc-stats-leaderboard thead th { overflow-wrap: normal; word-break: normal; }
+.tc-stats-leaderboard tbody th { overflow-wrap: anywhere; }
+.tc-stats-leaderboard td.tc-stats-rate { font-size: 1rem; }
+@media (max-width: 479px) {
+  .tc-stats-leaderboard :is(th, td) { padding: .75rem .3rem; }
+  .tc-stats-leaderboard :is(th, td):first-child { width: 2.75rem; padding-inline-start: .625rem; }
+  .tc-stats-leaderboard :is(th, td):last-child { padding-inline-end: .625rem; }
+  .tc-stats-leaderboard .tc-stats-logo { display: none; }
+  .tc-stats-leaderboard .tc-stats-total { width: 4.75rem; }
+  .tc-stats-leaderboard .tc-stats-rate { width: 5.25rem; }
+  .tc-stats-score { gap: .25rem; }
+  .tc-stats-score img { width: 1.5rem; height: 1.5rem; }
+}
 /* Same bordered white tile as the Table tab's team badges. */
 .tc-stats-logo .tc-badge { width: 2.25rem; height: 1.625rem; padding: .15rem; border-radius: .4rem; }
 .tc-stats-logo .tc-badge-cse { gap: .12rem; font-size: .5rem; }

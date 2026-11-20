@@ -82,7 +82,7 @@
 .led-table .led-col-team { text-align: left; }
 .led-rank { color: var(--led-muted); font-weight: 800; }
 .led-team { display: flex; align-items: center; gap: 1cqh; min-width: 0; font-size: 2.6cqh; font-weight: 800; }
-.led-team-name { min-width: 0; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
+.led-team-name { min-width: 0; line-height: 1.1; white-space: normal; overflow-wrap: normal; word-break: normal; hyphens: none; }
 .led-team .tc-badge { width: 4.4cqh; height: 3.2cqh; padding: .25cqh; border-radius: .7cqh; box-shadow: inset 0 0 0 1px var(--led-line); font-size: 1.15cqh; }
 .led-team .tc-badge-cse { gap: .2cqh; font-size: 1.05cqh; }
 .led-team .tc-badge-initials { background: var(--color-base-200); }

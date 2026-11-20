@@ -10,6 +10,9 @@ return [
 
     'timezone' => 'Asia/Colombo',
 
+    // Scorer venue dropdown and public venue filter.
+    'venues' => ['Ground 1', 'Ground 2', 'Ground 3', 'Ground 4'],
+
     // Shared by scorer mutation actions, in addition to the existing network limit.
     'writes_per_minute' => 30,
 

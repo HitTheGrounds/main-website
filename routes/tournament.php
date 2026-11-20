@@ -13,6 +13,9 @@ if (config('tournament.enabled') !== true) {
 Route::get('/tournament', PublicTournamentController::class)
     ->middleware(EnsureTournamentEnabled::class)->name('tournament.index');
 
+Route::get('/tournament/matches/{matchId}/scorecard', [PublicTournamentController::class, 'scorecard'])
+    ->whereNumber('matchId')->middleware(EnsureTournamentEnabled::class)->name('tournament.scorecard');
+
 // Cheap change counter the public page polls (one cache read per request).
 Route::get('/tournament/rev', fn () => response()
     ->json(['rev' => (int) Cache::get(TournamentWriteService::revisionKey((int) config('tournament.year')), 0)]))
@@ -23,6 +26,7 @@ Route::middleware([EnsureTournamentEnabled::class, 'auth.company', 'scorer'])
         Route::view('/dashboard', 'scorer.dashboard')->name('dashboard');
         Route::view('/groups', 'scorer.groups.index')->name('groups.index');
         Route::view('/standings', 'scorer.standings')->name('standings');
+        Route::view('/screen', 'scorer.screen')->name('screen');
         Route::view('/knockouts', 'scorer.knockouts')->name('knockouts');
         Route::view('/matches/{matchId}/result', 'scorer.result')->whereNumber('matchId')->name('matches.result');
         Route::view('/matches/{matchId}/players', 'scorer.players')->whereNumber('matchId')->name('matches.players');

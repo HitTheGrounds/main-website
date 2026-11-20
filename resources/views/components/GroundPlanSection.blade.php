@@ -36,7 +36,7 @@
                     </p>
                 </div>
                 <a href="https://maps.app.goo.gl/efGNoHjXfRSPCnv96" target="_blank" rel="noopener noreferrer"
-                   class="btn-island btn-island-solid shrink-0" aria-label="Open venue in Google Maps (opens in a new tab)">
+                   class="btn-island btn-island-solid ground-plan-heading-cta shrink-0" aria-label="Open venue in Google Maps (opens in a new tab)">
                     Open in Google Maps
                     <span class="btn-dot" aria-hidden="true">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10" /></svg>
@@ -48,6 +48,18 @@
                 <img src="{{ asset('images/ground-plan-2026.webp') }}" width="1672" height="941"
                          alt="Hit the Grounds 2026 venue plan: University Grounds in the centre, Pavilion to the upper left, Lagaan to the upper right, New Gym to the lower right, and washrooms at L Block across Main Street. John Rodrigo Mawatha runs along the top and left."
                          loading="lazy" decoding="async" class="block h-auto w-full rounded-2xl sm:rounded-3xl">
+                {{-- Desktop: caption bar under the framed plan (the heading's button moves here). --}}
+                <figcaption class="ground-plan-caption">
+                    <span class="ground-plan-caption-place">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10" r="2.25"/></svg>
+                        <span><strong>University Grounds</strong> University of Moratuwa</span>
+                    </span>
+                    <a href="https://maps.app.goo.gl/efGNoHjXfRSPCnv96" target="_blank" rel="noopener noreferrer" class="ground-plan-caption-link">
+                        Open in Google Maps
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+                        <span class="sr-only">(opens in a new tab)</span>
+                    </a>
+                </figcaption>
             </figure>
         </div>
     </x-PageContainer>

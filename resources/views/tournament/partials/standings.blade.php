@@ -23,13 +23,14 @@
                             <caption class="sr-only">{{ $group['name'] }} standings</caption>
                             <thead>
                                 <tr>
-                                    <th scope="col">Position</th><th scope="col">Team</th><th scope="col">Played</th>
+                                    <th scope="col"><span class="tc-position-label">Position</span><span class="tc-position-short" aria-hidden="true">#</span></th><th scope="col">Team</th><th scope="col">Played</th>
                                     <th scope="col">Wins</th><th scope="col">Losses</th><th scope="col">Ties</th>
                                     <th scope="col">No results</th><th scope="col">Points</th><th scope="col">NRR</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($group['teams'] as $team)
+                                    @php($nrr = $formatNrr($team['nrr']))
                                     <tr>
                                         <td>{{ $team['rank'] }}</td>
                                         <th scope="row" class="min-w-40 max-w-72 break-words">
@@ -44,12 +45,13 @@
                                                 <span><abbr title="Ties">T</abbr> {{ $team['ties'] }}</span>
                                                 <span><abbr title="No results">NR</abbr> {{ $team['no_results'] }}</span>
                                             </span>
+                                            <span class="tc-mobile-nrr">NRR {{ $nrr }}</span>
                                             </span>
                                             </span>
                                         </th>
                                         <td>{{ $team['played'] }}</td><td>{{ $team['wins'] }}</td><td>{{ $team['losses'] }}</td>
                                         <td>{{ $team['ties'] }}</td><td>{{ $team['no_results'] }}</td>
-                                        <td class="font-bold">{{ $team['points'] }}</td><td>{{ $formatNrr($team['nrr']) }}</td>
+                                        <td class="font-bold">{{ $team['points'] }}</td><td>{{ $nrr }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

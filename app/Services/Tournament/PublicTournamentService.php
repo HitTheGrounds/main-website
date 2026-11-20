@@ -48,7 +48,7 @@ class PublicTournamentService
     public function matches(int $year, array $filters = []): array
     {
         $this->validateYear($year);
-        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'sort', 'page'])) {
+        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'venue', 'sort', 'page'])) {
             throw ValidationException::withMessages(['tournament' => 'Select valid match filters.']);
         }
         $filters = array_map(fn ($value) => $value === '' ? null : $value, $filters);
@@ -56,11 +56,13 @@ class PublicTournamentService
             'stage' => ['nullable', 'string', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
+            'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
             'sort' => ['nullable', 'string', Rule::in(['recent', 'schedule', 'newest'])],
             'page' => ['nullable', 'integer', 'between:1,10000'],
         ])->validate();
         $filters = ['stage' => $filters['stage'] ?? null, 'status' => $filters['status'] ?? null,
             'group_id' => isset($filters['group_id']) ? (int) $filters['group_id'] : null,
+            'venue' => $filters['venue'] ?? null,
             // Preserve old schedule-sort links while applying the current recency rule.
             'sort' => ($filters['sort'] ?? 'recent') === 'schedule' ? 'recent' : ($filters['sort'] ?? 'recent'),
             'page' => (int) ($filters['page'] ?? 1)];
@@ -68,7 +70,7 @@ class PublicTournamentService
         return $this->snapshots->run(function () use ($year, $filters) {
             $groups = $this->groups($year);
             $query = $this->visibleMatches($year);
-            foreach (['stage', 'status', 'group_id'] as $field) {
+            foreach (['stage', 'status', 'group_id', 'venue'] as $field) {
                 if ($filters[$field] !== null) {
                     $query->where($field, $filters[$field]);
                 }
@@ -95,6 +97,23 @@ class PublicTournamentService
                 'latest_result_published_at' => $this->publicationTime($latestResult),
                 'pagination' => ['page' => $filters['page'], 'per_page' => self::PAGE_SIZE, 'total' => $total,
                     'last_page' => max(1, (int) ceil($total / self::PAGE_SIZE))]];
+        });
+    }
+
+    public function scorecard(int $year, int $matchId): array
+    {
+        return $this->snapshots->run(function () use ($year, $matchId) {
+            $match = $this->visibleMatches($year)->where('status', 'finished')->whereNotNull('result_published_at')
+                ->select([...self::MATCH_FIELDS, 'player_stats_published_at'])->findOrFail($matchId);
+            $teams = $this->teams([$match->team1_id, $match->team2_id]);
+            $players = $match->player_stats_published_at === null ? collect() : DB::table('player_match_stats')
+                ->where('match_id', $matchId)->where('record_state', 'published')->whereNotNull('published_at')
+                ->whereIn('team_id', [$match->team1_id, $match->team2_id])->orderBy('player_name')->orderBy('id')
+                ->get(['team_id', 'player_name', 'batting_status', 'runs_scored', 'balls_faced', 'fours', 'sixes',
+                    'bowling_balls', 'runs_conceded', 'wickets_taken', 'dot_balls'])->groupBy('team_id');
+
+            return ['match' => $this->presentMatch($match, $teams, collect()), 'players' => $players,
+                'sides' => $match->batting_first_id === $match->team2_id ? ['team2', 'team1'] : ['team1', 'team2']];
         });
     }
 

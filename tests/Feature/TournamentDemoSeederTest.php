@@ -60,6 +60,29 @@ class TournamentDemoSeederTest extends TestCase
         $this->assertSame($snapshot, DB::table('matches')->get()->toJson());
     }
 
+    public function test_scorecard_serves_both_published_innings_and_excludes_drafts(): void
+    {
+        $this->populate();
+        config(['tournament.enabled' => true]);
+        Route::middleware('web')->group(base_path('routes/tournament.php'));
+        Route::getRoutes()->refreshNameLookups();
+
+        $match = DB::table('matches')->where('display_number', 1)->first();
+        DB::table('player_match_stats')->where('match_id', $match->id)->where('record_state', 'draft')
+            ->update(['player_name' => 'Private draft correction']);
+        $this->get(route('tournament.scorecard', $match->id))->assertOk()
+            ->assertSee('DEMO 2026 A1 Player 1')->assertSee('DEMO 2026 A2 Player 1')
+            ->assertSee('480.00')->assertSee('2.2')->assertDontSee('Private draft correction');
+
+        foreach (['live', 'upcoming'] as $status) {
+            $id = DB::table('matches')->where('status', $status)->value('id');
+            $this->get(route('tournament.scorecard', $id))->assertNotFound();
+            $this->get('/tournament?status='.$status)->assertOk()->assertDontSee('class="tc-scorecard-open"', false);
+        }
+        config(['tournament.year' => 2027]);
+        $this->get(route('tournament.scorecard', $match->id))->assertNotFound();
+    }
+
     public function test_existing_group_blocks_demo_before_any_registration_changes(): void
     {
         DB::table('tournament_groups')->insert(['tournament_year' => 2026, 'name' => 'Existing group']);

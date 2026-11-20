@@ -99,7 +99,7 @@ class TournamentCompletedDemoSeeder extends Seeder
             'tournament_year' => $year, 'display_number' => $number, 'stage' => $stage,
             'group_id' => $group, 'bracket_position' => $slot, 'team1_id' => $one, 'team2_id' => $two,
             'balls_per_over' => $balls, 'overs_per_innings' => 5, 'max_wickets' => 7,
-            'status' => 'finished', 'venue' => 'DEMO ground '.($number % 2 + 1),
+            'status' => 'finished', 'venue' => 'Ground '.($number % 2 + 1), 'scheduled_at' => now()->startOfDay()->addMinutes(30 * $number),
             'result_type' => 'win', 'result_method' => 'normal', 'winner_id' => $one, 'batting_first_id' => $one,
             'team1_runs' => 60, 'team2_runs' => 48, 'team1_wickets' => 3, 'team2_wickets' => 3,
             'team1_deliveries' => 5 * $balls, 'team2_deliveries' => 5 * $balls,

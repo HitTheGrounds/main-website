@@ -19,12 +19,100 @@
   display: grid;
   flex: 1;
   min-height: 0;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 1.2cqh 1cqw;
+  gap: 1.6cqh 1.6cqh;
 }
-.led-group { grid-column: span 3; }
-.led-group:nth-child(n+5) { grid-column: span 4; }
+/* Four cards per row, all the same width; a shorter second row is centred. */
+.led-group { grid-column: span 2; }
+/* Counted by element type so the decorative <div> ornaments beside the <section> cards are ignored. */
+.led-group:nth-of-type(5):nth-last-of-type(3) { grid-column: 2 / span 2; }
+.led-group:nth-of-type(5):nth-last-of-type(2) { grid-column: 3 / span 2; }
+.led-group:nth-of-type(5):last-of-type { grid-column: 4 / span 2; }
+
+/* Light palette on the brand cream. Every text colour clears 5.4:1 on its background
+   (measured on the shaded rows too) so it stays legible from the back of the venue. */
+.led-body {
+  --led-bg: var(--color-base-100);
+  --led-card: #FFFFFF;
+  --led-card-head: #03162F; /* brand navy: header strips and group letters */
+  --led-row-alt: rgb(31 27 22 / .035);
+  --led-line: rgb(31 27 22 / .14);
+  --led-text: var(--color-secondary);
+  --led-muted: rgb(31 27 22 / .74);
+  --led-orange: var(--color-primary);
+  --led-orange-ink: #9A3A06;
+  --led-win: #17663A;
+  --led-loss: #A82A18;
+  --led-tie: #7A4F00;
+  margin: 0;
+  background: var(--led-bg);
+  color: var(--led-text);
+  -webkit-font-smoothing: antialiased;
+}
+.led-viewport { background: radial-gradient(120% 90% at 50% 0%, #FBF9F4 0%, var(--led-bg) 60%); }
+
+.led-header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 2cqh; height: 8cqh; }
+.led-logo { display: flex; align-items: center; height: 100%; padding: .4cqh 0; }
+.led-logo img { height: 100%; width: auto; }
+.led-title { display: flex; align-items: center; gap: 1.6cqh; }
+.led-title h1 { margin: 0; font-size: 5cqh; font-weight: 900; line-height: 1; letter-spacing: .02em; text-transform: uppercase; }
+.led-title h1 span { color: var(--led-orange-ink); }
+.led-live { display: inline-flex; align-items: center; gap: .8cqh; padding: .7cqh 1.4cqh; border-radius: 99cqh; background: rgb(255 106 19 / .14); color: var(--led-orange-ink); font-size: 1.9cqh; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.led-live::before { content: ""; width: 1.1cqh; height: 1.1cqh; border-radius: 50%; background: currentColor; animation: led-pulse 2s ease-in-out infinite; }
+@keyframes led-pulse { 50% { opacity: .25; } }
+
+.led-group { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; border-radius: 1.6cqh; background: var(--led-card); box-shadow: inset 0 0 0 1px var(--led-line), 0 .4cqh 1.6cqh rgb(31 27 22 / .06); }
+.led-group-head { display: flex; flex: none; align-items: center; gap: 1.2cqh; padding: 1.1cqh 1.8cqh; background: var(--led-card-head); border-bottom: .45cqh solid var(--led-orange); }
+.led-group-letter { display: grid; place-items: center; flex: none; min-width: 4.6cqh; height: 4.6cqh; padding: 0 .6cqh; border-radius: 1cqh; background: var(--led-orange); color: var(--led-card-head); font-size: 3.1cqh; font-weight: 900; line-height: 1; }
+.led-group-name { min-width: 0; color: #fff; font-size: 2.9cqh; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; overflow-wrap: anywhere; }
+
+/* Inset from the card edges so rows, shading and the points column never touch the border. */
+.led-table { flex: 1 1 0; width: calc(100% - 2.4cqh); min-height: 0; margin: .6cqh 1.2cqh 1.2cqh; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; }
+.led-table th, .led-table td { padding: 0 .4cqh; text-align: center; white-space: nowrap; }
+.led-table :is(th, td):first-child { padding-left: .8cqh; }
+.led-table :is(th, td):last-child { padding-right: .8cqh; }
+.led-table thead tr { border-bottom: 1px solid var(--led-line); }
+.led-table tbody tr:first-child { border-top: 0; }
+.led-table thead th { height: 3.6cqh; color: var(--led-muted); font-size: 1.75cqh; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.led-table thead abbr { text-decoration: none; }
+.led-table tbody tr { border-top: 1px solid var(--led-line); }
+.led-table tbody tr:nth-child(even) { background: var(--led-row-alt); }
+.led-table tbody td { font-size: 2.7cqh; font-weight: 700; }
+.led-table .led-col-team { text-align: left; }
+.led-rank { color: var(--led-muted); font-weight: 800; }
+.led-team { display: flex; align-items: center; gap: 1cqh; min-width: 0; font-size: 2.6cqh; font-weight: 800; }
+.led-team-name { min-width: 0; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
+.led-team .tc-badge { width: 4.4cqh; height: 3.2cqh; padding: .25cqh; border-radius: .7cqh; box-shadow: inset 0 0 0 1px var(--led-line); font-size: 1.15cqh; }
+.led-team .tc-badge-cse { gap: .2cqh; font-size: 1.05cqh; }
+.led-team .tc-badge-initials { background: var(--color-base-200); }
+.led-w { color: var(--led-win); }
+.led-l { color: var(--led-loss); }
+.led-t { color: var(--led-tie); }
+.led-nrr { color: var(--led-muted); font-size: 2.3cqh !important; }
+.led-pts { position: relative; color: var(--led-orange-ink); font-size: 3cqh !important; font-weight: 900 !important; }
+.led-table thead .led-pts-head { color: var(--led-orange-ink); }
+.led-table tbody .led-pts { background: rgb(255 106 19 / .12); }
+/* Cards are a quarter of the wall wide, so type is sized to fit that width. */
+.led-group .led-table tbody td { font-size: 2.4cqh; }
+.led-group .led-team { gap: .7cqh; font-size: 2.1cqh; }
+.led-group .led-team .tc-badge { width: 3.6cqh; height: 2.7cqh; }
+.led-group .led-nrr { font-size: 2cqh !important; }
+.led-group .led-pts { font-size: 2.7cqh !important; }
+.led-table tbody tr:first-child .led-pts { border-radius: .8cqh .8cqh 0 0; }
+.led-table tbody tr:last-child .led-pts { border-radius: 0 0 .8cqh .8cqh; }
+.led-qualified td:first-child { box-shadow: inset .5cqh 0 0 var(--led-orange-ink); }
+.led-qualified .led-rank { color: var(--led-orange-ink); }
+
+/* Decorative line art in the bottom row's empty outer columns: muted so it never competes with the tables. */
+.led-groups { position: relative; }
+.led-ornament { position: absolute; bottom: 0; display: flex; align-items: center; justify-content: center; width: calc(12.5% - 1.6cqh); height: calc(50% - .8cqh); padding: 1.5cqh 0; pointer-events: none; opacity: .5; }
+.led-ornament img { width: auto; height: auto; max-width: 100%; max-height: 100%; }
+.led-ornament-left { left: 0; }
+.led-ornament-right { right: 0; }
+.led-ornament-right img { transform: scaleX(-1); }
+.led-empty { grid-column: 1 / -1; align-self: center; text-align: center; font-size: 4cqh; font-weight: 800; color: var(--led-muted); }
+@media (prefers-reduced-motion: reduce) { .led-live::before { animation: none; } }
 
 .scorer-workspace {
   --scorer-ink: var(--color-secondary);

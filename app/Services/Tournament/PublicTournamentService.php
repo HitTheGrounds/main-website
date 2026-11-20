@@ -3,10 +3,13 @@
 namespace App\Services\Tournament;
 
 use App\Models\GroupTeam;
+use App\Models\PlayerTournamentStat;
 use App\Models\Team;
 use App\Models\TournamentGroup;
 use App\Models\TournamentMatch;
 use App\Support\TeamLogo;
+use Brick\Math\BigRational;
+use Brick\Math\RoundingMode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -53,7 +56,7 @@ class PublicTournamentService
         }
         $filters = array_map(fn ($value) => $value === '' ? null : $value, $filters);
         $filters = Validator::make($filters, [
-            'stage' => ['nullable', 'string', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['nullable', 'string', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
             'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
@@ -189,20 +192,48 @@ class PublicTournamentService
                 $rows = (clone $eligible)->leftJoin('teams as t', 't.id', '=', 'pts.team_id')
                     ->where('pts.'.$metric, '>=', $top->last())->orderByDesc('pts.'.$metric)->orderBy('pts.team_member_id')
                     ->limit(self::MAX_RANKING_ROWS + 1)->get(['pts.team_member_id', 'pts.team_id', 'pts.player_name',
-                        't.team_name', 'pts.'.$metric.' as figure', 'pts.'.$count.' as recorded_count']);
+                        't.team_name', 'pts.'.$metric.' as figure', 'pts.'.$count.' as recorded_count',
+                        'pts.balls_faced', 'pts.runs_conceded', 'pts.bowling_overs_units',
+                        'pts.strike_rate_complete', 'pts.economy_complete']);
                 abort_if($rows->count() > self::MAX_RANKING_ROWS, 503, 'Tournament data is temporarily unavailable.');
-                foreach ($rows as $index => $row) {
-                    $figure = (int) $row->figure;
-                    $entries[] = ['rank' => $index > 0 && $entries[$index - 1]['value'] === $figure ? $entries[$index - 1]['rank'] : $index + 1,
-                        'player_id' => (int) $row->team_member_id, 'player_name' => $row->player_name,
-                        'team_id' => (int) $row->team_id, 'team_name' => $row->team_name ?? 'Team unavailable',
-                        'value' => $figure, 'recorded_count' => (int) $row->recorded_count];
+                $rates = [];
+                foreach ($rows as $row) {
+                    $rates[$row->team_member_id] = $this->rankingRate($row, $category);
                 }
+                foreach ($rows->groupBy('figure') as $group) {
+                    // Missing inputs cannot decide an award. Keep the whole
+                    // tied-total group joint until all its rates are known.
+                    $canBreakTie = $group->every(fn ($row) => $rates[$row->team_member_id] !== null);
+                    if ($canBreakTie) {
+                        $group = $group->sort(function ($a, $b) use ($rates, $category) {
+                            $comparison = $rates[$a->team_member_id]->compareTo($rates[$b->team_member_id]);
+
+                            return ($category === 'runs' ? -$comparison : $comparison)
+                                ?: $a->team_member_id <=> $b->team_member_id;
+                        });
+                    }
+                    $previousRate = null;
+                    $groupStart = count($entries);
+                    foreach ($group as $row) {
+                        $rate = $rates[$row->team_member_id];
+                        $index = count($entries);
+                        $sameRank = $index > $groupStart && (! $canBreakTie || $rate->isEqualTo($previousRate));
+                        $entries[] = ['rank' => $sameRank ? $entries[$index - 1]['rank'] : $index + 1,
+                            'player_id' => (int) $row->team_member_id, 'player_name' => $row->player_name,
+                            'team_id' => (int) $row->team_id, 'team_name' => $row->team_name ?? 'Team unavailable',
+                            'value' => (int) $row->figure, 'recorded_count' => (int) $row->recorded_count,
+                            'rate' => $rate === null ? null : (string) $rate->toScale(2, RoundingMode::HALF_UP)];
+                        $previousRate = $rate;
+                    }
+                }
+                // Apply the cutoff after the rate tie-break, retaining true
+                // joint fifth places rather than every equal raw total.
+                $entries = array_values(array_filter($entries, fn ($entry) => $entry['rank'] <= 5));
             }
 
             // Tournament-wide clocks, not the request time or mutable summary updated_at.
             // Match-result publication can also change player-award eligibility.
-            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F']);
+            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year));
 
             return ['year' => $year, 'category' => $category, 'gender' => $gender, 'entries' => $entries,
                 'publication_times' => [
@@ -212,6 +243,19 @@ class PublicTournamentService
                 'leader_ids' => array_column(array_filter($entries, fn ($entry) => $entry['rank'] === 1 && $entry['value'] > 0), 'player_id'),
                 'coverage' => ['players_with_published_entries' => (clone $population)->count(), 'players_with_recorded_metric' => $recordedPlayers]];
         });
+    }
+
+    private function rankingRate(object $row, string $category): ?BigRational
+    {
+        if ($category === 'runs' && $row->strike_rate_complete && $row->balls_faced > 0) {
+            return BigRational::of((string) $row->figure)->multipliedBy(100)->dividedBy((string) $row->balls_faced);
+        }
+        if ($category === 'wickets' && $row->economy_complete && $row->runs_conceded !== null && $row->bowling_overs_units > 0) {
+            return BigRational::of((string) $row->runs_conceded)->multipliedBy(PlayerTournamentStat::BOWLING_OVER_UNITS)
+                ->dividedBy((string) $row->bowling_overs_units);
+        }
+
+        return null;
     }
 
     public function bracket(int $year): array
@@ -254,6 +298,56 @@ class PublicTournamentService
         });
     }
 
+    public function grounds(int $year): array
+    {
+        $this->validateYear($year);
+
+        return $this->snapshots->run(function () use ($year) {
+            $venues = config('tournament.venues') ?: ['Ground 1', 'Ground 2', 'Ground 3', 'Ground 4'];
+            $groups = $this->groups($year);
+            $matches = $this->bounded(
+                $this->visibleMatches($year)
+                    ->whereNotNull('venue')
+                    ->whereIn('venue', $venues)
+                    ->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END')
+                    ->orderBy('scheduled_at')
+                    ->orderBy('id')
+                    ->select(self::MATCH_FIELDS),
+                self::MAX_FIXTURES
+            );
+            $teams = $this->teams($matches->flatMap(fn ($match) => [$match->team1_id, $match->team2_id])->all());
+
+            $grounds = [];
+            foreach ($venues as $venue) {
+                $venueMatches = $matches->filter(fn ($m) => strcasecmp(trim((string) $m->venue), trim((string) $venue)) === 0);
+                $live = $venueMatches->filter(fn ($m) => $m->status === 'live')->values();
+                $upcoming = $venueMatches->filter(fn ($m) => $m->status === 'upcoming')->values();
+                $finished = $venueMatches->filter(fn ($m) => $m->status === 'finished')->values();
+
+                $presentedLive = $live->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedUpcoming = $upcoming->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+                $presentedFinished = $finished->map(fn ($m) => $this->presentMatch($m, $teams, $groups))->all();
+
+                $grounds[] = [
+                    'venue' => $venue,
+                    'live_match' => $presentedLive[0] ?? null,
+                    'live_matches' => $presentedLive,
+                    'upcoming_matches' => $presentedUpcoming,
+                    'finished_matches' => $presentedFinished,
+                    'latest_finished' => $presentedFinished !== [] ? end($presentedFinished) : null,
+                    'total_matches' => count($venueMatches),
+                ];
+            }
+
+            return [
+                'year' => $year,
+                'venues' => $venues,
+                'grounds' => $grounds,
+                'latest_result_published_at' => $this->publicationTime($matches->where('status', 'finished')->max('result_published_at')),
+            ];
+        });
+    }
+
     private function presentMatch(TournamentMatch $match, $teams, $groups): array
     {
         $a = $teams->get($match->team1_id)?->team_name ?? 'Team unavailable';
@@ -279,7 +373,7 @@ class PublicTournamentService
             'status' => $match->status, 'balls_per_over' => $match->balls_per_over,
             'overs_per_innings' => $match->overs_per_innings, 'max_wickets' => $match->max_wickets,
             'scheduled_at' => $match->scheduled_at?->toIso8601String(), 'venue' => $match->venue,
-            'display_number' => $match->display_number, 'result' => $result];
+            'display_number' => $match->display_number, 'batting_first_id' => $match->batting_first_id, 'result' => $result];
     }
 
     private function publicationTime(string|\DateTimeInterface|null $value): ?string
@@ -289,7 +383,7 @@ class PublicTournamentService
 
     private function visibleMatches(int $year): Builder
     {
-        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F'])
+        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year))
             ->where(fn ($query) => $query->whereIn('status', ['upcoming', 'live'])
                 ->orWhere(fn ($finished) => $finished->where('status', 'finished')->whereNotNull('result_published_at')));
     }

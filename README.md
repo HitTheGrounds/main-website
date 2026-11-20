@@ -128,6 +128,51 @@ The site is served at **http://localhost:8000**.
 | Run tests | `composer test` (or `php artisan test`) |
 | Build production assets | `npm run build` |
 
+Tournament cap rankings use total runs followed by higher strike rate, and total
+wickets followed by lower economy. Economy uses each match's four- or six-ball
+over length; partial overs are calculated from legal balls without rounding.
+Equal rates remain joint ranks. If any player in a tied-total group has incomplete
+rate inputs, that group remains tied until the figures are complete.
+
+After applying the player ranking rates migration to an existing installation,
+rebuild the derived summaries for each existing tournament year before serving
+the updated stats (use the intended database configuration):
+
+```bash
+php artisan migrate
+php artisan tournament:rebuild-summaries 2026 --apply
+npm run build
+```
+
+New publications, corrections, and withdrawals recalculate these summaries automatically.
+
+---
+
+## Optional tournament Playoffs
+
+Run `php artisan migrate` when deploying this change. Playoffs default to off
+for every tournament year. With the tournament enabled, an admin can use
+**Admin Dashboard > Tournament: Playoffs > Enable Playoffs > Save tournament settings**.
+
+When enabled, scorers can select **Playoffs** under **Qualification & bracket**
+and schedule any number of matches between saved group qualifiers, including
+repeat appearances. Saved group qualifiers and teams with a published, finished
+Playoff win are eligible for quarter-finals. Group qualifiers can enter directly
+without playing or winning a Playoff. Semi-finals and the final follow the existing rules.
+Group qualification has no team limit while Playoffs is enabled; when disabled,
+the existing eight-team limit applies. Reduce saved qualifiers to eight or fewer
+before turning Playoffs off; no qualifiers are removed automatically.
+
+Playoffs appear in the public Matches tab and stage filters, and published player
+figures contribute to Stats. They do not appear in group tables or the public
+bracket. Turning the switch off hides Playoff fixtures and controls, blocks their scoring actions,
+and excludes their figures from derived player totals. Saved matches and player
+figures are retained and included again when enabled. Settings changes refresh
+public pages through the existing tournament revision polling.
+
+The migration refuses rollback while Playoff match history exists; use the
+dashboard switch to disable the feature without discarding history.
+
 ---
 
 <div align="center">

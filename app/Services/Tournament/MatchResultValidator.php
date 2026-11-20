@@ -204,7 +204,7 @@ class MatchResultValidator
             $this->reject('tournament', 'The result contains unsupported fields.');
         }
         Validator::make($match->only(['stage', 'team1_id', 'team2_id', 'balls_per_over', 'overs_per_innings', 'max_wickets']), [
-            'stage' => ['required', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['required', Rule::in(['G', 'PO', 'QF', 'SF', 'F'])],
             'team1_id' => ['required', 'integer', 'min:1'], 'team2_id' => ['required', 'integer', 'min:1', 'different:team1_id'],
             'balls_per_over' => ['required', Rule::in([4, 6])], 'overs_per_innings' => ['required', Rule::in([5])], 'max_wickets' => ['required', Rule::in([7])],
         ])->validate();

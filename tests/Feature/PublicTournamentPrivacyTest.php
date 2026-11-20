@@ -191,7 +191,8 @@ class PublicTournamentPrivacyTest extends TestCase
         $this->assertSame(array_slice($names, 0, 5), array_column($entries, 'player_name'));
         $this->assertSame([99, 98, 97, 96, 95], array_column($entries, 'value'));
         foreach ($entries as $entry) {
-            $this->assertSame(['rank', 'player_id', 'player_name', 'team_id', 'team_name', 'value', 'recorded_count'], array_keys($entry));
+            $this->assertSame(['rank', 'player_id', 'player_name', 'team_id', 'team_name', 'value', 'recorded_count', 'rate'], array_keys($entry));
+            $this->assertNull($entry['rate']); // Legacy/incomplete inputs expose no invented rate.
         }
         foreach (array_slice($names, 5) as $unlisted) {
             $response->assertDontSee($unlisted);

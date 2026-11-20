@@ -19,6 +19,7 @@ return [
     // Creation defaults only; the scorer selects four or six for each match.
     'default_balls_per_over' => [
         'group' => 4,
+        'playoff' => 4,
         'quarter_final' => 4,
         'semi_final' => 6,
         'final' => 6,

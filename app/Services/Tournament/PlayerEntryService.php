@@ -24,7 +24,7 @@ class PlayerEntryService
         // A coherent feature snapshot, without consuming the mutation budget.
         return $this->writes->run($year, function () use ($year, $matchId) {
             abort_unless(User::whereKey(CompanyAuth::user()?->id)->sharedLock()->first()?->is_scorer, 403);
-            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F'])
+            $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year))
                 ->first(['id', 'stage', 'group_id', 'team1_id', 'team2_id', 'status', 'result_type', 'result_published_at']);
             if (! $match) {
                 throw ValidationException::withMessages(['player' => 'Select a match in this tournament year.']);

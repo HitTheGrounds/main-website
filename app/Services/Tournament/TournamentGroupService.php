@@ -176,7 +176,7 @@ class TournamentGroupService
     private function assertEditionOpen(int $year): void
     {
         if (GroupTeam::where('tournament_year', $year)->where('qualified', true)->exists()
-            || TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['QF', 'SF', 'F'])->exists()) {
+            || TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['PO', 'QF', 'SF', 'F'])->exists()) {
             $this->reject('group', 'Group setup is locked because qualification or knockout matches depend on it.');
         }
     }

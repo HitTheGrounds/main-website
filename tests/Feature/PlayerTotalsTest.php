@@ -8,7 +8,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Services\Tournament\PlayerTotalsService;
 use App\Services\Tournament\TournamentWriteService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +18,7 @@ use Tests\TestCase;
 
 class PlayerTotalsTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     private function player(): TeamMember
     {
@@ -102,6 +102,63 @@ class PlayerTotalsTest extends TestCase
         DB::table('matches')->where('id', $a->match_id)->update(['status' => 'finished']);
         $this->rebuild(2026, [$member->id]);
         $this->assertSame(10, $this->summary($member)->runs_scored);
+    }
+
+    public function test_rates_aggregate_mixed_over_lengths_and_partial_overs_from_published_sources(): void
+    {
+        config(['tournament.enabled' => true]);
+        $member = $this->player();
+        $this->source($member, ['runs_scored' => 40, 'balls_faced' => 20,
+            'bowling_balls' => 10, 'runs_conceded' => 20, 'wickets_taken' => 2]);
+        $sixBall = $this->source($member, ['runs_scored' => 10, 'balls_faced' => 20,
+            'bowling_balls' => 9, 'runs_conceded' => 4, 'wickets_taken' => 1]);
+        DB::table('matches')->where('id', $sixBall->match_id)->update(['balls_per_over' => 6]);
+        $this->source($member, ['runs_scored' => 999, 'balls_faced' => 1, 'bowling_balls' => 1, 'runs_conceded' => 999],
+            ['record_state' => 'draft', 'pending_action' => 'replace', 'published_at' => null]);
+        $this->rebuild(2026, [$member->id]);
+        $row = $this->summary($member);
+        $this->assertSame(19, $row->bowling_balls);
+        $this->assertSame(48, $row->bowling_overs_units); // 10/4 + 9/6 = 4 actual overs.
+        $this->assertTrue($row->strike_rate_complete);
+        $this->assertTrue($row->economy_complete);
+        $public = app(\App\Services\Tournament\PublicTournamentService::class);
+        $this->assertSame('125.00', $public->rankings(2026)['entries'][0]['rate']);
+        $this->assertSame('6.00', $public->rankings(2026, ['category' => 'wickets'])['entries'][0]['rate']);
+
+        DB::table('player_match_stats')->where('id', $sixBall->id)->update(['bowling_balls' => 3, 'balls_faced' => 5]);
+        $this->rebuild(2026, [$member->id]);
+        $this->assertSame(36, $this->summary($member)->bowling_overs_units);
+        $this->assertSame('200.00', $public->rankings(2026)['entries'][0]['rate']);
+        $this->assertSame('8.00', $public->rankings(2026, ['category' => 'wickets'])['entries'][0]['rate']);
+        $sixBall->delete();
+        $this->rebuild(2026, [$member->id]);
+        $this->assertSame(30, $this->summary($member)->bowling_overs_units);
+        $this->assertSame('8.00', $public->rankings(2026, ['category' => 'wickets'])['entries'][0]['rate']);
+    }
+
+    public function test_missing_rate_inputs_cannot_be_hidden_by_matching_recorded_counts(): void
+    {
+        $member = $this->player();
+        $this->source($member, ['runs_scored' => 20, 'runs_conceded' => 10]);
+        $this->source($member, ['balls_faced' => 10, 'bowling_balls' => 8]);
+        $this->rebuild(2026, [$member->id]);
+        $row = $this->summary($member);
+        $this->assertSame($row->runs_scored_recorded_count, $row->balls_faced_recorded_count);
+        $this->assertSame($row->runs_conceded_recorded_count, $row->bowling_balls_recorded_count);
+        $this->assertFalse($row->strike_rate_complete);
+        $this->assertFalse($row->economy_complete);
+    }
+
+    public function test_did_not_bat_and_known_non_bowling_zeros_do_not_invalidate_rates(): void
+    {
+        $member = $this->player();
+        $this->source($member, ['runs_scored' => 20, 'balls_faced' => 10, 'bowling_balls' => 4, 'runs_conceded' => 8]);
+        $this->source($member, ['batting_status' => 'did_not_bat', 'bowling_balls' => 0, 'runs_conceded' => 0]);
+        $this->rebuild(2026, [$member->id]);
+        $row = $this->summary($member);
+        $this->assertTrue($row->strike_rate_complete);
+        $this->assertTrue($row->economy_complete);
+        $this->assertSame(12, $row->bowling_overs_units);
     }
 
     public static function excludedMatches(): array

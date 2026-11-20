@@ -30,7 +30,7 @@ class QualificationService
             $this->reject('Supply a list of selected team IDs.');
         }
         Validator::make(compact('teamIds', 'revision'), [
-            'teamIds' => ['array', 'max:'.$this->capacity()], 'teamIds.*' => ['integer', 'min:1', 'distinct'],
+            'teamIds' => ['array'], 'teamIds.*' => ['integer', 'min:1', 'distinct'],
             'revision' => ['regex:/\A[a-f0-9]{64}\z/'],
         ])->validate();
         $teamIds = array_map('intval', $teamIds);
@@ -41,13 +41,17 @@ class QualificationService
             if (! hash_equals($current['revision'], $revision)) {
                 $this->reject('Qualification guidance or selections changed. Reload the latest choices before saving.');
             }
+            // Read the current limit under the same year lock as admin flag changes.
+            if ($current['capacity'] !== null) {
+                Validator::make(compact('teamIds'), ['teamIds' => ['array', 'max:'.$current['capacity']]])->validate();
+            }
             foreach ($teamIds as $id) {
                 if (! $rows->contains('team_id', $id) || ! $teams->firstWhere('id', $id)?->approved) {
                     $this->reject('Select approved teams assigned to this tournament year.');
                 }
             }
             $removed = array_diff($current['selected'], $teamIds);
-            foreach ($matches->whereIn('stage', ['QF', 'SF', 'F']) as $match) {
+            foreach ($matches->whereIn('stage', ['PO', 'QF', 'SF', 'F']) as $match) {
                 if (in_array($match->team1_id, $removed, true) || in_array($match->team2_id, $removed, true)) {
                     $this->reject('A selected team already appears in a knockout fixture. Resolve that fixture before removing its qualification.');
                 }
@@ -122,7 +126,7 @@ class QualificationService
         }
         $selected = $rows->where('qualified', true)->pluck('team_id')->sort()->values()->all();
         $snapshot = ['year' => $year, 'groups' => $result, 'runner_up_guidance' => $this->rank($runners),
-            'unequal_groups' => $sizes->count() > 1, 'capacity' => $this->capacity(), 'selected' => $selected];
+            'unequal_groups' => $sizes->count() > 1, 'capacity' => $this->capacity($year), 'selected' => $selected];
         $snapshot['revision'] = hash('sha256', json_encode([$snapshot, $matches->map->only(['id', 'version'])->all()], JSON_THROW_ON_ERROR));
 
         return $snapshot;
@@ -133,9 +137,9 @@ class QualificationService
         return $this->ranker->rank($entries);
     }
 
-    private function capacity(): int
+    private function capacity(int $year): ?int
     {
-        return 2 * (int) config('tournament.knockout_slots.QF');
+        return app(PlayoffFeature::class)->enabled($year) ? null : 2 * (int) config('tournament.knockout_slots.QF');
     }
 
     private function authorize(bool $lock = false): void

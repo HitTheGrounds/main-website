@@ -100,7 +100,7 @@ class MatchResultService
             $match->result_published_at = now();
             $match->published_by = $actor->id;
             $match->draft_result = null;
-            $this->transitions->assertResultPublication($before, $match, $matches);
+            $this->transitions->assertResultPublication($before, $match, $matches, $assignments);
             $this->save($match, $actor);
 
             // The collection contains this same model instance with its new values.
@@ -164,7 +164,7 @@ class MatchResultService
     private function find(int $year, int $matchId): TournamentMatch
     {
         $match = TournamentMatch::whereKey($matchId)->where('tournament_year', $year)->first();
-        if (! $match || ! in_array($match->stage, ['G', 'QF', 'SF', 'F'], true)) {
+        if (! $match || ! in_array($match->stage, app(PlayoffFeature::class)->stages($year), true)) {
             $this->reject('Select an existing match in this tournament year.');
         }
 

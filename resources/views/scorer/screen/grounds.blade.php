@@ -38,34 +38,39 @@
                             $isLive = $liveMatch !== null;
                             $isFeaturedNext = ! $isLive && $featuredMatch !== null;
                             $scheduleList = $isLive ? $upcoming : array_slice($upcoming, 1);
+                            // MOCK upcoming fixtures for layout previews: local environment only, and only for a ground
+                            // with no real upcoming fixtures. Real data always wins; production never sees these.
+                            if ($scheduleList === [] && app()->isLocal()) {
+                                $mockTeams = [1 => ['D1', 'D2', 'D3', 'D4', 'F1', 'F2'], 2 => ['C1', 'C2', 'E1', 'E2', 'G1', 'G2'],
+                                    3 => ['B1', 'B2', 'D3', 'D4', 'F3', 'F4'], 4 => ['A1', 'A2', 'C3', 'C4', 'E3', 'E4']][(($groundNum - 1) % 4) + 1];
+                                $mockGroups = [1 => ['Demo D', 'Demo D', 'Demo F'], 2 => ['Demo C', 'Demo E', 'Demo G'], 3 => ['Demo B', 'Demo D', 'Demo F'], 4 => ['Demo A', 'Demo C', 'Demo E']][(($groundNum - 1) % 4) + 1];
+                                foreach ([0, 1, 2] as $k) {
+                                    $scheduleList[] = ['display_number' => 20 + $groundNum * 3 + $k, 'stage' => 'G', 'group' => ['name' => $mockGroups[$k]], 'scheduled_at' => null,
+                                        'team1' => ['name' => 'DEMO 2026 '.$mockTeams[$k * 2]], 'team2' => ['name' => 'DEMO 2026 '.$mockTeams[$k * 2 + 1]]];
+                                }
+                            }
+                            // MOCK next match for a ground whose matches are all finished (same local-only rule),
+                            // so the area under the ground shows who plays next instead of the last result.
+                            if ($featuredMatch === null && app()->isLocal()) {
+                                $featuredMatch = ['team1' => ['name' => 'DEMO 2026 H'.($groundNum * 2 - 1)], 'team2' => ['name' => 'DEMO 2026 H'.($groundNum * 2)],
+                                    'scheduled_at' => \Carbon\CarbonImmutable::now($tz)->setTime(15, 0)->addMinutes(15 * $groundNum)->toIso8601String()];
+                                $isFeaturedNext = true;
+                            }
                             $latestFinished = $ground['latest_finished'] ?? null;
                             $hasMatches = $featuredMatch !== null || ! empty($scheduleList) || $latestFinished !== null;
                         @endphp
 
                         <section class="led-ground-card led-ground-card-{{ $groundNum }}" aria-labelledby="ground-heading-{{ $groundNum }}">
-                            {{-- Cricket ground header bar with stadium emblem and live status --}}
+                            {{-- Ground header bar: tag and name --}}
                             <header class="led-ground-head">
                                 <div class="led-ground-head-title">
                                     <span class="led-ground-tag" aria-hidden="true">G{{ $groundNum }}</span>
-                                    <svg class="led-ground-icon" viewBox="0 0 32 20" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <ellipse cx="16" cy="10" rx="14" ry="8" stroke-width="1.5" stroke-dasharray="3 2" />
-                                        <rect x="13.5" y="5.5" width="5" height="9" rx="0.5" fill="currentColor" fill-opacity="0.3" stroke-width="1" />
-                                        <line x1="13.5" y1="7" x2="18.5" y2="7" stroke-width="0.8" />
-                                        <line x1="13.5" y1="13" x2="18.5" y2="13" stroke-width="0.8" />
-                                    </svg>
                                     <h2 id="ground-heading-{{ $groundNum }}" class="led-ground-name">{{ $ground['venue'] }}</h2>
                                 </div>
+                                {{-- No LIVE NOW / NEXT pills: a ground with a current or next match shows just its name. --}}
                                 <div class="led-ground-head-status">
-                                    @if ($isLive)
-                                        <span class="led-ground-pill is-live">
-                                            <span class="led-pill-pulse" aria-hidden="true"></span>
-                                            LIVE NOW
-                                        </span>
-                                    @elseif ($isFeaturedNext && $featuredMatch['scheduled_at'])
-                                        <span class="led-ground-pill is-upcoming">
-                                            <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                                            NEXT: {{ $formatTime($featuredMatch['scheduled_at']) }}
-                                        </span>
+                                    @if ($isLive || $isFeaturedNext)
+                                        {{-- intentionally empty --}}
                                     @elseif ($latestFinished && empty($upcoming))
                                         <span class="led-ground-pill is-concluded">
                                             CONCLUDED
@@ -79,75 +84,36 @@
                             </header>
 
                             <div class="led-ground-body">
-                                {{-- Left Column: Active / Next Match Arena --}}
+                                {{-- Left column: the ground (3D) on top, the current match (live, next, last result or free) below. --}}
                                 <div class="led-ground-arena">
+                                    {{-- 3D cricket ground with low-poly players (Blender source: resources/blender/cricket-ground.blend).
+                                         Four match scenes in four sets of kits, one per ground (repeating after four). --}}
+                                    @php
+                                        $sceneNum = (($groundNum - 1) % 4) + 1;
+                                    @endphp
+                                    <div class="led-ground-art">
+                                        {{-- 4-second looping animation (transparent WebM). The still is the poster and the fallback. --}}
+                                        <video src="{{ asset('images/led/cricket-ground-'.$sceneNum.'.webm') }}" poster="{{ asset('images/led/cricket-ground-'.$sceneNum.'.webp') }}"
+                                               width="1200" height="646" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
+                                    </div>
+
+                                    <div class="led-ground-match">
                                     @if ($featuredMatch)
+                                        {{-- Just who plays whom: live/next status and start time are already in the card header. --}}
                                         @php
-                                            $stageLabel = $featuredMatch['group']['name'] ?? ($stages[$featuredMatch['stage']] ?? $featuredMatch['stage']);
-                                            $matchNum = $featuredMatch['display_number'];
                                             $team1 = $featuredMatch['team1'];
                                             $team2 = $featuredMatch['team2'];
-                                            $battingFirstId = $featuredMatch['batting_first_id'] ?? null;
                                         @endphp
-                                        <div class="led-arena-top">
-                                            <div class="led-arena-badge-group">
-                                                <span @class(['led-arena-badge', 'is-live' => $isLive, 'is-next' => ! $isLive])>
-                                                    @if ($isLive)
-                                                        <span class="led-pill-pulse-sm" aria-hidden="true"></span>
-                                                        In progress
-                                                    @else
-                                                        Next match
-                                                    @endif
-                                                </span>
-                                                <span class="led-arena-stage">
-                                                    {{ $stageLabel }}@if ($matchNum !== null) · Match {{ $matchNum }}@endif
-                                                </span>
-                                            </div>
-                                            @if (! $isLive && $featuredMatch['scheduled_at'])
-                                                <time class="led-arena-time" datetime="{{ $featuredMatch['scheduled_at'] }}">
-                                                    <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                                                    {{ $formatTime($featuredMatch['scheduled_at']) }}
-                                                </time>
-                                            @endif
-                                        </div>
-
-                                        <div class="led-arena-teams">
+                                        <div class="led-arena-teams is-row" aria-label="{{ $isLive ? 'In progress' : 'Next match' }}: {{ $team1['name'] }} versus {{ $team2['name'] }}">
                                             <div class="led-arena-team">
                                                 <x-tournament.team-badge :name="$team1['name']" class="led-team-badge" />
-                                                <div class="led-arena-team-info">
-                                                    <span class="led-arena-team-name" title="{{ $team1['name'] }}">{{ $team1['name'] }}</span>
-                                                    @if ($battingFirstId !== null && (int) $battingFirstId === (int) $team1['id'])
-                                                        <span class="led-arena-bat-pill">Bats first</span>
-                                                    @endif
-                                                </div>
+                                                <span class="led-arena-team-name">{{ $team1['name'] }}</span>
                                             </div>
-
-                                            <div class="led-arena-vs" aria-hidden="true">
-                                                <span>VS</span>
-                                            </div>
-
-                                            <div class="led-arena-team">
+                                            <div class="led-arena-vs" aria-hidden="true"><span>VS</span></div>
+                                            <div class="led-arena-team led-arena-team-right">
                                                 <x-tournament.team-badge :name="$team2['name']" class="led-team-badge" />
-                                                <div class="led-arena-team-info">
-                                                    <span class="led-arena-team-name" title="{{ $team2['name'] }}">{{ $team2['name'] }}</span>
-                                                    @if ($battingFirstId !== null && (int) $battingFirstId === (int) $team2['id'])
-                                                        <span class="led-arena-bat-pill">Bats first</span>
-                                                    @endif
-                                                </div>
+                                                <span class="led-arena-team-name">{{ $team2['name'] }}</span>
                                             </div>
-                                        </div>
-
-                                        <div class="led-arena-foot">
-                                            <div class="led-arena-rules">
-                                                <span>{{ $featuredMatch['overs_per_innings'] }} overs</span>
-                                                <span>·</span>
-                                                <span>{{ $featuredMatch['balls_per_over'] }} balls/over</span>
-                                                <span>·</span>
-                                                <span>Max {{ $featuredMatch['max_wickets'] }} wkts</span>
-                                            </div>
-                                            @if ($isLive)
-                                                <span class="led-arena-live-note">Scores published on completion</span>
-                                            @endif
                                         </div>
                                     @elseif ($latestFinished)
                                         {{-- If all matches finished on this ground, show latest result --}}
@@ -163,23 +129,11 @@
                                     @else
                                         {{-- No matches scheduled --}}
                                         <div class="led-arena-empty">
-                                            <svg class="led-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                                                <ellipse cx="12" cy="12" rx="10" ry="6" stroke-dasharray="3 3"/>
-                                                <line x1="12" y1="8" x2="12" y2="16"/>
-                                            </svg>
                                             <p class="led-empty-title">Ground available</p>
                                             <p class="led-empty-sub">No fixtures currently underway</p>
                                         </div>
                                     @endif
-
-                                    {{-- Cricket ground watermark in the background --}}
-                                    <svg class="led-ground-watermark" viewBox="0 0 100 60" fill="none" stroke="currentColor" aria-hidden="true">
-                                        <ellipse cx="50" cy="30" rx="46" ry="26" stroke-width="0.8" stroke-dasharray="3 3" />
-                                        <ellipse cx="50" cy="30" rx="32" ry="18" stroke-width="0.8" stroke-dasharray="2 2" />
-                                        <rect x="45" y="20" width="10" height="20" rx="1" stroke-width="0.8" />
-                                        <line x1="45" y1="24" x2="55" y2="24" stroke-width="0.6" />
-                                        <line x1="45" y1="36" x2="55" y2="36" stroke-width="0.6" />
-                                    </svg>
+                                    </div>
                                 </div>
 
                                 {{-- Right Column: Upcoming Schedule on this Ground --}}
@@ -196,9 +150,6 @@
                                                     $itemStage = $m['group']['name'] ?? ($stages[$m['stage']] ?? $m['stage']);
                                                 @endphp
                                                 <div class="led-sched-item" role="listitem">
-                                                    <div class="led-sched-item-time">
-                                                        {{ $formatTime($m['scheduled_at']) ?? 'TBD' }}
-                                                    </div>
                                                     <div class="led-sched-item-main">
                                                         <div class="led-sched-item-meta">
                                                             <span>Match {{ $m['display_number'] ?? '–' }}</span>
@@ -206,9 +157,9 @@
                                                             <span>{{ $itemStage }}</span>
                                                         </div>
                                                         <div class="led-sched-item-matchup">
-                                                            <span class="truncate">{{ $m['team1']['name'] }}</span>
-                                                            <span class="led-sched-vs" aria-hidden="true">vs</span>
-                                                            <span class="truncate">{{ $m['team2']['name'] }}</span>
+                                                            <span class="led-sched-team">{{ $m['team1']['name'] }}</span>
+                                                            <span class="led-sched-vs">vs</span>
+                                                            <span class="led-sched-team">{{ $m['team2']['name'] }}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -256,6 +207,20 @@
                 };
                 updateClock();
                 setInterval(updateClock, 1000);
+
+                // Ground animations: start them explicitly (some kiosk browsers ignore the autoplay attribute)
+                // and restart after the screen has been hidden.
+                const playGrounds = () => document.querySelectorAll('.led-ground-art video').forEach((video) => {
+                    if (video.paused) video.play().catch(() => { /* the poster stays visible */ });
+                });
+                document.querySelectorAll('.led-ground-art video').forEach((video) => {
+                    video.addEventListener('canplay', playGrounds, { once: true });
+                    // The browser may pause media when the page is briefly hidden or resized; resume right away.
+                    video.addEventListener('pause', () => setTimeout(() => { if (!document.hidden) playGrounds(); }, 300));
+                });
+                document.addEventListener('visibilitychange', () => { if (!document.hidden) playGrounds(); });
+                setInterval(() => { if (!document.hidden) playGrounds(); }, 5000);  // backstop for an unattended wall
+                playGrounds();
 
                 // Polling tournament revision for real-time match state updates
                 const rev = @js($rev);

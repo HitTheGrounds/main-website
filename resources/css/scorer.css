@@ -232,6 +232,8 @@
 .led-grounds-stage {
   gap: 1cqh;
 }
+/* Lift the shared page cap (91rem) so the stage keeps its 2:1 shape on wide screens such as 1920×1080. */
+.tc.led-grounds-stage { max-width: none; margin: 0; padding: 1.5vh 1.5vw; }
 .led-header-clock {
   display: flex;
   align-items: center;
@@ -299,12 +301,6 @@
   font-size: 2.3cqh;
   font-weight: 900;
   line-height: 1;
-}
-.led-ground-icon {
-  width: 3.4cqh;
-  height: 2.2cqh;
-  color: #16a34a;
-  flex: none;
 }
 .led-ground-name {
   color: #ffffff;
@@ -568,11 +564,6 @@
   position: relative;
   z-index: 1;
 }
-.led-empty-icon {
-  width: 4cqh;
-  height: 4cqh;
-  opacity: .5;
-}
 .led-empty-title {
   font-size: 1.8cqh;
   font-weight: 800;
@@ -584,16 +575,26 @@
   font-size: 1.4cqh;
   font-weight: 600;
 }
-.led-ground-watermark {
-  position: absolute;
-  right: .8cqw;
-  bottom: .6cqh;
-  width: 14cqh;
-  height: 8.4cqh;
-  color: #16a34a;
-  opacity: .08;
-  pointer-events: none;
-}
+/* Arena: the 3D ground (Blender render) fills the top; the current match sits underneath it. */
+.led-ground-arena { justify-content: flex-start; gap: .8cqh; }
+.led-ground-art { flex: 1 1 0; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.led-ground-art :is(img, video) { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 1cqh 1.2cqh rgb(3 22 47 / .16)); }
+.led-ground-match { flex: none; display: flex; flex-direction: column; gap: .7cqh; padding-top: .7cqh; border-top: 1px solid var(--led-line); }
+.led-ground-match :is(.led-arena-concluded, .led-arena-empty) { flex: none; gap: .4cqh; }
+.led-ground-match .led-arena-foot { padding-top: .5cqh; }
+
+/* Teams on one row: team 1 left, VS centred, team 2 right (mirrored). */
+/* Equal halves for both teams (grid, not flex) so neither name gets less room than the other. */
+.led-arena-teams.is-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: .8cqh; margin: 0; padding-block: .4cqh; }
+.led-arena-teams.is-row .led-arena-team { min-width: 0; gap: .6cqh; }
+.led-arena-teams.is-row .led-team-badge { width: 4.2cqh !important; height: 3cqh !important; }
+/* One line per name; a very long name ends in "…" rather than breaking the row. */
+.led-arena-teams.is-row .led-arena-team-name { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.15; font-size: 2.05cqh; }
+.led-arena-teams.is-row .led-arena-team-right { flex-direction: row-reverse; text-align: right; }
+.led-arena-teams.is-row .led-arena-team-right .led-arena-team-info { flex-direction: row-reverse; }
+.led-arena-teams.is-row .led-arena-vs { flex: none; padding: .3cqh .8cqh; border-radius: .6cqh; background: rgb(3 22 47 / .07); color: var(--led-card-head); }
+.led-arena-teams.is-row .led-arena-vs::before,
+.led-arena-teams.is-row .led-arena-vs::after { content: none; }
 .led-ground-schedule {
   flex: .95 1 0;
   min-width: 0;
@@ -692,6 +693,11 @@
   color: var(--led-muted);
   flex: none;
 }
+/* Matchup without the time: both names get equal halves, "vs" in the middle. */
+.led-sched-item .led-sched-item-matchup { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: .8cqh; font-size: 1.7cqh; }
+.led-sched-team { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.led-sched-team:last-child { text-align: right; }
+.led-sched-item { padding: .7cqh 1cqw; }
 .led-sched-empty {
   display: grid;
   place-items: center;

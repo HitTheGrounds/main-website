@@ -129,15 +129,14 @@ class ScorerGroundsScreenTest extends TestCase
             ->assertSee('G3')
             ->assertSee('G4')
             // In-progress match on Ground 1
-            ->assertSee('LIVE NOW')
+            ->assertSee('In progress: Alpha Titans versus Beta Warriors')
             ->assertSee('Alpha Titans')
             ->assertSee('Beta Warriors')
-            ->assertSee('Bats first')
             // Upcoming match on Ground 1
             ->assertSee('Gamma Strikers')
             ->assertSee('Delta Knights')
             // Ground 2 upcoming
-            ->assertSee('NEXT:')
+            ->assertSee('Next match: Beta Warriors versus Gamma Strikers')
             // Ground 4 has no matches
             ->assertSee('Ground available')
             // 2:1 ratio LED viewport and stage

@@ -42,7 +42,7 @@ class KnockoutIntegrity
     /** Completed proposals only. Incomplete result drafts remain permitted. */
     public function assertFinishedResult(TournamentMatch $match, array $result): void
     {
-        if (! in_array($match->stage, ['QF', 'SF', 'F'], true)) {
+        if (! in_array($match->stage, ['PO', 'QF', 'SF', 'F'], true)) {
             return;
         }
         if (($result['result_type'] ?? null) !== 'win' || $match->team1_id === $match->team2_id

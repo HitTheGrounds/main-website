@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\GroupTeam;
 use App\Models\TournamentMatch;
 use App\Services\Tournament\KnockoutDependencies;
 use Illuminate\Validation\ValidationException;
@@ -14,6 +15,25 @@ class KnockoutDependenciesTest extends TestCase
     {
         return (new TournamentMatch)->forceFill(['id' => 11, 'tournament_year' => 2026, 'stage' => $stage, 'team1_id' => 1,
             'team2_id' => 2, 'status' => 'finished', 'result_type' => 'win', 'winner_id' => 1, 'result_published_at' => now()]);
+    }
+
+    public function test_playoff_correction_requires_another_qualification_source_for_the_quarter_participant(): void
+    {
+        $before = $this->source('PO');
+        $proposed = clone $before;
+        $proposed->winner_id = 2;
+        $dependent = $this->source('QF');
+        $dependent->id = 22;
+        $guard = app(KnockoutDependencies::class);
+        try {
+            $guard->assertChange($before, $proposed, [$before, $dependent]);
+            $this->fail('Removed the only qualification source for a quarter-final participant.');
+        } catch (ValidationException $exception) {
+            $this->assertStringContainsString('QF match #22', $exception->errors()['tournament'][0]);
+        }
+        $assignment = (new GroupTeam)->forceFill(['tournament_year' => 2026, 'team_id' => 1, 'qualified' => true]);
+        $guard->assertChange($before, $proposed, [$before, $dependent], [$assignment]);
+        $this->assertSame(1, $before->winner_id);
     }
 
     public static function invalidatedWins(): array

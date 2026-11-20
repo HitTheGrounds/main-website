@@ -53,7 +53,7 @@ class PublicTournamentService
         }
         $filters = array_map(fn ($value) => $value === '' ? null : $value, $filters);
         $filters = Validator::make($filters, [
-            'stage' => ['nullable', 'string', Rule::in(['G', 'QF', 'SF', 'F'])],
+            'stage' => ['nullable', 'string', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', 'string', Rule::in(['upcoming', 'live', 'finished'])],
             'group_id' => ['nullable', 'integer', 'min:1'],
             'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
@@ -202,7 +202,7 @@ class PublicTournamentService
 
             // Tournament-wide clocks, not the request time or mutable summary updated_at.
             // Match-result publication can also change player-award eligibility.
-            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F']);
+            $publications = TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year));
 
             return ['year' => $year, 'category' => $category, 'gender' => $gender, 'entries' => $entries,
                 'publication_times' => [
@@ -289,7 +289,7 @@ class PublicTournamentService
 
     private function visibleMatches(int $year): Builder
     {
-        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', ['G', 'QF', 'SF', 'F'])
+        return TournamentMatch::where('tournament_year', $year)->whereIn('stage', app(PlayoffFeature::class)->stages($year))
             ->where(fn ($query) => $query->whereIn('status', ['upcoming', 'live'])
                 ->orWhere(fn ($finished) => $finished->where('status', 'finished')->whereNotNull('result_published_at')));
     }

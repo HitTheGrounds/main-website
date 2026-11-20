@@ -44,6 +44,13 @@
 .scorer-screen h2 { letter-spacing: -.025em; }
 .scorer-screen .label { display: block; margin-bottom: .25rem; white-space: normal; font-weight: 700; }
 .scorer-screen :is(.input,.select,.textarea) { min-height: 44px; min-width: 0; max-width: 100%; font-size: 1rem; border-color: var(--color-neutral); background-color: var(--scorer-paper); }
+/* Use native pickers so fixture choices remain reachable near the viewport edge. */
+.scorer-screen select.select {
+  appearance: auto;
+  background-image: none;
+  padding-inline-end: .75rem;
+}
+.scorer-screen select.select::picker(select) { appearance: auto; }
 .scorer-screen .btn { min-height: 44px; height: auto; padding-block: .5rem; white-space: normal; text-transform: none; text-align: center; border-radius: .625rem; }
 .scorer-screen .badge { height: auto; min-height: 1.5rem; white-space: normal; }
 .scorer-workspace :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible { outline: 2px solid var(--color-primary-ink); outline-offset: 3px; }

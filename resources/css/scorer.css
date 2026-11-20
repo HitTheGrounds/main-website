@@ -258,12 +258,12 @@
 .sd-filter-actions { display: flex; gap: .5rem; align-items: end; }
 .sd-filter-actions .btn-secondary { flex: 1; }
 @media (min-width: 640px) {
-  .sd-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sd-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sd-filter-actions { grid-column: 1 / -1; justify-content: flex-end; }
   .sd-filter-actions .btn-secondary { flex: none; }
 }
 @media (min-width: 1024px) {
-  .sd-filters { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+  .sd-filters { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
   .sd-filter-actions { grid-column: auto; }
 }
 

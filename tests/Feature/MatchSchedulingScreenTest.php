@@ -140,6 +140,34 @@ class MatchSchedulingScreenTest extends TestCase
             ->assertSet('filters.stage', 'G');
     }
 
+    public function test_venue_filter_combines_with_existing_filters_resets_pagination_and_clears(): void
+    {
+        $this->scorer();
+        foreach (range(1, 11) as $number) {
+            $input = $this->fixture(2026, 'Group '.$number);
+            app(MatchSchedulingService::class)->create(2026, 3, $input,
+                ['venue' => $number === 1 ? 'Ground 1' : 'Ground 2', 'status' => 'upcoming']);
+        }
+        $input = $this->fixture(2026, 'Live group');
+        $live = app(MatchSchedulingService::class)->create(2026, 3, $input, ['venue' => 'Ground 1', 'status' => 'live']);
+
+        $component = Volt::test('scorer.matches-manager')->assertSee('All venues')
+            ->call('gotoPage', 2)->assertSet('paginators.page', 2)
+            ->set('filterForm.venue', 'Ground 1')->call('applyFilters')->assertHasNoErrors()
+            ->assertSet('paginators.page', 1)->assertSee('Matches found: 2')
+            ->set('filterForm.group_id', (string) $input['group_id'])->set('filterForm.stage', 'G')
+            ->set('filterForm.status', 'live')->call('applyFilters')->assertHasNoErrors()
+            ->assertSee('Matches found: 1');
+        $this->assertSame([$live->id], app(MatchSchedulingService::class)->listing(2026, [
+            'venue' => 'Ground 1', 'group_id' => $input['group_id'], 'stage' => 'G', 'status' => 'live',
+        ])->getCollection()->modelKeys());
+
+        $component->set('filterForm.venue', 'Ground 9')->call('applyFilters')->assertHasErrors('venue')
+            ->assertSet('filters.venue', 'Ground 1')
+            ->call('clearFilters')->assertHasNoErrors()->assertSet('filters', [])
+            ->assertSet('filterForm.venue', '')->assertSee('Matches found: 12');
+    }
+
     public function test_unapproved_teams_and_other_year_groups_are_not_offered_and_names_are_escaped(): void
     {
         $this->scorer();

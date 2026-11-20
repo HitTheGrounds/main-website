@@ -29,12 +29,13 @@ class MatchSchedulingService
     public function listing(int $year, array $filters = []): LengthAwarePaginator
     {
         $query = $this->readQuery($year);
-        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id'])) {
+        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'venue'])) {
             $this->reject('tournament', 'Select valid match filters.');
         }
         $filters = Validator::make($filters, [
             'stage' => ['nullable', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', Rule::in(['upcoming', 'live', 'finished'])],
+            'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
             // A removed/other-year group simply has no matching fixtures. Do not
             // break an open dashboard if an unused group is deleted elsewhere.
             'group_id' => ['nullable', 'integer', 'min:1'],

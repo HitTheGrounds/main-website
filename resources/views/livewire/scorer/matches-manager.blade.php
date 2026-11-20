@@ -25,7 +25,7 @@ new class extends Component {
     public ?string $fixtureRevision = null;
     #[Locked]
     public array $fixtureTeams = [];
-    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => ''];
+    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => '', 'venue' => ''];
     public string $notice = '';
     // Which popup is open: '' (none), 'create' or 'edit'. UI state only; the
     // browser can change it freely, so nothing security-relevant depends on it.
@@ -534,6 +534,7 @@ new class extends Component {
             <label><span class="label">Group filter</span><select wire:model="filterForm.group_id" class="select w-full"><option value="">All groups</option>@foreach($groups as $group)<option value="{{ $group['id'] }}">{{ $group['name'] }}</option>@endforeach</select></label>
             <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option>@foreach($stageLabels as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach</select></label>
             <label><span class="label">Status filter</span><select wire:model="filterForm.status" class="select w-full"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="live">In progress</option><option value="finished">Finished</option></select></label>
+            <label><span class="label">Venue filter</span><select wire:model="filterForm.venue" class="select w-full"><option value="">All venues</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
             <div class="sd-filter-actions">
                 <button type="submit" wire:loading.attr="disabled" class="btn btn-secondary">
                     <x-scorer.icon name="filter" /> Apply filters

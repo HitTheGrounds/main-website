@@ -59,7 +59,7 @@ class PublicPlayerListsTest extends TestCase
     #[DataProvider('categories')]
     public function test_each_category_renders_selected_figure_and_team(string $category, string $heading): void
     {
-        $this->summary('Known player', 50, 'Female', ['wickets_taken' => 2, 'wickets_taken_recorded_count' => 1,
+        $this->summary('Known player', 50, in_array($category, ['wickets', 'dot_balls'], true) ? 'Male' : 'Female', ['wickets_taken' => 2, 'wickets_taken_recorded_count' => 1,
             'fours' => 6, 'fours_recorded_count' => 2, 'sixes' => 3, 'sixes_recorded_count' => 1,
             'dot_balls' => 8, 'dot_balls_recorded_count' => 2]);
         $teamName = DB::table('teams')->value('team_name');

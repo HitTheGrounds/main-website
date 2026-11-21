@@ -29,24 +29,38 @@ class MatchSchedulingService
     public function listing(int $year, array $filters = []): LengthAwarePaginator
     {
         $query = $this->readQuery($year);
-        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'venue'])) {
+        if (array_diff(array_keys($filters), ['stage', 'status', 'group_id', 'venue', 'sort'])) {
             $this->reject('tournament', 'Select valid match filters.');
         }
         $filters = Validator::make($filters, [
             'stage' => ['nullable', Rule::in(app(PlayoffFeature::class)->stages($year))],
             'status' => ['nullable', Rule::in(['upcoming', 'live', 'finished'])],
             'venue' => ['nullable', 'string', Rule::in(config('tournament.venues'))],
+            'sort' => ['nullable', Rule::in(['upcoming_first', 'scheduled_asc'])],
             // A removed/other-year group simply has no matching fixtures. Do not
             // break an open dashboard if an unused group is deleted elsewhere.
             'group_id' => ['nullable', 'integer', 'min:1'],
         ])->validate();
         foreach ($filters as $field => $value) {
-            if ($value !== null && $value !== '') {
+            if ($field !== 'sort' && $value !== null && $value !== '') {
                 $query->where($field, $value);
             }
         }
 
-        return $query->orderByDesc('id')->paginate(10);
+        $sort = $filters['sort'] ?? 'upcoming_first';
+        // Keep unscheduled fixtures last on both SQLite and PostgreSQL.
+        $query->orderByRaw('CASE WHEN scheduled_at IS NULL THEN 1 ELSE 0 END');
+        if ($sort === 'upcoming_first') {
+            // Schedules are entered in Sri Lankan time and stored in UTC.
+            $now = CarbonImmutable::now(config('tournament.timezone'))->utc();
+            $query->orderByRaw('CASE WHEN scheduled_at >= ? THEN 0 ELSE 1 END', [$now])
+                ->orderByRaw('CASE WHEN scheduled_at >= ? THEN scheduled_at END ASC', [$now])
+                ->orderByRaw('CASE WHEN scheduled_at < ? THEN scheduled_at END DESC', [$now]);
+        } else {
+            $query->orderBy('scheduled_at');
+        }
+
+        return $query->orderBy('id')->paginate(10);
     }
 
     public function findForScheduling(int $year, int $matchId): TournamentMatch

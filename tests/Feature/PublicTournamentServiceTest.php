@@ -103,8 +103,8 @@ class PublicTournamentServiceTest extends TestCase
         [$other, $otherTeams] = $this->fixture(2, 2027);
         $this->match($other, $otherTeams[0]->id, $otherTeams[1]->id, ['tournament_year' => 2027]);
         $service = app(PublicTournamentService::class);
-        $first = $service->matches(2026, ['sort' => 'newest']);
-        $second = $service->matches(2026, ['sort' => 'newest', 'page' => '2']);
+        $first = $service->matches(2026, ['sort' => 'scheduled_asc']);
+        $second = $service->matches(2026, ['sort' => 'scheduled_asc', 'page' => '2']);
         $this->assertCount(12, $first['matches']);
         $this->assertCount(2, $second['matches']);
         $this->assertSame(14, $first['pagination']['total']);
@@ -115,14 +115,14 @@ class PublicTournamentServiceTest extends TestCase
         $this->assertSame([], $service->matches(2026, ['page' => 3])['matches']);
     }
 
-    public function test_allowlisted_filters_and_null_last_update_order_are_stable(): void
+    public function test_allowlisted_filters_and_unscheduled_order_are_stable(): void
     {
         [$group, $teams] = $this->fixture(4);
         $without = $this->match($group, $teams[0]->id, $teams[1]->id, ['updated_at' => null]);
         $later = $this->match($group, $teams[0]->id, $teams[2]->id, ['status' => 'live', 'updated_at' => '2026-11-20 04:00:00']);
         $earlier = $this->match($group, $teams[0]->id, $teams[3]->id, ['updated_at' => '2026-11-20 03:00:00']);
         $service = app(PublicTournamentService::class);
-        $this->assertSame([$later->id, $earlier->id, $without->id], array_column($service->matches(2026)['matches'], 'id'));
+        $this->assertSame([$without->id, $later->id, $earlier->id], array_column($service->matches(2026)['matches'], 'id'));
         $this->assertSame([$later->id], array_column($service->matches(2026, ['status' => 'live', 'stage' => 'G', 'group_id' => $group])['matches'], 'id'));
         $this->assertSame([], $service->matches(2026, ['stage' => 'F'])['matches']);
     }

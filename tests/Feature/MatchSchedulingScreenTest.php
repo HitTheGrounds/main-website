@@ -140,6 +140,45 @@ class MatchSchedulingScreenTest extends TestCase
             ->assertSet('filters.stage', 'G');
     }
 
+    public function test_schedule_sorting_puts_nearest_upcoming_first_and_unscheduled_last(): void
+    {
+        $this->scorer();
+        $localNow = \Carbon\CarbonImmutable::parse('2026-11-21 00:00:00', 'Asia/Colombo');
+        $this->travelTo($localNow);
+        $matches = [];
+        foreach (['near' => $localNow->addMinutes(15), 'far' => $localNow->addDays(2),
+            'past' => $localNow->subMinutes(15), 'older' => $localNow->subDays(2),
+            'same' => $localNow->addMinutes(15), 'unscheduled' => null] as $name => $time) {
+            $matches[$name] = app(MatchSchedulingService::class)->create(2026, 3, $this->fixture(2026, $name),
+                ['scheduled_at' => $time?->format('Y-m-d\TH:i')]);
+        }
+
+        $service = app(MatchSchedulingService::class);
+        $ids = fn (array $names) => array_map(fn ($name) => $matches[$name]->id, $names);
+        $this->assertSame($ids(['near', 'same', 'far', 'past', 'older', 'unscheduled']),
+            $service->listing(2026)->getCollection()->modelKeys());
+        $this->assertSame($ids(['older', 'past', 'near', 'same', 'far', 'unscheduled']),
+            $service->listing(2026, ['sort' => 'scheduled_asc'])->getCollection()->modelKeys());
+    }
+
+    public function test_sort_filter_combines_with_status_resets_pagination_and_clears(): void
+    {
+        $this->scorer();
+        foreach (range(1, 11) as $number) {
+            app(MatchSchedulingService::class)->create(2026, 3, $this->fixture(2026, 'Group '.$number));
+        }
+
+        Volt::test('scorer.matches-manager')->assertSee('Nearest upcoming first')
+            ->call('gotoPage', 2)->assertSet('paginators.page', 2)
+            ->set('filterForm.sort', 'scheduled_asc')->set('filterForm.status', 'upcoming')
+            ->call('applyFilters')->assertHasNoErrors()->assertSet('paginators.page', 1)
+            ->assertSet('filters.sort', 'scheduled_asc')->assertSee('Matches found: 11. Scheduled time: first to last.')
+            ->set('filterForm.sort', 'invalid')->call('applyFilters')->assertHasErrors('sort')
+            ->assertSet('filters.sort', 'scheduled_asc')
+            ->call('clearFilters')->assertHasNoErrors()->assertSet('filters', [])
+            ->assertSet('filterForm.sort', 'upcoming_first')->assertSee('Matches found: 11. Nearest upcoming first.');
+    }
+
     public function test_venue_filter_combines_with_existing_filters_resets_pagination_and_clears(): void
     {
         $this->scorer();

@@ -109,7 +109,7 @@ class PublicTournamentMatchesTest extends TestCase
         foreach ($teams->skip(1) as $team) {
             $this->match($group, $teams[0]->id, $team->id, ['status' => 'live']);
         }
-        $query = ['tab' => 'matches', 'stage' => 'G', 'status' => 'live', 'group_id' => $group, 'sort' => 'newest'];
+        $query = ['tab' => 'matches', 'stage' => 'G', 'status' => 'live', 'group_id' => $group, 'sort' => 'scheduled_asc'];
         $first = $this->get('/tournament?'.http_build_query([...$query, 'PRIVATE-QUERY' => 'PRIVATE-VALUE']))
             ->assertOk()->assertSee('method="GET"', false)->assertSee('Apply filters')->assertSee('Page 1 of 2')
             ->assertSee(route('tournament.index', [...$query, 'page' => 2]))->assertDontSee('PRIVATE-VALUE');
@@ -128,32 +128,37 @@ class PublicTournamentMatchesTest extends TestCase
     }
 
     #[DataProvider('matchStatuses')]
-    public function test_status_tabs_sort_by_latest_update_or_latest_publication(string $status): void
+    public function test_status_tabs_default_to_nearest_schedule_using_sri_lankan_time(string $status): void
     {
-        [$group, $teams] = $this->fixture(6);
+        [$group, $teams] = $this->fixture(7);
+        $now = \Carbon\CarbonImmutable::parse('2026-11-21 00:00:00', 'Asia/Colombo');
+        $this->travelTo($now);
         $ids = [];
-        // Creation order, scheduled time, and updated_at on finished rows must
-        // not override the requested publication/update order.
-        foreach ([['10:00', '12:00'], ['11:00', '09:00'], ['12:00', null], ['08:00', null], ['10:00', null]] as $i => [$result, $players]) {
-            $details = ['status' => $status, 'scheduled_at' => '2026-11-25 20:00:00',
-                'updated_at' => $i === 3 ? null : '2026-11-20 '.(['12:00', '11:00', '12:00', '08:00', '10:00'][$i]).':00'];
+        // Include both sides of Sri Lankan midnight, equal times, and an unset schedule.
+        foreach ([$now->addMinutes(15), $now->addDay(), $now->subMinutes(15),
+            $now->subDays(2), $now->addMinutes(15), null] as $i => $scheduled) {
+            $details = ['status' => $status, 'scheduled_at' => $scheduled?->utc()->format('Y-m-d H:i:s'),
+                'updated_at' => $now->addHours($i)->utc()->format('Y-m-d H:i:s')];
             if ($status === 'finished') {
-                $details += ['result_type' => 'no_result', 'result_published_at' => '2026-11-20 '.$result.':00',
-                    'player_stats_published_at' => $players === null ? null : '2026-11-20 '.$players.':00'];
-                $details['updated_at'] = '2026-11-21 20:00:00';
+                $details += ['result_type' => 'no_result', 'result_published_at' => $now->subHours($i)->utc()->format('Y-m-d H:i:s')];
             }
             $ids[] = $this->match($group, $teams[0]->id, $teams[$i + 1]->id, $details);
         }
-        $expected = [$ids[2], $ids[0], $ids[1], $ids[4], $ids[3]];
+        $expected = [$ids[0], $ids[4], $ids[1], $ids[2], $ids[3], $ids[5]];
         $response = $this->get('/tournament?status='.$status)->assertOk()
-            ->assertSee($status === 'finished' ? 'Latest published first' : 'Latest updated first');
+            ->assertSee('<option value="upcoming_first" selected', false)
+            ->assertSee('Nearest upcoming first')->assertSee('Scheduled time: first to last')
+            ->assertDontSee('Latest published first')->assertDontSee('Latest updated first')->assertDontSee('Newest added');
         $this->assertSame($expected, array_column($response->viewData('matchData')['matches'], 'id'));
         if ($status === 'finished') {
             $this->assertSame($expected,
                 array_column($this->get('/tournament')->assertOk()->viewData('matchData')['matches'], 'id'));
         }
-        $this->assertSame($expected, array_column($this->get('/tournament?status='.$status.'&sort=schedule')
-            ->assertOk()->viewData('matchData')['matches'], 'id'));
+        $chronological = $this->get('/tournament?status='.$status.'&sort=scheduled_asc')->assertOk()
+            ->assertSee('<option value="scheduled_asc" selected', false)
+            ->assertSee(route('tournament.index', ['tab' => 'matches', 'status' => 'live', 'sort' => 'scheduled_asc']));
+        $this->assertSame([$ids[3], $ids[2], $ids[0], $ids[4], $ids[1], $ids[5]],
+            array_column($chronological->viewData('matchData')['matches'], 'id'));
     }
 
     public function test_empty_edition_and_escaped_public_text(): void

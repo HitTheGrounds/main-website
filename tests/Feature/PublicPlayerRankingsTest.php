@@ -35,18 +35,27 @@ class PublicPlayerRankingsTest extends TestCase
         return $member->id;
     }
 
-    public function test_tournament_wickets_tab_only_ranks_male_players(): void
+    public static function maleOnlyCategories(): array
+    {
+        return [
+            ['wickets', 'wickets_taken', 'Most wickets'],
+            ['dot_balls', 'dot_balls', 'Dot ball dominators'],
+        ];
+    }
+
+    #[DataProvider('maleOnlyCategories')]
+    public function test_tournament_bowling_tabs_only_rank_male_players(string $category, string $metric, string $caption): void
     {
         config(['tournament.year' => 2026]);
         Route::middleware('web')->group(base_path('routes/tournament.php'));
         Route::getRoutes()->refreshNameLookups();
 
-        $male = $this->summary(10, 'Male', ['wickets_taken' => 2, 'wickets_taken_recorded_count' => 1]);
-        $female = $this->summary(20, 'Female', ['wickets_taken' => 5, 'wickets_taken_recorded_count' => 1]);
-        $other = $this->summary(30, 'Other', ['wickets_taken' => 4, 'wickets_taken_recorded_count' => 1]);
+        $male = $this->summary(10, 'Male', [$metric => 2, $metric.'_recorded_count' => 1]);
+        $female = $this->summary(20, 'Female', [$metric => 5, $metric.'_recorded_count' => 1]);
+        $other = $this->summary(30, 'Other', [$metric => 4, $metric.'_recorded_count' => 1]);
 
-        $response = $this->get('/tournament?tab=stats&category=wickets&gender=Female')
-            ->assertOk()->assertSee('Player (Male)')->assertSee('Most wickets, Male players')
+        $response = $this->get('/tournament?tab=stats&category='.$category.'&gender=Female')
+            ->assertOk()->assertSee('Player (Male)')->assertSee($caption.', Male players')
             ->assertSee('Published name '.$male)
             ->assertDontSee('Published name '.$female)->assertDontSee('Published name '.$other);
         $ranking = $response->viewData('rankingData');

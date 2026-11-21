@@ -6,6 +6,7 @@ use App\Models\TeamMember;
 use App\Services\Tournament\PublicTournamentService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -32,6 +33,30 @@ class PublicPlayerRankingsTest extends TestCase
         ], $changes));
 
         return $member->id;
+    }
+
+    public function test_tournament_wickets_tab_only_ranks_male_players(): void
+    {
+        config(['tournament.year' => 2026]);
+        Route::middleware('web')->group(base_path('routes/tournament.php'));
+        Route::getRoutes()->refreshNameLookups();
+
+        $male = $this->summary(10, 'Male', ['wickets_taken' => 2, 'wickets_taken_recorded_count' => 1]);
+        $female = $this->summary(20, 'Female', ['wickets_taken' => 5, 'wickets_taken_recorded_count' => 1]);
+        $other = $this->summary(30, 'Other', ['wickets_taken' => 4, 'wickets_taken_recorded_count' => 1]);
+
+        $response = $this->get('/tournament?tab=stats&category=wickets&gender=Female')
+            ->assertOk()->assertSee('Player (Male)')->assertSee('Most wickets, Male players')
+            ->assertSee('Published name '.$male)
+            ->assertDontSee('Published name '.$female)->assertDontSee('Published name '.$other);
+        $ranking = $response->viewData('rankingData');
+        $this->assertSame([$male], array_column($ranking['entries'], 'player_id'));
+        $this->assertSame([$male], $ranking['leader_ids']);
+        $this->assertSame(1, $ranking['entries'][0]['rank']);
+
+        $runs = $this->get('/tournament?tab=stats&category=runs')->assertOk()
+            ->assertSee('Most runs, All players')->assertDontSee('Player (Male)');
+        $this->assertSame([$other, $female, $male], array_column($runs->viewData('rankingData')['entries'], 'player_id'));
     }
 
     public function test_top_five_includes_every_cutoff_tie_and_keeps_joint_leaders(): void

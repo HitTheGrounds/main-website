@@ -55,7 +55,7 @@ class PublicTournamentController extends Controller
         if ($tab === 'stats') {
             try {
                 $rankingFilters = array_intersect_key($request->query(), ['category' => true]);
-                if (($rankingFilters['category'] ?? null) === 'wickets') {
+                if (in_array($rankingFilters['category'] ?? null, ['wickets', 'dot_balls'], true)) {
                     $rankingFilters['gender'] = 'Male';
                 }
                 $rankingData = $tournament->rankings($year, $rankingFilters);

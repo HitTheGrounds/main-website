@@ -25,7 +25,7 @@ new class extends Component {
     public ?string $fixtureRevision = null;
     #[Locked]
     public array $fixtureTeams = [];
-    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => '', 'venue' => ''];
+    public array $filterForm = ['group_id' => '', 'stage' => '', 'status' => '', 'venue' => '', 'sort' => 'upcoming_first'];
     public string $notice = '';
     // Which popup is open: '' (none), 'create' or 'edit'. UI state only; the
     // browser can change it freely, so nothing security-relevant depends on it.
@@ -328,7 +328,9 @@ new class extends Component {
 }; ?>
 
 @php
-    $activeFilters = collect($filters)->filter(fn ($value) => $value !== null && $value !== '')->count();
+    $activeFilters = collect($filters)->except('sort')->filter(fn ($value) => $value !== null && $value !== '')->count()
+        + (int) (($filters['sort'] ?? 'upcoming_first') !== 'upcoming_first');
+    $sortLabels = ['upcoming_first' => 'Nearest upcoming first', 'scheduled_asc' => 'Scheduled time: first to last'];
 @endphp
 <div class="scorer-screen sd-screen space-y-5" x-data="{ panel: $wire.entangle('panel') }">
     <header class="scorer-heading sd-heading">
@@ -527,7 +529,7 @@ new class extends Component {
     <section class="sd-matches" aria-labelledby="match-list-heading">
         <div class="sd-matches-head">
             <h2 id="match-list-heading">Matches</h2>
-            <p class="sd-count">Matches found: {{ $matches->total() }}. Newest first.</p>
+            <p class="sd-count">Matches found: {{ $matches->total() }}. {{ $sortLabels[$filters['sort'] ?? 'upcoming_first'] }}.</p>
         </div>
 
         <form wire:submit="applyFilters" class="sd-filters" aria-label="Filter matches">
@@ -535,6 +537,7 @@ new class extends Component {
             <label><span class="label">Stage filter</span><select wire:model="filterForm.stage" class="select w-full"><option value="">All stages</option>@foreach($stageLabels as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach</select></label>
             <label><span class="label">Status filter</span><select wire:model="filterForm.status" class="select w-full"><option value="">All statuses</option><option value="upcoming">Upcoming</option><option value="live">In progress</option><option value="finished">Finished</option></select></label>
             <label><span class="label">Venue filter</span><select wire:model="filterForm.venue" class="select w-full"><option value="">All venues</option>@foreach(config('tournament.venues') as $venue)<option value="{{ $venue }}">{{ $venue }}</option>@endforeach</select></label>
+            <label><span class="label">Sort by</span><select wire:model="filterForm.sort" class="select w-full">@foreach($sortLabels as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach</select></label>
             <div class="sd-filter-actions">
                 <button type="submit" wire:loading.attr="disabled" class="btn btn-secondary">
                     <x-scorer.icon name="filter" /> Apply filters

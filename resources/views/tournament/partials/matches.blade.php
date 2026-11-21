@@ -12,9 +12,10 @@
         $pagination = $matchData['pagination'];
         $currentStatus = $filters['status'] ?? 'finished';
         // Status is chosen with the tabs, so only stage, group, venue and order count as filters here.
-        $hasFilters = $filters['stage'] !== null || $filters['group_id'] !== null || $filters['venue'] !== null;
+        $hasFilters = $filters['stage'] !== null || $filters['group_id'] !== null || $filters['venue'] !== null
+            || $filters['sort'] !== 'upcoming_first';
         $keptFilters = array_filter(['stage' => $filters['stage'], 'group_id' => $filters['group_id'], 'venue' => $filters['venue'],
-            'sort' => $filters['sort'] !== 'recent' ? $filters['sort'] : null], fn ($value) => $value !== null);
+            'sort' => $filters['sort'] !== 'upcoming_first' ? $filters['sort'] : null], fn ($value) => $value !== null);
         $emptyStatus = ['finished' => 'No finished matches have published results yet.',
             'upcoming' => 'No upcoming matches are scheduled right now.', 'live' => 'No matches are in progress right now.'];
     @endphp
@@ -28,7 +29,7 @@
         @endforeach
     </nav>
 
-    <details class="tc-filter tc-filter-matches" @if ($hasFilters || $filters['sort'] !== 'recent') open @endif>
+    <details class="tc-filter tc-filter-matches" @if ($hasFilters) open @endif>
         <summary>
             <svg class="tc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
             Filter matches
@@ -65,10 +66,10 @@
                 </select>
             </div>
             <div>
-                <label for="match-sort" class="mb-2 block font-semibold">Order</label>
+                <label for="match-sort" class="mb-2 block font-semibold">Sort by</label>
                 <select id="match-sort" name="sort" class="select w-full">
-                    <option value="recent" @selected($filters['sort'] === 'recent')>{{ $currentStatus === 'finished' ? 'Latest published first' : 'Latest updated first' }}</option>
-                    <option value="newest" @selected($filters['sort'] === 'newest')>Newest added</option>
+                    <option value="upcoming_first" @selected($filters['sort'] === 'upcoming_first')>Nearest upcoming first</option>
+                    <option value="scheduled_asc" @selected($filters['sort'] === 'scheduled_asc')>Scheduled time: first to last</option>
                 </select>
             </div>
             <div class="tc-form-actions">

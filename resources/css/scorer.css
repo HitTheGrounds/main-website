@@ -974,7 +974,10 @@
   .sd-filter-actions .btn-secondary { flex: none; }
 }
 @media (min-width: 1024px) {
-  .sd-filters { grid-template-columns: repeat(4, minmax(0, 1fr)) auto; }
+  .sd-filters { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+@media (min-width: 1280px) {
+  .sd-filters { grid-template-columns: repeat(5, minmax(0, 1fr)) auto; }
   .sd-filter-actions { grid-column: auto; }
 }
 

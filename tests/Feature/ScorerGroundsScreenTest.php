@@ -63,6 +63,37 @@ class ScorerGroundsScreenTest extends TestCase
         }
     }
 
+    public function test_ground_queues_use_nearest_upcoming_order_without_filter_controls(): void
+    {
+        $now = CarbonImmutable::parse('2026-11-21 00:00:00', 'Asia/Colombo');
+        $this->travelTo($now->utc());
+        $teams = Team::factory()->count(2)->create(['approved' => true]);
+        $ids = [];
+        foreach (['older' => $now->subDays(2), 'far' => $now->addDay(),
+            'past' => $now->subMinutes(15), 'near' => $now->addMinutes(15),
+            'same' => $now->addMinutes(15), 'unscheduled' => null] as $name => $time) {
+            $ids[$name] = DB::table('matches')->insertGetId([
+                'tournament_year' => 2026, 'stage' => 'G', 'team1_id' => $teams[0]->id,
+                'team2_id' => $teams[1]->id, 'status' => 'upcoming', 'venue' => 'Ground 1',
+                'balls_per_over' => 4, 'overs_per_innings' => 5, 'max_wickets' => 7,
+                'scheduled_at' => $time?->utc()->toDateTimeString(),
+            ]);
+        }
+        $scorer = User::factory()->create(['is_admin' => false, 'company_id' => null, 'is_scorer' => true]);
+        $response = $this->signedIn($scorer)->get('/scorer/screen/grounds')->assertOk()
+            ->assertDontSee('Apply filters')->assertDontSee('Sort by')->assertDontSee('<select', false);
+        $ground = $response->viewData('groundsData')['grounds'][0];
+        $this->assertSame(array_map(fn ($name) => $ids[$name], ['near', 'same', 'far', 'past', 'older', 'unscheduled']),
+            array_column($ground['upcoming_matches'], 'id'));
+        $this->assertNull($ground['live_match']);
+
+        // Time alone advances the queue on the LED screen's periodic reload.
+        $this->travelTo($now->addHour()->utc());
+        $ground = $this->get('/scorer/screen/grounds')->assertOk()->viewData('groundsData')['grounds'][0];
+        $this->assertSame(array_map(fn ($name) => $ids[$name], ['far', 'near', 'same', 'past', 'older', 'unscheduled']),
+            array_column($ground['upcoming_matches'], 'id'));
+    }
+
     public function test_screen_renders_four_grounds_and_matches_without_navbars(): void
     {
         $team1 = Team::factory()->create(['team_name' => 'Alpha Titans', 'approved' => true]);

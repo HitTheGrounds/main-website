@@ -29,12 +29,12 @@
             @endif
             <div role="region" aria-label="Player rankings" tabindex="0" class="overflow-x-auto">
                 <table class="tc-stats-leaderboard">
-                    <caption class="sr-only">{{ $categories[$category] }}, All players</caption>
+                    <caption class="sr-only">{{ $categories[$category] }}, {{ $category === 'wickets' ? 'Male players' : 'All players' }}</caption>
                     <thead>
                         <tr>
                             <th scope="col"><span class="sr-only">Rank</span></th>
                             <th scope="col" class="tc-stats-logo"><span class="sr-only">Team</span></th>
-                            <th scope="col">Player</th>
+                            <th scope="col">{{ $category === 'wickets' ? 'Player (Male)' : 'Player' }}</th>
                             @if ($rateLabel)
                                 <th scope="col" class="tc-stats-rate">{{ $rateLabel }}</th>
                             @endif
